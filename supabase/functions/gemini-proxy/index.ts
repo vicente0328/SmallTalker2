@@ -170,6 +170,24 @@ ${hasHistory ? "주의: 이미 아는 사이. 초면 인사 금지. 지난 대�
       });
     }
 
+    if (action === 'searchRelated') {
+      const { tipContent, tipType } = payload;
+      const text = await callClaude(apiKey,
+        `다음 ${tipType === 'business' ? '비즈니스' : '라이프스타일'} 대화 팁과 관련된 최신 뉴스나 아티클을 찾기 위한 구체적인 검색 키워드를 5개 생성하세요.
+각 키워드는 Google 검색에 바로 사용할 수 있는 형태여야 합니다.
+한국어와 영어 키워드를 섞어서 생성하세요.
+
+팁 내용: "${tipContent}"
+
+각 항목에 title(검색 결과 제목으로 보여줄 간결한 설명)과 query(실제 검색 쿼리)를 포함하세요.`,
+        { results: [{ title: "string", query: "string" }] }
+      );
+      const json = text.replace(/^```json?\s*/i, '').replace(/```\s*$/i, '').trim();
+      return new Response(json, {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     throw new Error('정의되지 않은 액션입니다.');
 
   } catch (error: any) {

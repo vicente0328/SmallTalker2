@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@^2.45.4';
 import { Contact, Meeting, UserProfile, SmallTalkGuide } from '../types';
-import { generateGuideStreaming } from '../services/geminiService';
+import { generateGuideStreaming, searchRelatedArticles, RelatedArticle } from '../services/geminiService';
 import { CURRENT_DATE } from '../constants';
 
 interface MeetingDetailViewProps {
@@ -37,6 +37,12 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
   const [loadingStage, setLoadingStage] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [noteContent, setNoteContent] = useState(meeting.userNote || "");
+  const [businessArticles, setBusinessArticles] = useState<RelatedArticle[]>([]);
+  const [lifeArticles, setLifeArticles] = useState<RelatedArticle[]>([]);
+  const [loadingBusinessArticles, setLoadingBusinessArticles] = useState(false);
+  const [loadingLifeArticles, setLoadingLifeArticles] = useState(false);
+  const [showBusinessArticles, setShowBusinessArticles] = useState(false);
+  const [showLifeArticles, setShowLifeArticles] = useState(false);
 
   const meetingDate = new Date(meeting.date);
   const isPastMeeting = meetingDate < CURRENT_DATE;
@@ -133,6 +139,53 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
         await onUpdateNote(meeting.id, noteContent);
     }
   };
+
+  const handleSearchBusiness = async (content: string) => {
+    setShowBusinessArticles(true);
+    if (businessArticles.length > 0) return;
+    setLoadingBusinessArticles(true);
+    const articles = await searchRelatedArticles(content, 'business');
+    setBusinessArticles(articles);
+    setLoadingBusinessArticles(false);
+  };
+
+  const handleSearchLife = async (content: string) => {
+    setShowLifeArticles(true);
+    if (lifeArticles.length > 0) return;
+    setLoadingLifeArticles(true);
+    const articles = await searchRelatedArticles(content, 'lifestyle');
+    setLifeArticles(articles);
+    setLoadingLifeArticles(false);
+  };
+
+  const renderArticleList = (articles: RelatedArticle[], isLoading: boolean) => (
+    <div className="mt-4 pt-3 border-t border-slate-100 space-y-2">
+      {isLoading ? (
+        <div className="flex items-center gap-2 py-2">
+          <div className="w-4 h-4 border-2 border-indigo-500 rounded-full border-t-transparent animate-spin"></div>
+          <span className="text-xs text-slate-400">관련 기사를 검색하고 있습니다...</span>
+        </div>
+      ) : articles.length > 0 ? (
+        articles.map((article, idx) => (
+          <a
+            key={idx}
+            href={article.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 transition-colors group"
+          >
+            <div className="bg-indigo-50 p-1 rounded-md text-indigo-500 flex-shrink-0">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+            </div>
+            <span className="text-xs font-medium text-slate-600 group-hover:text-indigo-600 transition-colors flex-1">{article.title}</span>
+            <svg className="w-3.5 h-3.5 text-slate-300 group-hover:text-indigo-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+          </a>
+        ))
+      ) : (
+        <p className="text-xs text-slate-400 py-2">검색 결과를 찾을 수 없습니다.</p>
+      )}
+    </div>
+  );
 
   const loadingMessages = [
       "과거 미팅 히스토리를 정밀 분석하고 있습니다...",
@@ -282,6 +335,14 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                         출처: {guide.businessTip.source}
                     </div>
                 )}
+                <button
+                  onClick={() => handleSearchBusiness(guide.businessTip.content)}
+                  className="mt-3 flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold hover:bg-blue-100 transition-all"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                  더 알아보기
+                </button>
+                {showBusinessArticles && renderArticleList(businessArticles, loadingBusinessArticles)}
               </div>
 
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-amber-50 relative overflow-hidden">
@@ -292,6 +353,14 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                     <h4 className="text-sm font-bold text-amber-900">Life Style Insight</h4>
                 </div>
                 <p className="text-slate-800 font-semibold text-base leading-relaxed">{guide.lifeTip}</p>
+                <button
+                  onClick={() => handleSearchLife(guide.lifeTip)}
+                  className="mt-3 flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-600 rounded-lg text-xs font-bold hover:bg-amber-100 transition-all"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                  더 알아보기
+                </button>
+                {showLifeArticles && renderArticleList(lifeArticles, loadingLifeArticles)}
               </div>
             </div>
           )}

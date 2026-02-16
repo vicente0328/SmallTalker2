@@ -190,6 +190,32 @@ export const prefetchGuides = async (
   }
 };
 
+export interface RelatedArticle {
+  title: string;
+  url: string;
+}
+
+export const searchRelatedArticles = async (
+  tipContent: string,
+  tipType: 'business' | 'lifestyle'
+): Promise<RelatedArticle[]> => {
+  try {
+    const result = await callEdgeFunction({
+      action: 'searchRelated',
+      payload: { tipContent, tipType },
+    });
+
+    const items = result?.results || [];
+    return items.map((item: { title: string; query: string }) => ({
+      title: item.title,
+      url: `https://www.google.com/search?q=${encodeURIComponent(item.query)}&tbm=nws`,
+    }));
+  } catch (error) {
+    console.error("Search related articles failed:", error);
+    return [];
+  }
+};
+
 export const analyzeNoteForProfileUpdate = async (
     supabase: SupabaseClient,
     note: string,
