@@ -337,10 +337,10 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                 )}
                 <button
                   onClick={() => handleSearchBusiness(guide.businessTip.content)}
-                  className="mt-3 flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold hover:bg-blue-100 transition-all"
+                  className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md hover:shadow-lg transition-all"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                  더 알아보기
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                  관련 뉴스 더 알아보기
                 </button>
                 {showBusinessArticles && renderArticleList(businessArticles, loadingBusinessArticles)}
               </div>
@@ -355,10 +355,10 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                 <p className="text-slate-800 font-semibold text-base leading-relaxed">{guide.lifeTip}</p>
                 <button
                   onClick={() => handleSearchLife(guide.lifeTip)}
-                  className="mt-3 flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-600 rounded-lg text-xs font-bold hover:bg-amber-100 transition-all"
+                  className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500 text-white rounded-xl text-sm font-bold hover:bg-amber-600 shadow-md hover:shadow-lg transition-all"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                  더 알아보기
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                  관련 뉴스 더 알아보기
                 </button>
                 {showLifeArticles && renderArticleList(lifeArticles, loadingLifeArticles)}
               </div>

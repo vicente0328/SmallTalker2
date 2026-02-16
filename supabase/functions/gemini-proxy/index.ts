@@ -17,7 +17,7 @@ async function callClaude(apiKey: string, prompt: string, jsonSchema: Record<str
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-sonnet-4-5-20250929",
       max_tokens: 1024,
       messages: [
         {
@@ -50,7 +50,7 @@ function streamClaude(apiKey: string, prompt: string, jsonSchema: Record<string,
             "anthropic-version": "2023-06-01",
           },
           body: JSON.stringify({
-            model: "claude-haiku-4-5-20251001",
+            model: "claude-sonnet-4-5-20250929",
             max_tokens: 1024,
             stream: true,
             messages: [
@@ -127,7 +127,15 @@ serve(async (req) => {
       const { user, contact, meeting, historyNotes } = payload;
       const hasHistory = historyNotes && historyNotes.trim() !== "";
 
-      const prompt = `비즈니스 미팅 스몰토크 가이드를 작성하세요. 반드시 존댓말(~합니다, ~하세요, ~드립니다)로 작성하세요.
+      const prompt = `비즈니스 미팅 전 스몰토크에서 꺼낼 수 있는 구체적인 대화 주제를 추천하세요. 반드시 존댓말(~합니다, ~하세요, ~드립니다)로 작성하세요.
+
+중요 규칙:
+- 톤앤매너, 말투, 태도에 대한 조언은 하지 마세요.
+- 대신 실제로 꺼낼 수 있는 구체적인 화제/주제를 추천하세요.
+- businessTip: 상대방의 업계, 회사, 직무와 관련된 최신 이슈나 트렌드 기반의 구체적 대화 주제를 추천하세요. (예: "최근 OO업계의 XX 트렌드에 대해 이야기해보세요")
+- lifeTip: 상대방의 관심사/취미/라이프스타일과 관련된 구체적 대화 주제를 추천하세요. (예: "요즘 인기 있는 XX 맛집/여행지/취미 이야기를 꺼내보세요")
+- 각 팁은 반드시 구체적인 주제명이나 키워드를 포함해야 합니다.
+
 사용자: ${user.name}(${user.role}), 파트너: ${contact.name}(${contact.role}, ${contact.company})
 성격: ${contact.personality}, 관심사: ${JSON.stringify(contact.interests)}
 미팅: ${meeting.title}
@@ -136,8 +144,8 @@ ${hasHistory ? "주의: 이미 아는 사이. 초면 인사 금지. 지난 대�
 
       const schema = {
         pastReview: "관계 맥락 요약 (string)",
-        businessTip: { content: "비즈니스 대화 팁 (string)", source: "출처 (string)" },
-        lifeTip: "라이프스타일 대화 팁 (string)"
+        businessTip: { content: "구체적인 비즈니스 스몰토크 주제 추천 (string)", source: "출처나 근거 (string)" },
+        lifeTip: "구체적인 라이프스타일 스몰토크 주제 추천 (string)"
       };
 
       // 스트리밍 여부 확인
@@ -173,13 +181,17 @@ ${hasHistory ? "주의: 이미 아는 사이. 초면 인사 금지. 지난 대�
     if (action === 'searchRelated') {
       const { tipContent, tipType } = payload;
       const text = await callClaude(apiKey,
-        `다음 ${tipType === 'business' ? '비즈니스' : '라이프스타일'} 대화 팁과 관련된 최신 뉴스나 아티클을 찾기 위한 구체적인 검색 키워드를 5개 생성하세요.
-각 키워드는 Google 검색에 바로 사용할 수 있는 형태여야 합니다.
-한국어와 영어 키워드를 섞어서 생성하세요.
+        `다음 ${tipType === 'business' ? '비즈니스' : '라이프스타일'} 스몰토크 주제와 관련된 최신 뉴스 기사를 찾을 수 있는 구체적인 검색 키워드를 5개 생성하세요.
 
-팁 내용: "${tipContent}"
+규칙:
+- 각 키워드는 Google 뉴스 검색에 바로 사용할 수 있는 형태여야 합니다.
+- 최신 트렌드, 뉴스, 업계 동향을 찾을 수 있는 키워드를 생성하세요.
+- 한국어 키워드 위주로 생성하되, 필요시 영어를 섞으세요.
+- title은 "OO 관련 최신 뉴스", "XX 업계 동향" 등 사용자가 이해하기 쉬운 형태로 작성하세요.
 
-각 항목에 title(검색 결과 제목으로 보여줄 간결한 설명)과 query(실제 검색 쿼리)를 포함하세요.`,
+주제 내용: "${tipContent}"
+
+각 항목에 title(사용자에게 보여줄 간결한 설명)과 query(실제 Google 뉴스 검색 쿼리)를 포함하세요.`,
         { results: [{ title: "string", query: "string" }] }
       );
       const json = text.replace(/^```json?\s*/i, '').replace(/```\s*$/i, '').trim();
