@@ -18,7 +18,7 @@ async function callClaude(apiKey: string, prompt: string, jsonSchema: Record<str
     },
     body: JSON.stringify({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 512,
+      max_tokens: 1024,
       messages: [
         {
           role: "user",
@@ -51,7 +51,7 @@ function streamClaude(apiKey: string, prompt: string, jsonSchema: Record<string,
           },
           body: JSON.stringify({
             model: "claude-haiku-4-5-20251001",
-            max_tokens: 512,
+            max_tokens: 1024,
             stream: true,
             messages: [
               {
