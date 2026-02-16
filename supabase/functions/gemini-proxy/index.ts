@@ -127,7 +127,7 @@ serve(async (req) => {
       const { user, contact, meeting, historyNotes } = payload;
       const hasHistory = historyNotes && historyNotes.trim() !== "";
 
-      const prompt = `비즈니스 미팅 스몰토크 가이드를 작성하세요.
+      const prompt = `비즈니스 미팅 스몰토크 가이드를 작성하세요. 반드시 존댓말(~합니다, ~하세요, ~드립니다)로 작성하세요.
 사용자: ${user.name}(${user.role}), 파트너: ${contact.name}(${contact.role}, ${contact.company})
 성격: ${contact.personality}, 관심사: ${JSON.stringify(contact.interests)}
 미팅: ${meeting.title}
