@@ -12,7 +12,7 @@ import SettingView from './components/SettingView';
 import AuthView from './components/AuthView';
 import { ViewState, Meeting, Contact, UserProfile, SmallTalkGuide } from './types';
 import { CURRENT_USER } from './constants';
-import { analyzeNoteForProfileUpdate } from './services/geminiService';
+import { analyzeNoteForProfileUpdate, prefetchGuides } from './services/geminiService';
 
 const mapContactFromDB = (data: any): Contact => ({
   id: String(data.id),
@@ -114,6 +114,16 @@ const App: React.FC = () => {
     };
     fetchData();
   }, [session]);
+
+  // 프리페치: 데이터 로드 완료 후 오늘/내일 미팅 가이드를 백그라운드로 미리 생성
+  useEffect(() => {
+    if (loading || !meetings.length || !contacts.length) return;
+
+    prefetchGuides(supabase, user, meetings, contacts, meetings, async (meetingId, guide) => {
+      setMeetings(prev => prev.map(m => m.id === meetingId ? { ...m, aiGuide: guide } : m));
+      await supabase.from('meetings').update({ ai_guide: guide }).eq('id', meetingId);
+    });
+  }, [loading, meetings.length]);
 
   if (!session) return <AuthView />;
 

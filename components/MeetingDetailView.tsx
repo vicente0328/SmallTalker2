@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@^2.45.4';
 import { Contact, Meeting, UserProfile, SmallTalkGuide } from '../types';
-import { generateGuide } from '../services/geminiService';
+import { generateGuideStreaming } from '../services/geminiService';
 import { CURRENT_DATE } from '../constants';
 
 interface MeetingDetailViewProps {
@@ -33,7 +33,8 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
   const [guide, setGuide] = useState<SmallTalkGuide | null>(meeting.aiGuide || null);
   const [loading, setLoading] = useState(!meeting.aiGuide);
   const [error, setError] = useState<string | null>(null);
-  const [loadingStage, setLoadingStage] = useState(0); 
+  const [loadingStage, setLoadingStage] = useState(0);
+  const [streamingText, setStreamingText] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
   const [noteContent, setNoteContent] = useState(meeting.userNote || "");
 
@@ -72,9 +73,13 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
       }, 2500);
 
       try {
-        const data = await generateGuide(supabase, user, contact, meeting, historyNotes);
+        const data = await generateGuideStreaming(
+          supabase, user, contact, meeting, historyNotes,
+          (partialText) => { if (mounted) setStreamingText(partialText); }
+        );
         if (mounted) {
             setGuide(data);
+            setStreamingText("");
             if (onSaveAIGuide) onSaveAIGuide(meeting.id, data);
         }
       } catch (err: any) {
@@ -186,21 +191,21 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
           </div>
 
           {loading ? (
-            <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-indigo-50/50 flex flex-col items-center text-center space-y-6">
-                <div className="relative w-16 h-16">
-                    <div className="absolute inset-0 border-4 border-indigo-50 rounded-full"></div>
-                    <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin" style={{ animationDuration: '0.8s' }}></div>
-                </div>
-                <div className="space-y-2 w-full max-w-[280px]">
-                    <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-                        <span>Analysis Status</span>
-                        <span>{Math.round(((loadingStage + 1) / 3) * 100)}%</span>
+            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-indigo-50/50 space-y-4">
+                <div className="flex items-center gap-3">
+                    <div className="relative w-8 h-8 flex-shrink-0">
+                        <div className="absolute inset-0 border-3 border-indigo-50 rounded-full"></div>
+                        <div className="absolute inset-0 border-3 border-indigo-600 rounded-full border-t-transparent animate-spin" style={{ animationDuration: '0.8s' }}></div>
                     </div>
-                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-indigo-600 transition-all duration-700 ease-out" style={{ width: `${((loadingStage + 1) / 3) * 100}%` }}></div>
-                    </div>
-                    <p className="text-sm font-bold text-slate-700 pt-2 animate-pulse leading-relaxed">{loadingMessages[loadingStage]}</p>
+                    <p className="text-sm font-bold text-slate-600 animate-pulse">
+                        {streamingText ? "AI가 가이드를 작성하고 있습니다..." : loadingMessages[loadingStage]}
+                    </p>
                 </div>
+                {streamingText && (
+                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <pre className="text-xs text-slate-600 whitespace-pre-wrap font-sans leading-relaxed">{streamingText}</pre>
+                    </div>
+                )}
             </div>
           ) : error ? (
             <div className="bg-red-50 p-6 rounded-3xl border border-red-100 flex flex-col items-center text-center space-y-3">
