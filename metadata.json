@@ -1,0 +1,5 @@
+{
+  "name": "SmallTalker AI",
+  "description": "A business relationship management AI that generates personalized small talk guides for meetings by analyzing past interactions and current industry news.",
+  "requestFramePermissions": []
+}
