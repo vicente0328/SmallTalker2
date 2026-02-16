@@ -30,14 +30,40 @@ async function callEdgeFunction(body: Record<string, unknown>): Promise<any> {
   return result;
 }
 
-// 스트리밍 가이드 생성 - 텍스트가 생성되는 즉시 onChunk 콜백 호출
+// 부분 JSON에서 완성된 필드를 추출
+function tryParsePartialGuide(raw: string): Partial<SmallTalkGuide> {
+  const cleaned = raw.replace(/^```json?\s*/i, '').replace(/```\s*$/i, '').trim();
+  const guide: Partial<SmallTalkGuide> = {};
+
+  // pastReview 추출
+  const prMatch = cleaned.match(/"pastReview"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+  if (prMatch) guide.pastReview = prMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n');
+
+  // businessTip.content 추출
+  const btMatch = cleaned.match(/"content"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+  const srcMatch = cleaned.match(/"source"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+  if (btMatch) {
+    guide.businessTip = {
+      content: btMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n'),
+      source: srcMatch ? srcMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n') : undefined,
+    };
+  }
+
+  // lifeTip 추출
+  const ltMatch = cleaned.match(/"lifeTip"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+  if (ltMatch) guide.lifeTip = ltMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n');
+
+  return guide;
+}
+
+// 스트리밍 가이드 생성 - 필드가 완성될 때마다 점진적으로 가이드 업데이트
 export const generateGuideStreaming = async (
   supabase: SupabaseClient,
   user: UserProfile,
   contact: Contact,
   meeting: Meeting,
   historyNotes: string,
-  onChunk: (partialText: string) => void,
+  onPartialGuide: (partial: Partial<SmallTalkGuide>) => void,
 ): Promise<SmallTalkGuide> => {
   const response = await fetch(FUNCTION_URL, {
     method: "POST",
@@ -75,7 +101,10 @@ export const generateGuideStreaming = async (
         const event = JSON.parse(data);
         if (event.text) {
           fullText += event.text;
-          onChunk(fullText);
+          const partial = tryParsePartialGuide(fullText);
+          if (partial.pastReview || partial.businessTip || partial.lifeTip) {
+            onPartialGuide(partial);
+          }
         }
         if (event.error) {
           throw new Error(event.error);
@@ -86,7 +115,7 @@ export const generateGuideStreaming = async (
     }
   }
 
-  // 스트리밍 완료 후 JSON 파싱
+  // 최종 파싱
   const cleaned = fullText.replace(/^```json?\s*/i, '').replace(/```\s*$/i, '').trim();
   const result = JSON.parse(cleaned);
 

@@ -115,15 +115,17 @@ const App: React.FC = () => {
     fetchData();
   }, [session]);
 
-  // 프리페치: 데이터 로드 완료 후 오늘/내일 미팅 가이드를 백그라운드로 미리 생성
+  // 프리페치: 데이터 로드 완료 후 오늘/내일 미팅 가이드를 백그라운드로 미리 생성 (1회만)
+  const [prefetched, setPrefetched] = useState(false);
   useEffect(() => {
-    if (loading || !meetings.length || !contacts.length) return;
+    if (loading || prefetched || !meetings.length || !contacts.length) return;
+    setPrefetched(true);
 
     prefetchGuides(supabase, user, meetings, contacts, meetings, async (meetingId, guide) => {
       setMeetings(prev => prev.map(m => m.id === meetingId ? { ...m, aiGuide: guide } : m));
       await supabase.from('meetings').update({ ai_guide: guide }).eq('id', meetingId);
     });
-  }, [loading, meetings.length]);
+  }, [loading, prefetched, meetings.length]);
 
   if (!session) return <AuthView />;
 

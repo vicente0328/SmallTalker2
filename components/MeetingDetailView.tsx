@@ -31,10 +31,10 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
   onSelectContact
 }) => {
   const [guide, setGuide] = useState<SmallTalkGuide | null>(meeting.aiGuide || null);
+  const [partialGuide, setPartialGuide] = useState<Partial<SmallTalkGuide>>({});
   const [loading, setLoading] = useState(!meeting.aiGuide);
   const [error, setError] = useState<string | null>(null);
   const [loadingStage, setLoadingStage] = useState(0);
-  const [streamingText, setStreamingText] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
   const [noteContent, setNoteContent] = useState(meeting.userNote || "");
 
@@ -75,11 +75,11 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
       try {
         const data = await generateGuideStreaming(
           supabase, user, contact, meeting, historyNotes,
-          (partialText) => { if (mounted) setStreamingText(partialText); }
+          (partial) => { if (mounted) setPartialGuide(partial); }
         );
         if (mounted) {
             setGuide(data);
-            setStreamingText("");
+            setPartialGuide({});
             if (onSaveAIGuide) onSaveAIGuide(meeting.id, data);
         }
       } catch (err: any) {
@@ -191,19 +191,56 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
           </div>
 
           {loading ? (
-            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-indigo-50/50 space-y-4">
-                <div className="flex items-center gap-3">
-                    <div className="relative w-8 h-8 flex-shrink-0">
-                        <div className="absolute inset-0 border-3 border-indigo-50 rounded-full"></div>
-                        <div className="absolute inset-0 border-3 border-indigo-600 rounded-full border-t-transparent animate-spin" style={{ animationDuration: '0.8s' }}></div>
+            <div className="space-y-4">
+                {/* 아직 아무 필드도 없으면 스피너 표시 */}
+                {!partialGuide.pastReview && (
+                    <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-indigo-50/50 flex items-center gap-3">
+                        <div className="relative w-8 h-8 flex-shrink-0">
+                            <div className="absolute inset-0 border-3 border-indigo-50 rounded-full"></div>
+                            <div className="absolute inset-0 border-3 border-indigo-600 rounded-full border-t-transparent animate-spin" style={{ animationDuration: '0.8s' }}></div>
+                        </div>
+                        <p className="text-sm font-bold text-slate-600 animate-pulse">{loadingMessages[loadingStage]}</p>
                     </div>
-                    <p className="text-sm font-bold text-slate-600 animate-pulse">
-                        {streamingText ? "AI가 가이드를 작성하고 있습니다..." : loadingMessages[loadingStage]}
-                    </p>
-                </div>
-                {streamingText && (
-                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                        <pre className="text-xs text-slate-600 whitespace-pre-wrap font-sans leading-relaxed">{streamingText}</pre>
+                )}
+
+                {/* pastReview 카드 - 첫 번째로 나타남 */}
+                {partialGuide.pastReview && (
+                    <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 animate-fade-in">
+                        <div className="flex items-center gap-2 mb-3">
+                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">만남 복기 및 관계 맥락</h4>
+                        </div>
+                        <p className="text-slate-700 text-sm leading-relaxed font-medium">{partialGuide.pastReview}</p>
+                    </div>
+                )}
+
+                {/* businessTip 카드 - 두 번째로 나타남 */}
+                {partialGuide.businessTip ? (
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-blue-50 animate-fade-in">
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="bg-blue-100 p-1.5 rounded-lg text-blue-600">
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                            </div>
+                            <h4 className="text-sm font-bold text-blue-900">Business Conversation Tip</h4>
+                        </div>
+                        <p className="text-slate-800 font-semibold text-base leading-relaxed">{partialGuide.businessTip.content}</p>
+                    </div>
+                ) : partialGuide.pastReview && (
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 animate-pulse">
+                        <div className="relative w-6 h-6 flex-shrink-0">
+                            <div className="absolute inset-0 border-2 border-blue-600 rounded-full border-t-transparent animate-spin" style={{ animationDuration: '0.8s' }}></div>
+                        </div>
+                        <p className="text-xs text-slate-400">비즈니스 대화 팁을 작성하고 있습니다...</p>
+                    </div>
+                )}
+
+                {/* lifeTip 로딩 표시 */}
+                {partialGuide.businessTip && !partialGuide.lifeTip && (
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 animate-pulse">
+                        <div className="relative w-6 h-6 flex-shrink-0">
+                            <div className="absolute inset-0 border-2 border-amber-500 rounded-full border-t-transparent animate-spin" style={{ animationDuration: '0.8s' }}></div>
+                        </div>
+                        <p className="text-xs text-slate-400">라이프스타일 인사이트를 작성하고 있습니다...</p>
                     </div>
                 )}
             </div>
