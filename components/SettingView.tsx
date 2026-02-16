@@ -107,7 +107,6 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
 
   const isProviderDisabledError = syncError?.includes('provider is not enabled');
   const isAccessDeniedError = syncError?.includes('access_denied') || syncError?.includes('403');
-  const currentOrigin = window.location.origin;
 
   return (
     <div className="space-y-6 animate-fade-in pb-12">
@@ -128,14 +127,6 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
         <div className="p-6 space-y-4">
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">External Services</h3>
             
-            <div className="p-4 bg-indigo-50/50 border border-indigo-100 rounded-2xl">
-                <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-2">Redirect Info</p>
-                <p className="text-[11px] text-slate-600 leading-relaxed">
-                    구글 연동 완료 후 현재 주소인 <code className="bg-white px-1 rounded border text-indigo-600 font-bold">{currentOrigin}</code>로 돌아옵니다.
-                    만약 "Local Host" 에러가 발생한다면 Supabase 대시보드에서 이 주소를 <strong>Redirect URLs</strong>에 추가했는지 확인하세요.
-                </p>
-            </div>
-
             {syncError && (
                 <div className="p-4 bg-red-50 border border-red-100 rounded-2xl animate-shake">
                     <div className="flex items-center gap-2 text-red-600 mb-2">
