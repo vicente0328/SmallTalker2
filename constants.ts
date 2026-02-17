@@ -1,7 +1,7 @@
 import { UserProfile, Contact, Meeting } from './types';
 
-// 1. Set Current Date to February 28, 2026
-export const CURRENT_DATE = new Date("2026-02-28T09:00:00");
+// 1. Use the user's actual current date/time
+export const CURRENT_DATE = new Date();
 
 export const CURRENT_USER: UserProfile = {
   name: "한수",
