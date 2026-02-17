@@ -5,20 +5,23 @@ import { CURRENT_DATE } from '../constants';
 
 interface ContactProfileViewProps {
   contact: Contact;
-  meetings: Meeting[]; 
+  meetings: Meeting[];
   onBack: () => void;
   onSelectMeeting: (meeting: Meeting) => void;
   onUpdateContact?: (updatedContact: Contact) => void;
+  onDeleteContact?: (contactId: string) => void;
 }
 
-const ContactProfileView: React.FC<ContactProfileViewProps> = ({ 
-    contact, 
+const ContactProfileView: React.FC<ContactProfileViewProps> = ({
+    contact,
     meetings,
-    onBack, 
+    onBack,
     onSelectMeeting,
-    onUpdateContact 
+    onUpdateContact,
+    onDeleteContact
 }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [formData, setFormData] = useState({
       name: contact.name,
       role: contact.role === 'Unknown' ? '' : contact.role,
@@ -335,6 +338,49 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
             >
               저장하기
             </button>
+          </div>
+          {onDeleteContact && (
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="w-full mt-3 py-2.5 text-red-400 text-sm font-medium hover:text-red-600 transition-colors"
+            >
+              이 연락처 삭제하기
+            </button>
+          )}
+        </div>
+      )}
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl w-full max-w-xs shadow-2xl overflow-hidden">
+            <div className="p-6 text-center">
+              <div className="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-1">연락처 삭제</h3>
+              <p className="text-sm text-slate-500">
+                <span className="font-semibold text-slate-700">{contact.name}</span> 님의 연락처를 삭제하시겠습니까?<br/>삭제 후에는 복구할 수 없습니다.
+              </p>
+            </div>
+            <div className="flex border-t border-slate-100">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 py-3.5 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => {
+                  onDeleteContact?.(contact.id);
+                  setShowDeleteConfirm(false);
+                }}
+                className="flex-1 py-3.5 text-red-500 font-bold text-sm hover:bg-red-50 transition-colors border-l border-slate-100"
+              >
+                삭제
+              </button>
+            </div>
           </div>
         </div>
       )}

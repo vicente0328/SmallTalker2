@@ -241,6 +241,13 @@ const App: React.FC = () => {
     }
   };
 
+  const handleDeleteContact = async (contactId: string) => {
+    setContacts(prev => prev.filter(c => c.id !== contactId));
+    setSelectedContact(null);
+    setView(ViewState.CONTACT_LIST);
+    await supabase.from('contacts').delete().eq('id', contactId);
+  };
+
   const handleAddContact = async (newContact: Contact) => {
     setContacts(prev => [...prev, newContact]);
     await supabase.from('contacts').insert([{
@@ -343,7 +350,7 @@ const App: React.FC = () => {
         return <ContactListView contacts={contacts} onSelectContact={handleSelectContact} onAddContact={handleAddContact} dismissedTips={dismissedTips} onDismissTip={handleDismissTip} />;
       case ViewState.CONTACT_PROFILE:
         if (!selectedContact) return null;
-        return <ContactProfileView contact={selectedContact} meetings={meetings} onBack={() => setView(ViewState.CONTACT_LIST)} onSelectMeeting={handleSelectMeeting} onUpdateContact={handleUpdateContact} />;
+        return <ContactProfileView contact={selectedContact} meetings={meetings} onBack={() => setView(ViewState.CONTACT_LIST)} onSelectMeeting={handleSelectMeeting} onUpdateContact={handleUpdateContact} onDeleteContact={handleDeleteContact} />;
       case ViewState.SETTINGS:
         return <SettingView user={user} onUpdateUser={handleUpdateUser} onLogout={() => supabase.auth.signOut()} />;
       default: return null;
