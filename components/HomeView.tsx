@@ -283,7 +283,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
 
             {!upcomingMeeting && (
                 <p className="mt-3 text-st-muted text-sm font-medium">
-                    캘린더에서 미팅을 추가하고 AI 스몰토크 가이드를 받아보세요.
+                    캘린더에서 미팅을 추가하고<br/>AI 스몰토크 가이드를 받아보세요.
                 </p>
             )}
           </div>
@@ -310,13 +310,13 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                 </button>
             </div>
           ) : (
-            <div className="w-full">
+            <div className="w-full mt-8">
                 <button
                     onClick={(e) => { e.stopPropagation(); onNavigateToCalendar?.(); }}
-                    className="w-full bg-white text-st-blue text-base md:text-lg font-bold py-3 md:py-4 rounded-xl md:rounded-2xl transition-all shadow-lg shadow-st-ink/30 flex items-center justify-center gap-2"
+                    className="w-full bg-white/15 backdrop-blur-sm border border-white/20 text-white text-base md:text-lg font-semibold py-3.5 md:py-4 rounded-xl md:rounded-2xl transition-all hover:bg-white/25 flex items-center justify-center gap-2"
                 >
                     <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
                     첫 미팅 추가하기
                 </button>

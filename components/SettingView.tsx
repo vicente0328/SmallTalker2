@@ -140,7 +140,7 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
                     </div>
                     <div>
                         <label className="block text-xs font-bold text-st-muted mb-1 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-st-purple"></span>
+                            <span className="w-2 h-2 rounded-full bg-st-yellow"></span>
                             Lifestyle Interests
                         </label>
                         <input
