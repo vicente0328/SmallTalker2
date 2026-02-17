@@ -125,11 +125,11 @@ const App: React.FC = () => {
     fetchData();
   }, [session]);
 
-  // Welcome tour: show on first login (no contacts + no meetings = new user)
+  // Welcome tour: show on first login
   useEffect(() => {
     if (loading || !session) return;
     const tourDone = localStorage.getItem('smalltalker_tour_done');
-    if (!tourDone && contacts.length === 0 && meetings.length === 0) {
+    if (!tourDone) {
       setShowWelcomeTour(true);
     }
   }, [loading, session]);
@@ -137,6 +137,13 @@ const App: React.FC = () => {
   const handleCompleteTour = () => {
     setShowWelcomeTour(false);
     localStorage.setItem('smalltalker_tour_done', 'true');
+    if (!localStorage.getItem('smalltalker_signup_time')) {
+      localStorage.setItem('smalltalker_signup_time', Date.now().toString());
+    }
+  };
+
+  const handleRestartTour = () => {
+    setShowWelcomeTour(true);
   };
 
   const handleDismissTip = (key: string) => {
@@ -285,7 +292,7 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (currentView) {
       case ViewState.HOME:
-        return <HomeView user={user} meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onUpdateContact={handleUpdateContact} onAddContact={handleAddContact} onNavigateToCalendar={() => setView(ViewState.CALENDAR)} onNavigateToContacts={() => setView(ViewState.CONTACT_LIST)} />;
+        return <HomeView user={user} meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onUpdateContact={handleUpdateContact} onAddContact={handleAddContact} onNavigateToCalendar={() => setView(ViewState.CALENDAR)} onNavigateToContacts={() => setView(ViewState.CONTACT_LIST)} onRestartTour={handleRestartTour} />;
       case ViewState.CALENDAR:
         return <CalendarView meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onAddMeeting={handleAddMeeting} onEditMeeting={handleEditMeeting} onDeleteMeeting={handleDeleteMeeting} onAddContact={handleAddContact} dismissedTips={dismissedTips} onDismissTip={handleDismissTip} />;
       case ViewState.MEETING_DETAIL:

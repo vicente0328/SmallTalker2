@@ -11,6 +11,7 @@ interface HomeViewProps {
   onAddContact?: (newContact: Contact) => void;
   onNavigateToCalendar?: () => void;
   onNavigateToContacts?: () => void;
+  onRestartTour?: () => void;
 }
 
 interface QuickProfile {
@@ -108,9 +109,17 @@ const detectExisting = (contact: Contact | null | undefined) => {
   };
 };
 
-const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectMeeting, onUpdateContact, onAddContact, onNavigateToCalendar, onNavigateToContacts }) => {
+const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectMeeting, onUpdateContact, onAddContact, onNavigateToCalendar, onNavigateToContacts, onRestartTour }) => {
   const [profile, setProfile] = useState<QuickProfile>(INITIAL_PROFILE);
   const [submitted, setSubmitted] = useState(false);
+
+  // 가입 후 7일 이내인지 확인
+  const isNewUser = (() => {
+    const signupTime = localStorage.getItem('smalltalker_signup_time');
+    if (!signupTime) return true; // 투어 완료 전이면 신규 유저
+    const elapsed = Date.now() - parseInt(signupTime, 10);
+    return elapsed < 7 * 24 * 60 * 60 * 1000; // 7일
+  })();
 
   const upcomingMeetings = meetings
     .filter(m => new Date(m.date) >= CURRENT_DATE)
@@ -212,9 +221,22 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
 
       {/* Date & Greeting */}
       <div className="space-y-1 md:space-y-4 px-2 mb-4 md:mb-8 shrink-0">
-        <p className="text-slate-500 font-semibold text-sm md:text-lg">
-          {CURRENT_DATE.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' })}
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-slate-500 font-semibold text-sm md:text-lg">
+            {CURRENT_DATE.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' })}
+          </p>
+          {isNewUser && onRestartTour && (
+            <button
+              onClick={onRestartTour}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-lg hover:bg-indigo-100 transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              사용 가이드
+            </button>
+          )}
+        </div>
         <h2 className="text-3xl md:text-5xl font-bold text-slate-900 leading-[1.15] tracking-tight">
           안녕하세요,<br/>
           <span className="text-indigo-600">{user.name}님.</span>
@@ -231,9 +253,9 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
             <div className="absolute bottom-0 left-0 w-56 h-56 md:w-64 md:h-64 bg-violet-600/20 rounded-full blur-[50px] md:blur-[60px] -ml-16 -mb-8 mix-blend-screen"></div>
         </div>
 
-        <div className="relative z-10 flex flex-col h-full justify-between p-6 md:p-8">
+        <div className={`relative z-10 flex flex-col h-full p-6 md:p-8 ${upcomingMeeting ? 'justify-between' : 'justify-center items-center text-center'}`}>
           <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-[10px] md:text-xs font-bold text-indigo-200 mb-4 md:mb-6 tracking-wide">
+            <div className={`inline-flex items-center gap-2 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-[10px] md:text-xs font-bold text-indigo-200 mb-4 md:mb-6 tracking-wide ${!upcomingMeeting ? 'mx-auto' : ''}`}>
                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_8px_rgba(129,140,248,0.8)]"></span>
                UPCOMING SCHEDULE
             </div>
@@ -279,7 +301,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                 </button>
             </div>
           ) : (
-            <div className="w-full mt-4 md:mt-0">
+            <div className="w-full mt-6">
                 <button
                     onClick={(e) => { e.stopPropagation(); onNavigateToCalendar?.(); }}
                     className="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-base md:text-lg font-bold py-3 md:py-4 rounded-xl md:rounded-2xl transition-all shadow-lg shadow-indigo-900/30 flex items-center justify-center gap-2"
