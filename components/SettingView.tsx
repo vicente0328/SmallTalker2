@@ -39,19 +39,8 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
     }
   };
 
-  const handleSync = async () => {
-    setSyncError(null);
-    if (onGoogleSync) {
-      setIsSyncing(true);
-      try {
-        await onGoogleSync();
-      } catch (err: any) {
-        console.error("Sync Trigger Error:", err);
-        setSyncError(err.message || "연동을 시작하는 중 오류가 발생했습니다.");
-      } finally {
-        setIsSyncing(false);
-      }
-    }
+  const handleSync = () => {
+    alert('Google Calendar 연동 기능은 현재 준비 중입니다.\n빠른 시일 내에 제공할 예정이니 조금만 기다려 주세요!');
   };
 
   if (isEditingProfile) {
@@ -261,10 +250,9 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
                 </div>
                 <button
                     onClick={handleSync}
-                    disabled={isSyncing}
-                    className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${isSyncing ? 'bg-indigo-100 text-indigo-400' : 'bg-indigo-600 text-white shadow-sm hover:bg-indigo-500'}`}
+                    className="px-4 py-1.5 rounded-full text-xs font-bold transition-all bg-indigo-600 text-white shadow-sm hover:bg-indigo-500"
                 >
-                    {isSyncing ? '연결 중...' : '연동하기'}
+                    연동하기
                 </button>
             </div>
         </div>
