@@ -145,7 +145,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         return;
     }
 
-    const dateTimeString = `${formDate}T${formTime}:00`;
+    // Include local timezone offset so Supabase stores the correct absolute moment
+    const tempDate = new Date(`${formDate}T${formTime}`);
+    const offset = -tempDate.getTimezoneOffset();
+    const sign = offset >= 0 ? '+' : '-';
+    const tzH = String(Math.floor(Math.abs(offset) / 60)).padStart(2, '0');
+    const tzM = String(Math.abs(offset) % 60).padStart(2, '0');
+    const dateTimeString = `${formDate}T${formTime}:00${sign}${tzH}:${tzM}`;
     let finalContactId = formContactId;
     let newContact: Contact | undefined;
 
