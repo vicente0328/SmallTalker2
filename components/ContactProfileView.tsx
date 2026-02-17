@@ -21,8 +21,8 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
       name: contact.name,
-      role: contact.role,
-      company: contact.company,
+      role: contact.role === 'Unknown' ? '' : contact.role,
+      company: contact.company === 'Unknown' ? '' : contact.company,
       tags: contact.tags.join(', '),
       businessInterests: contact.interests.business.join(', '),
       lifestyleInterests: contact.interests.lifestyle.join(', '),
@@ -121,14 +121,14 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
                         value={formData.company}
                         onFocus={() => clearUnknownOnFocus('company')}
                         onChange={(e) => setFormData({...formData, company: e.target.value})}
-                        placeholder="회사"
+                        placeholder="회사/소속"
                     />
                     <input 
                         className="flex-1 text-center text-slate-600 bg-slate-50 border-b border-slate-200 focus:outline-none p-1"
                         value={formData.role}
                         onFocus={() => clearUnknownOnFocus('role')}
                         onChange={(e) => setFormData({...formData, role: e.target.value})}
-                        placeholder="직함"
+                        placeholder="직책"
                     />
                 </div>
             </div>
