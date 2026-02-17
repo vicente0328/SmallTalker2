@@ -27,11 +27,13 @@ const mapContactFromDB = (data: any): Contact => ({
   personality: data.personality,
   contactFrequency: data.contact_frequency,
   avatarUrl: data.avatar_url,
+  relationshipType: data.relationship_type || '',
+  meetingFrequency: data.meeting_frequency || '',
 });
 
 const mapMeetingFromDB = (data: any): Meeting => ({
   id: String(data.id),
-  contactId: String(data.contact_id),
+  contactIds: data.contact_ids || (data.contact_id ? [String(data.contact_id)] : []),
   title: data.title,
   date: data.date,
   location: data.location,
@@ -48,6 +50,7 @@ const mapUserFromDB = (data: any): UserProfile => ({
   phoneNumber: data.phone_number || "",
   email: data.email || "",
   interests: data.interests || { business: [], lifestyle: [] },
+  memo: data.memo || "",
   avatarUrl: data.avatar_url,
 });
 
@@ -55,11 +58,11 @@ const App: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [currentView, setView] = useState<ViewState>(ViewState.HOME);
   const [loading, setLoading] = useState(true);
-  
+
   const [user, setUser] = useState<UserProfile>(CURRENT_USER);
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
-  
+
   const [selectedMeetingId, setSelectedMeetingId] = useState<string | null>(null);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
 
@@ -84,7 +87,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (!session) return;
-    
+
     const fetchData = async () => {
       setLoading(true);
       try {
@@ -103,7 +106,8 @@ const App: React.FC = () => {
               name: meta?.full_name || meta?.name || "New User",
               email: session.user.email,
               avatar_url: meta?.avatar_url || "",
-              interests: { business: [], lifestyle: [] }
+              interests: { business: [], lifestyle: [] },
+              memo: "",
             }])
             .select()
             .single();
@@ -180,8 +184,10 @@ const App: React.FC = () => {
 
   const handleSelectMeeting = (meeting: Meeting) => {
     setSelectedMeetingId(meeting.id);
-    const contact = contacts.find(c => c.id === meeting.contactId);
-    setSelectedContact(contact || null);
+    const meetingContacts = meeting.contactIds
+      .map(id => contacts.find(c => c.id === id))
+      .filter((c): c is Contact => !!c);
+    setSelectedContact(meetingContacts[0] || null);
     setView(ViewState.MEETING_DETAIL);
   };
 
@@ -190,19 +196,34 @@ const App: React.FC = () => {
       setView(ViewState.CONTACT_PROFILE);
   };
 
+  const handleUpdateUser = async (updatedUser: UserProfile) => {
+    setUser(updatedUser);
+    if (session) {
+      await supabase.from('user_profiles').update({
+        name: updatedUser.name,
+        role: updatedUser.role,
+        company: updatedUser.company,
+        industry: updatedUser.industry,
+        interests: updatedUser.interests,
+        memo: updatedUser.memo,
+      }).eq('id', session.user.id);
+    }
+  };
+
   const handleUpdateContact = async (updatedContact: Contact) => {
     setContacts(prev => prev.map(c => c.id === updatedContact.id ? updatedContact : c));
     setSelectedContact(prev => prev?.id === updatedContact.id ? updatedContact : prev);
     await supabase.from('contacts').update({
         name: updatedContact.name, company: updatedContact.company, role: updatedContact.role,
         phone_number: updatedContact.phoneNumber, email: updatedContact.email,
-        tags: updatedContact.tags, interests: updatedContact.interests, personality: updatedContact.personality
+        tags: updatedContact.tags, interests: updatedContact.interests, personality: updatedContact.personality,
+        relationship_type: updatedContact.relationshipType, meeting_frequency: updatedContact.meetingFrequency,
     }).eq('id', updatedContact.id);
 
     // 연락처 정보 변경 시, 해당 연락처의 미래 미팅 가이드 무효화
     const now = new Date();
     const futureMeetingIds = meetings
-      .filter(m => m.contactId === updatedContact.id && new Date(m.date) >= now && m.aiGuide)
+      .filter(m => m.contactIds.includes(updatedContact.id) && new Date(m.date) >= now && m.aiGuide)
       .map(m => m.id);
     if (futureMeetingIds.length > 0) {
       setMeetings(prev => prev.map(m => futureMeetingIds.includes(m.id) ? { ...m, aiGuide: undefined } : m));
@@ -214,10 +235,11 @@ const App: React.FC = () => {
 
   const handleAddContact = async (newContact: Contact) => {
     setContacts(prev => [...prev, newContact]);
-    await supabase.from('contacts').insert([{ 
+    await supabase.from('contacts').insert([{
         id: newContact.id, user_id: session.user.id, name: newContact.name, company: newContact.company, role: newContact.role,
         phone_number: newContact.phoneNumber, email: newContact.email, tags: newContact.tags,
-        interests: newContact.interests, personality: newContact.personality, avatar_url: newContact.avatarUrl
+        interests: newContact.interests, personality: newContact.personality, avatar_url: newContact.avatarUrl,
+        relationship_type: newContact.relationshipType, meeting_frequency: newContact.meetingFrequency,
     }]);
   };
 
@@ -226,33 +248,39 @@ const App: React.FC = () => {
     await supabase.from('meetings').update({ user_note: newNote }).eq('id', meetingId);
 
     const meeting = meetings.find(m => m.id === meetingId);
-    const contact = contacts.find(c => c.id === meeting?.contactId);
-    if (meeting && contact) {
-        // 노트 변경 시, 이 미팅 이후의 같은 연락처 미래 미팅 가이드 무효화
-        const meetingDate = new Date(meeting.date);
-        const futureMeetingIds = meetings
-          .filter(m => m.contactId === contact.id && new Date(m.date) > meetingDate && m.aiGuide)
-          .map(m => m.id);
-        if (futureMeetingIds.length > 0) {
-          setMeetings(prev => prev.map(m => futureMeetingIds.includes(m.id) ? { ...m, aiGuide: undefined } : m));
-          for (const id of futureMeetingIds) {
-            await supabase.from('meetings').update({ ai_guide: null }).eq('id', id);
-          }
-        }
+    if (meeting) {
+        const meetingContacts = meeting.contactIds
+          .map(id => contacts.find(c => c.id === id))
+          .filter((c): c is Contact => !!c);
+        const primaryContact = meetingContacts[0];
 
-        try {
-            const updates = await analyzeNoteForProfileUpdate(supabase, newNote, contact);
-            const updatedContact: Contact = {
-                ...contact,
-                interests: {
-                    business: Array.from(new Set([...contact.interests.business, ...updates.businessInterests])),
-                    lifestyle: Array.from(new Set([...contact.interests.lifestyle, ...updates.lifestyleInterests])),
-                },
-                personality: updates.personality || contact.personality
-            };
-            setContacts(prev => prev.map(c => c.id === contact.id ? updatedContact : c));
-            await supabase.from('contacts').update({ interests: updatedContact.interests, personality: updatedContact.personality }).eq('id', contact.id);
-        } catch (e) { console.error(e); }
+        if (primaryContact) {
+            // 노트 변경 시, 이 미팅 이후의 같은 참석자 미래 미팅 가이드 무효화
+            const meetingDate = new Date(meeting.date);
+            const futureMeetingIds = meetings
+              .filter(m => m.contactIds.some(id => meeting.contactIds.includes(id)) && new Date(m.date) > meetingDate && m.aiGuide)
+              .map(m => m.id);
+            if (futureMeetingIds.length > 0) {
+              setMeetings(prev => prev.map(m => futureMeetingIds.includes(m.id) ? { ...m, aiGuide: undefined } : m));
+              for (const id of futureMeetingIds) {
+                await supabase.from('meetings').update({ ai_guide: null }).eq('id', id);
+              }
+            }
+
+            try {
+                const updates = await analyzeNoteForProfileUpdate(supabase, newNote, primaryContact);
+                const updatedContact: Contact = {
+                    ...primaryContact,
+                    interests: {
+                        business: Array.from(new Set([...primaryContact.interests.business, ...updates.businessInterests])),
+                        lifestyle: Array.from(new Set([...primaryContact.interests.lifestyle, ...updates.lifestyleInterests])),
+                    },
+                    personality: updates.personality || primaryContact.personality
+                };
+                setContacts(prev => prev.map(c => c.id === primaryContact.id ? updatedContact : c));
+                await supabase.from('contacts').update({ interests: updatedContact.interests, personality: updatedContact.personality }).eq('id', primaryContact.id);
+            } catch (e) { console.error(e); }
+        }
     }
   };
 
@@ -270,7 +298,7 @@ const App: React.FC = () => {
     if (newContact) await handleAddContact(newContact);
     setMeetings(prev => prev.map(m => m.id === updatedMeeting.id ? updatedMeeting : m));
     await supabase.from('meetings').update({
-        contact_id: updatedMeeting.contactId, title: updatedMeeting.title,
+        contact_ids: updatedMeeting.contactIds, title: updatedMeeting.title,
         date: updatedMeeting.date, location: updatedMeeting.location
     }).eq('id', updatedMeeting.id);
   };
@@ -284,7 +312,7 @@ const App: React.FC = () => {
     if (newContact) await handleAddContact(newContact);
     setMeetings(prev => [...prev, newMeeting]);
     await supabase.from('meetings').insert([{
-        id: newMeeting.id, user_id: session.user.id, contact_id: newMeeting.contactId, title: newMeeting.title,
+        id: newMeeting.id, user_id: session.user.id, contact_ids: newMeeting.contactIds, title: newMeeting.title,
         date: newMeeting.date, location: newMeeting.location
     }]);
   };
@@ -297,15 +325,19 @@ const App: React.FC = () => {
         return <CalendarView meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onAddMeeting={handleAddMeeting} onEditMeeting={handleEditMeeting} onDeleteMeeting={handleDeleteMeeting} onAddContact={handleAddContact} dismissedTips={dismissedTips} onDismissTip={handleDismissTip} />;
       case ViewState.MEETING_DETAIL:
         const selectedMeeting = meetings.find(m => m.id === selectedMeetingId);
-        if (!selectedMeeting || !selectedContact) return null;
-        return <MeetingDetailView supabase={supabase} meeting={selectedMeeting} contact={selectedContact} user={user} allMeetings={meetings} onBack={() => setView(ViewState.CALENDAR)} onUpdateNote={handleUpdateMeetingNote} onSaveAIGuide={handleSaveAIGuide} onClearAIGuide={handleClearAIGuide} onNavigateToMeeting={handleSelectMeeting} onSelectContact={handleSelectContact} dismissedTips={dismissedTips} onDismissTip={handleDismissTip} />;
+        if (!selectedMeeting) return null;
+        const meetingContacts = selectedMeeting.contactIds
+          .map(id => contacts.find(c => c.id === id))
+          .filter((c): c is Contact => !!c);
+        if (meetingContacts.length === 0) return null;
+        return <MeetingDetailView supabase={supabase} meeting={selectedMeeting} contacts={meetingContacts} user={user} allMeetings={meetings} allContacts={contacts} onBack={() => setView(ViewState.CALENDAR)} onUpdateNote={handleUpdateMeetingNote} onSaveAIGuide={handleSaveAIGuide} onClearAIGuide={handleClearAIGuide} onNavigateToMeeting={handleSelectMeeting} onSelectContact={handleSelectContact} dismissedTips={dismissedTips} onDismissTip={handleDismissTip} />;
       case ViewState.CONTACT_LIST:
         return <ContactListView contacts={contacts} onSelectContact={handleSelectContact} onAddContact={handleAddContact} dismissedTips={dismissedTips} onDismissTip={handleDismissTip} />;
       case ViewState.CONTACT_PROFILE:
         if (!selectedContact) return null;
         return <ContactProfileView contact={selectedContact} meetings={meetings} onBack={() => setView(ViewState.CONTACT_LIST)} onSelectMeeting={handleSelectMeeting} onUpdateContact={handleUpdateContact} />;
       case ViewState.SETTINGS:
-        return <SettingView user={user} onUpdateUser={(u) => setUser(u)} onLogout={() => supabase.auth.signOut()} />;
+        return <SettingView user={user} onUpdateUser={handleUpdateUser} onLogout={() => supabase.auth.signOut()} />;
       default: return null;
     }
   };

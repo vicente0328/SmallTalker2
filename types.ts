@@ -10,6 +10,7 @@ export interface UserProfile {
     business: string[];
     lifestyle: string[];
   };
+  memo: string;
   avatarUrl?: string;
 }
 
@@ -28,16 +29,18 @@ export interface Contact {
   personality: string;
   contactFrequency: string;
   avatarUrl: string;
+  relationshipType: string;
+  meetingFrequency: string;
 }
 
 export interface Meeting {
   id: string;
-  contactId: string;
+  contactIds: string[];
   title: string;
   date: string;
   location: string;
   userNote?: string;
-  aiGuide?: SmallTalkGuide; 
+  aiGuide?: SmallTalkGuide;
   pastContext: {
     lastMetDate: string;
     lastMetLocation: string;

@@ -122,28 +122,55 @@ Deno.serve(async (req) => {
     const { action, payload } = JSON.parse(bodyText);
 
     if (action === 'generateGuide') {
-      const { user, contact, meeting, historyNotes } = payload;
+      const { user, contact, contacts, meeting, historyNotes } = payload;
       const hasHistory = historyNotes && historyNotes.trim() !== "";
+
+      // Build multi-contact info if available
+      const allContacts = contacts && contacts.length > 0 ? contacts : [contact];
+      const contactInfoLines = allContacts.map((c: any, i: number) => {
+        const label = allContacts.length > 1 ? `파트너${i + 1}` : '파트너';
+        return `[${label}] 이름: ${c.name}, 직책: ${c.role}, 회사: ${c.company}
+  - 성격: ${c.personality || '정보 없음'}
+  - 비즈니스 관심사: ${(c.interests?.business || []).join(', ') || '정보 없음'}
+  - 라이프스타일 관심사: ${(c.interests?.lifestyle || []).join(', ') || '정보 없음'}
+  - 나(${user.name})와의 관계: ${c.relationshipType || '정보 없음'}, 만남 횟수: ${c.meetingFrequency || '정보 없음'}`;
+      }).join('\n');
 
       const prompt = `비즈니스 미팅 전 스몰토크에서 꺼낼 수 있는 구체적인 대화 주제를 추천하세요. 반드시 존댓말(~합니다, ~하세요, ~드립니다)로 작성하세요.
 
 중요 규칙:
 - 톤앤매너, 말투, 태도에 대한 조언은 하지 마세요.
 - 대신 실제로 꺼낼 수 있는 구체적인 화제/주제를 추천하세요.
-- businessTip: 상대방의 업계, 회사, 직무와 관련된 최신 이슈나 트렌드 기반의 구체적 대화 주제를 추천하세요. (예: "최근 OO업계의 XX 트렌드에 대해 이야기해보세요")
-- lifeTip: 상대방의 관심사/취미/라이프스타일과 관련된 구체적 대화 주제를 추천하세요. (예: "요즘 인기 있는 XX 맛집/여행지/취미 이야기를 꺼내보세요")
+- businessTip: 파트너의 업계, 회사, 직무와 관련된 최신 이슈나 트렌드 기반의 구체적 대화 주제를 추천하세요. (예: "최근 OO업계의 XX 트렌드에 대해 이야기해보세요")
+- lifeTip: 파트너의 관심사/취미/라이프스타일과 관련된 구체적 대화 주제를 추천하세요. (예: "요즘 인기 있는 XX 맛집/여행지/취미 이야기를 꺼내보세요")
 - 각 팁은 반드시 구체적인 주제명이나 키워드를 포함해야 합니다.
 
-매우 중요 - 히스토리 노트 해석 규칙:
-- 히스토리 노트는 "사용자(${user.name})"가 "파트너(${contact.name})"와의 미팅 후 기록한 메모입니다.
-- 노트에서 주어가 생략된 문장은 대부분 파트너(${contact.name})에 대한 이야기입니다.
-- 예: "골프를 좋아한다" → ${contact.name}님이 골프를 좋아한다는 뜻
-- 예: "최근 승진했다" → ${contact.name}님이 최근 승진했다는 뜻
-- 사용자(${user.name}) 자신에 대한 이야기와 혼동하지 마세요.
+=== 절대 준수 사항: 사용자(나)와 파트너(상대방) 정보 구분 ===
+아래 "나(사용자) 정보"는 대화 가이드를 받는 사용자 본인의 정보입니다.
+아래 "파트너(상대방) 정보"는 미팅 상대방의 정보입니다.
+- 파트너의 관심사, 직업, 특징을 사용자의 것으로 혼동하지 마세요.
+- 사용자의 관심사, 직업, 특징을 파트너의 것으로 혼동하지 마세요.
+- 예: 파트너가 유튜브 채널을 운영한다면, "상대방의 유튜브 채널"이라고 표현해야 하며, 사용자가 유튜브를 운영한다고 오해하면 안 됩니다.
+- 대화 주제 추천 시 파트너의 특성을 기반으로 하되, 사용자가 파트너에게 물어보거나 대화할 주제로 추천하세요.
 
-사용자: ${user.name}(${user.role}), 파트너: ${contact.name}(${contact.role}, ${contact.company})
-성격: ${contact.personality}, 관심사: ${JSON.stringify(contact.interests)}
-미팅: ${meeting.title}
+=== 히스토리 노트 해석 규칙 ===
+- 히스토리 노트는 "나(${user.name})"가 "파트너"와의 미팅 후 기록한 메모입니다.
+- 노트에서 주어가 생략된 문장은 대부분 파트너에 대한 이야기입니다.
+- 예: "골프를 좋아한다" → 파트너가 골프를 좋아한다는 뜻
+- 예: "유튜브 채널을 운영한다" → 파트너가 유튜브 채널을 운영한다는 뜻
+- 예: "최근 승진했다" → 파트너가 최근 승진했다는 뜻
+- 나(${user.name}) 자신에 대한 이야기와 절대 혼동하지 마세요.
+
+=== 나(사용자) 정보 ===
+이름: ${user.name}, 직책: ${user.role}, 회사: ${user.company}, 업종: ${user.industry || '정보 없음'}
+비즈니스 관심사: ${(user.interests?.business || []).join(', ') || '정보 없음'}
+라이프스타일 관심사: ${(user.interests?.lifestyle || []).join(', ') || '정보 없음'}
+
+=== 파트너(상대방) 정보 ===
+${contactInfoLines}
+
+=== 미팅 정보 ===
+제목: ${meeting.title}
 ${hasHistory ? `히스토리:\n${historyNotes}` : "첫 만남"}
 ${hasHistory ? "주의: 이미 아는 사이. 초면 인사 금지. 지난 대화 연속성 강조." : ""}`;
 

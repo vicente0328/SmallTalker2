@@ -14,6 +14,7 @@ export const CURRENT_USER: UserProfile = {
     business: ["북미 시장 진출", "친환경 패키지 트렌드", "AI 물류 최적화"],
     lifestyle: ["위스키 시음", "크로스핏", "주말 드라이브"]
   },
+  memo: "",
   avatarUrl: "https://ui-avatars.com/api/?name=한수&background=6366f1&color=fff&bold=true",
 };
 
@@ -30,6 +31,8 @@ export const MOCK_CONTACTS: Contact[] = [
     personality: "트렌드에 민감하고 디테일 중시",
     contactFrequency: "2주 1회",
     avatarUrl: "https://picsum.photos/200/200?random=1",
+    relationshipType: "비즈니스",
+    meetingFrequency: "4회 이상",
   },
   {
     id: "c2",
@@ -43,6 +46,8 @@ export const MOCK_CONTACTS: Contact[] = [
     personality: "논리정연, 예술적 조예 깊음",
     contactFrequency: "수시",
     avatarUrl: "https://picsum.photos/200/200?random=2",
+    relationshipType: "비즈니스",
+    meetingFrequency: "1~3회",
   },
   {
     id: "c3",
@@ -56,6 +61,8 @@ export const MOCK_CONTACTS: Contact[] = [
     personality: "한국 문화에 호기심 많음",
     contactFrequency: "1개월 1회",
     avatarUrl: "https://picsum.photos/200/200?random=3",
+    relationshipType: "비즈니스",
+    meetingFrequency: "1~3회",
   },
   {
     id: "c4",
@@ -69,6 +76,8 @@ export const MOCK_CONTACTS: Contact[] = [
     personality: "열정적, 강아지 이야기 좋아함",
     contactFrequency: "1주 1회",
     avatarUrl: "https://picsum.photos/200/200?random=4",
+    relationshipType: "비즈니스",
+    meetingFrequency: "1~3회",
   },
   {
     id: "c5",
@@ -82,6 +91,8 @@ export const MOCK_CONTACTS: Contact[] = [
     personality: "감각적, 웰니스 관심",
     contactFrequency: "3주 1회",
     avatarUrl: "https://picsum.photos/200/200?random=5",
+    relationshipType: "비즈니스",
+    meetingFrequency: "1~3회",
   },
   {
     id: "c6",
@@ -95,6 +106,8 @@ export const MOCK_CONTACTS: Contact[] = [
     personality: "호탕함, 와인 애호가",
     contactFrequency: "1개월 1회",
     avatarUrl: "https://picsum.photos/200/200?random=6",
+    relationshipType: "비즈니스",
+    meetingFrequency: "1~3회",
   },
   {
     id: "c7",
@@ -108,6 +121,8 @@ export const MOCK_CONTACTS: Contact[] = [
     personality: "자유로움, 시각적 영감 중시",
     contactFrequency: "프로젝트 단위",
     avatarUrl: "https://picsum.photos/200/200?random=7",
+    relationshipType: "비즈니스",
+    meetingFrequency: "1~3회",
   },
   {
     id: "c8",
@@ -121,6 +136,8 @@ export const MOCK_CONTACTS: Contact[] = [
     personality: "꼼꼼함, 예의 중시",
     contactFrequency: "2개월 1회",
     avatarUrl: "https://picsum.photos/200/200?random=8",
+    relationshipType: "비즈니스",
+    meetingFrequency: "0회 (첫 만남)",
   },
   {
     id: "c9",
@@ -134,6 +151,8 @@ export const MOCK_CONTACTS: Contact[] = [
     personality: "사교적, 힐링 필요",
     contactFrequency: "수시",
     avatarUrl: "https://picsum.photos/200/200?random=9",
+    relationshipType: "비즈니스",
+    meetingFrequency: "1~3회",
   },
   {
     id: "c10",
@@ -147,6 +166,8 @@ export const MOCK_CONTACTS: Contact[] = [
     personality: "직설적, 효율 추구",
     contactFrequency: "화상 미팅",
     avatarUrl: "https://picsum.photos/200/200?random=10",
+    relationshipType: "비즈니스",
+    meetingFrequency: "0회 (첫 만남)",
   },
 ];
 
@@ -154,61 +175,61 @@ export const MOCK_CONTACTS: Contact[] = [
 export const MOCK_MEETINGS: Meeting[] = [
   // --- February (Past) ---
   {
-    id: "m1", contactId: "c1", date: "2026-02-05T13:00:00", location: "성수동 카페",
+    id: "m1", contactIds: ["c1"], date: "2026-02-05T13:00:00", location: "성수동 카페",
     title: "네오뷰티 비건 라인 원료 미팅",
     pastContext: { lastMetDate: "", lastMetLocation: "", keywords: [], summary: "" },
     userNote: "(주)네오뷰티 상품기획팀장. 비건 원료 트렌드와 친환경 패키징에 관심이 큼. 최근 '테니스'에 빠져 주말마다 동호회 활동 중."
   },
   {
-    id: "m2", contactId: "c2", date: "2026-02-06T10:00:00", location: "강남역 인근 법무법인",
+    id: "m2", contactIds: ["c2"], date: "2026-02-06T10:00:00", location: "강남역 인근 법무법인",
     title: "수출 계약서 법률 자문",
     pastContext: { lastMetDate: "", lastMetLocation: "", keywords: [], summary: "" },
     userNote: "법무법인 율곡 파트너 변호사. 기업 M&A 및 공정거래법 전문. 클래식 음악 감상이 취미이며 최근 '바이닐(LP) 수집'을 시작함."
   },
   {
-    id: "m3", contactId: "c3", date: "2026-02-09T16:00:00", location: "여의도 IFC몰",
+    id: "m3", contactIds: ["c3"], date: "2026-02-09T16:00:00", location: "여의도 IFC몰",
     title: "북미 유통망 진출 전략 논의",
     pastContext: { lastMetDate: "", lastMetLocation: "", keywords: [], summary: "" },
     userNote: "글로벌 유통사 입점 담당자. 한국 스킨케어 브랜드의 북미 진출 전략 관심. 채식주의자(Vegan)이며 최근 한국의 '사찰 음식'에 관심이 생김."
   },
   {
-    id: "m4", contactId: "c4", date: "2026-02-11T19:00:00", location: "판교역 이자카야",
+    id: "m4", contactIds: ["c4"], date: "2026-02-11T19:00:00", location: "판교역 이자카야",
     title: "커넥트 AI 마케팅 협업 식사",
     pastContext: { lastMetDate: "", lastMetLocation: "", keywords: [], summary: "" },
     userNote: "IT 스타트업 '커넥트' 대표. 생성형 AI를 활용한 마케팅 자동화 관심. 반려견(골든 리트리버)을 키우며 유기견 봉사활동에 열심임."
   },
   {
-    id: "m5", contactId: "c5", date: "2026-02-13T14:00:00", location: "광화문 오피스",
+    id: "m5", contactIds: ["c5"], date: "2026-02-13T14:00:00", location: "광화문 오피스",
     title: "백화점 봄 시즌 팝업 제안",
     pastContext: { lastMetDate: "", lastMetLocation: "", keywords: [], summary: "" },
     userNote: "신세계백화점 MD. 럭셔리 뷰티 팝업스토어 기획 중. 스트레스 해소법으로 '명상과 요가'를 즐기며 향수(Niche Perfume) 컬렉터임."
   },
   {
-    id: "m6", contactId: "c6", date: "2026-02-16T12:00:00", location: "잠실 롯데월드몰",
+    id: "m6", contactIds: ["c6"], date: "2026-02-16T12:00:00", location: "잠실 롯데월드몰",
     title: "물류 자동화 설비 도입 오찬",
     pastContext: { lastMetDate: "", lastMetLocation: "", keywords: [], summary: "" },
     userNote: "유통 대기업 물류 혁신팀. 저온 물류(Cold Chain) 및 자동화 설비 도입 검토 중. 와인 애호가로 특히 '프랑스 부르고뉴' 와인을 좋아함."
   },
   {
-    id: "m7", contactId: "c7", date: "2026-02-18T11:00:00", location: "홍대역 인근 스튜디오",
+    id: "m7", contactIds: ["c7"], date: "2026-02-18T11:00:00", location: "홍대역 인근 스튜디오",
     title: "브랜드 필름 제작 킥오프",
     pastContext: { lastMetDate: "", lastMetLocation: "", keywords: [], summary: "" },
     userNote: "프리랜서 영상 크리에이티브 디렉터. 숏폼 광고 및 브랜드 필름 제작 관심. 최근 '필름 카메라' 출사에 재미를 붙였으며 제주도 여행 계획 중."
   },
   {
-    id: "m8", contactId: "c8", date: "2026-02-20T15:00:00", location: "부산 벡스코(BEXCO)",
+    id: "m8", contactIds: ["c8"], date: "2026-02-20T15:00:00", location: "부산 벡스코(BEXCO)",
     title: "기능성 앰플 일본 통관 관련",
     pastContext: { lastMetDate: "", lastMetLocation: "", keywords: [], summary: "" },
     userNote: "일본 대형 드러그스토어 바이어. K-뷰티 기능성 앰플의 일본 통관 규제 관심. 일본 전통차(茶) 전문가이며 최근 '한국 다도'를 배우고 싶어 함."
   },
   {
-    id: "m9", contactId: "c9", date: "2026-02-23T18:00:00", location: "신사동 가로수길",
+    id: "m9", contactIds: ["c9"], date: "2026-02-23T18:00:00", location: "신사동 가로수길",
     title: "상반기 인플루언서 PR 전략",
     pastContext: { lastMetDate: "", lastMetLocation: "", keywords: [], summary: "" },
     userNote: "홍보대행사 PR 매니저. 인플루언서 협업 및 위기 관리 커뮤니케이션 전문. 캠핑 마니아로 주말마다 '오토캠핑'을 떠나며 캠핑 장비 업그레이드 중."
   },
   {
-    id: "m10", contactId: "c10", date: "2026-02-25T09:00:00", location: "온라인 줌(Zoom) 미팅",
+    id: "m10", contactIds: ["c10"], date: "2026-02-25T09:00:00", location: "온라인 줌(Zoom) 미팅",
     title: "배송 로봇 한국 시장 조사",
     pastContext: { lastMetDate: "", lastMetLocation: "", keywords: [], summary: "" },
     userNote: "독일 물류 스타트업 엔지니어. 자율주행 배송 로봇의 한국 시장 도입 관심. '마라톤'이 취미이며 올해 가을 베를린 마라톤 대회 참가를 준비 중."
@@ -217,52 +238,52 @@ export const MOCK_MEETINGS: Meeting[] = [
   // --- March/April (Future) ---
   // Note: pastContext for these is derived from the Feb meetings above.
   {
-    id: "m11", contactId: "c1", date: "2026-03-12T14:00:00", location: "코엑스 박람회장",
+    id: "m11", contactIds: ["c1"], date: "2026-03-12T14:00:00", location: "코엑스 박람회장",
     title: "뷰티 엑스포 동반 참관",
     pastContext: { lastMetDate: "2026-02-05", lastMetLocation: "성수동 카페", keywords: ["비건", "테니스"], summary: "비건 원료 트렌드와 친환경 패키징에 관심이 큼. 최근 '테니스'에 빠져 주말마다 동호회 활동 중." }
   },
   {
-    id: "m12", contactId: "c2", date: "2026-03-25T18:00:00", location: "서초동 와인바",
+    id: "m12", contactIds: ["c2"], date: "2026-03-25T18:00:00", location: "서초동 와인바",
     title: "자문 보고서 리뷰 및 석식",
     pastContext: { lastMetDate: "2026-02-06", lastMetLocation: "강남역 법무법인", keywords: ["M&A", "LP수집"], summary: "기업 M&A 및 공정거래법 전문. 클래식 음악 감상이 취미이며 최근 '바이닐(LP) 수집'을 시작함." }
   },
   {
-    id: "m13", contactId: "c3", date: "2026-04-02T11:00:00", location: "인천공항 라운지",
+    id: "m13", contactIds: ["c3"], date: "2026-04-02T11:00:00", location: "인천공항 라운지",
     title: "최종 입점 계약 체결 및 배웅",
     pastContext: { lastMetDate: "2026-02-09", lastMetLocation: "여의도 IFC몰", keywords: ["북미진출", "사찰음식"], summary: "한국 스킨케어 북미 진출 전략 관심. 채식주의자(Vegen)이며 최근 한국의 '사찰 음식'에 관심이 생김." }
   },
   {
-    id: "m14", contactId: "c4", date: "2026-03-18T15:00:00", location: "판교 사옥 회의실",
+    id: "m14", contactIds: ["c4"], date: "2026-03-18T15:00:00", location: "판교 사옥 회의실",
     title: "솔루션 시연 및 투자 논의",
     pastContext: { lastMetDate: "2026-02-11", lastMetLocation: "판교역 이자카야", keywords: ["AI마케팅", "반려견"], summary: "생성형 AI를 활용한 마케팅 자동화 관심. 반려견(골든 리트리버)을 키우며 유기견 봉사활동에 열심임." }
   },
   {
-    id: "m15", contactId: "c5", date: "2026-04-08T16:00:00", location: "명동 롯데호텔",
+    id: "m15", contactIds: ["c5"], date: "2026-04-08T16:00:00", location: "명동 롯데호텔",
     title: "팝업스토어 최종 브랜드 확정",
     pastContext: { lastMetDate: "2026-02-13", lastMetLocation: "광화문 오피스", keywords: ["팝업기획", "요가"], summary: "럭셔리 뷰티 팝업스토어 기획 중. 스트레스 해소법으로 '명상과 요가'를 즐기며 향수(Niche Perfume) 컬렉터임." }
   },
   {
-    id: "m16", contactId: "c6", date: "2026-03-30T13:00:00", location: "의왕 물류센터",
+    id: "m16", contactIds: ["c6"], date: "2026-03-30T13:00:00", location: "의왕 물류센터",
     title: "스마트 물류 현장 실사",
     pastContext: { lastMetDate: "2026-02-16", lastMetLocation: "잠실 롯데월드몰", keywords: ["콜드체인", "와인"], summary: "저온 물류 및 자동화 설비 도입 검토 중. 와인 애호가로 특히 '프랑스 부르고뉴' 와인을 좋아함." }
   },
   {
-    id: "m17", contactId: "c7", date: "2026-04-15T14:00:00", location: "한남동 카페",
+    id: "m17", contactIds: ["c7"], date: "2026-04-15T14:00:00", location: "한남동 카페",
     title: "광고 영상 1차 가편집본 리뷰",
     pastContext: { lastMetDate: "2026-02-18", lastMetLocation: "홍대역 스튜디오", keywords: ["숏폼광고", "필름카메라"], summary: "숏폼 광고 및 브랜드 필름 제작 관심. 최근 '필름 카메라' 출사에 재미를 붙였으며 제주도 여행 계획 중." }
   },
   {
-    id: "m18", contactId: "c8", date: "2026-03-20T12:00:00", location: "도쿄 긴자(출장)",
+    id: "m18", contactIds: ["c8"], date: "2026-03-20T12:00:00", location: "도쿄 긴자(출장)",
     title: "현지 드러그스토어 매장 답사",
     pastContext: { lastMetDate: "2026-02-20", lastMetLocation: "부산 벡스코", keywords: ["통관규제", "다도"], summary: "일본 통관 규제 관심. 일본 전통차(茶) 전문가이며 최근 '한국 다도'를 배우고 싶어 함." }
   },
   {
-    id: "m19", contactId: "c9", date: "2026-04-22T19:00:00", location: "가평 캠핑장",
+    id: "m19", contactIds: ["c9"], date: "2026-04-22T19:00:00", location: "가평 캠핑장",
     title: "미디어 업계 네트워킹 데이",
     pastContext: { lastMetDate: "2026-02-23", lastMetLocation: "신사동 가로수길", keywords: ["위기관리", "오토캠핑"], summary: "인플루언서 협업 및 위기 관리 커뮤니케이션 전문. 캠핑 마니아로 주말마다 '오토캠핑'을 떠나며 캠핑 장비 업그레이드 중." }
   },
   {
-    id: "m20", contactId: "c10", date: "2026-04-28T17:00:00", location: "온라인 줌(Zoom)",
+    id: "m20", contactIds: ["c10"], date: "2026-04-28T17:00:00", location: "온라인 줌(Zoom)",
     title: "로봇 운영 결과 및 후속 미팅",
     pastContext: { lastMetDate: "2026-02-25", lastMetLocation: "온라인 줌", keywords: ["로봇배송", "마라톤"], summary: "자율주행 배송 로봇의 한국 시장 도입 관심. '마라톤'이 취미이며 올해 가을 베를린 마라톤 대회 참가를 준비 중." }
   },

@@ -64,13 +64,17 @@ export const generateGuideStreaming = async (
   meeting: Meeting,
   historyNotes: string,
   onPartialGuide: (partial: Partial<SmallTalkGuide>) => void,
+  additionalContacts?: Contact[],
 ): Promise<SmallTalkGuide> => {
+  const allContacts = additionalContacts && additionalContacts.length > 0
+    ? [contact, ...additionalContacts]
+    : [contact];
   const response = await fetch(FUNCTION_URL, {
     method: "POST",
     headers,
     body: JSON.stringify({
       action: 'generateGuide',
-      payload: { user, contact, meeting, historyNotes, stream: true },
+      payload: { user, contact, contacts: allContacts, meeting, historyNotes, stream: true },
     }),
   });
 
@@ -135,11 +139,15 @@ export const generateGuide = async (
   user: UserProfile,
   contact: Contact,
   meeting: Meeting,
-  historyNotes: string
+  historyNotes: string,
+  additionalContacts?: Contact[],
 ): Promise<SmallTalkGuide> => {
+  const allContacts = additionalContacts && additionalContacts.length > 0
+    ? [contact, ...additionalContacts]
+    : [contact];
   const result = await callEdgeFunction({
     action: 'generateGuide',
-    payload: { user, contact, meeting, historyNotes },
+    payload: { user, contact, contacts: allContacts, meeting, historyNotes },
   });
 
   return {
@@ -172,17 +180,22 @@ export const prefetchGuides = async (
   });
 
   for (const meeting of upcomingMeetings) {
-    const contact = contacts.find(c => c.id === meeting.contactId);
-    if (!contact) continue;
+    const primaryContact = contacts.find(c => meeting.contactIds.includes(c.id));
+    if (!primaryContact) continue;
+
+    const additionalContacts = meeting.contactIds
+      .filter(id => id !== primaryContact.id)
+      .map(id => contacts.find(c => c.id === id))
+      .filter((c): c is Contact => !!c);
 
     const historyNotes = allMeetings
-      .filter(m => m.contactId === contact.id && new Date(m.date) < new Date(meeting.date) && m.userNote?.trim())
+      .filter(m => m.contactIds.some(id => meeting.contactIds.includes(id)) && new Date(m.date) < new Date(meeting.date) && m.userNote?.trim())
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .map(m => `[${new Date(m.date).toLocaleDateString('ko-KR')}] ${m.userNote}`)
       .join("\n---\n");
 
     try {
-      const guide = await generateGuide(supabase, user, contact, meeting, historyNotes);
+      const guide = await generateGuide(supabase, user, primaryContact, meeting, historyNotes, additionalContacts);
       onGuideReady(meeting.id, guide);
     } catch (e) {
       console.error(`Prefetch failed for meeting ${meeting.id}:`, e);

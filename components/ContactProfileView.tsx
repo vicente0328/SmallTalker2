@@ -26,10 +26,12 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
       tags: contact.tags.join(', '),
       businessInterests: contact.interests.business.join(', '),
       lifestyleInterests: contact.interests.lifestyle.join(', '),
-      personality: contact.personality
+      personality: contact.personality,
+      relationshipType: contact.relationshipType || '',
+      meetingFrequency: contact.meetingFrequency || '',
   });
 
-  const contactMeetings = meetings.filter(m => m.contactId === contact.id);
+  const contactMeetings = meetings.filter(m => m.contactIds.includes(contact.id));
 
   const isTodayDate = (dateString: string) => {
     const d = new Date(dateString);
@@ -70,7 +72,9 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
               business: formData.businessInterests.split(',').map(s => s.trim()).filter(s => s),
               lifestyle: formData.lifestyleInterests.split(',').map(s => s.trim()).filter(s => s),
           },
-          personality: formData.personality
+          personality: formData.personality,
+          relationshipType: formData.relationshipType,
+          meetingFrequency: formData.meetingFrequency,
       };
       onUpdateContact(updated);
       setIsEditing(false);
@@ -161,6 +165,78 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
                 </div>
                 <span className="text-xs font-medium text-slate-600">Email</span>
             </a>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-bold text-slate-900 px-1">나(User)와의 관계</h3>
+
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <div className="flex items-center justify-between mb-3">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-violet-500"></span>
+                    관계 유형
+                </h4>
+                {!isEditing && (
+                    <button onClick={() => setIsEditing(true)} className="text-[11px] font-semibold text-indigo-500 hover:text-indigo-700 transition-colors px-2 py-1 rounded-lg hover:bg-indigo-50">편집하기</button>
+                )}
+            </div>
+            {isEditing ? (
+                <div className="flex flex-wrap gap-2">
+                    {['비즈니스', '친구', '가족', '지인', '멘토/멘티'].map(type => (
+                        <button
+                            key={type}
+                            type="button"
+                            onClick={() => setFormData({...formData, relationshipType: formData.relationshipType === type ? '' : type})}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${formData.relationshipType === type ? 'bg-violet-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                        >
+                            {type}
+                        </button>
+                    ))}
+                </div>
+            ) : (
+                <div>
+                    {contact.relationshipType ? (
+                        <span className="px-3 py-1.5 bg-violet-50 text-violet-700 text-sm font-medium rounded-lg">{contact.relationshipType}</span>
+                    ) : (
+                        <span className="text-slate-300 text-sm italic cursor-pointer hover:text-slate-400" onClick={() => setIsEditing(true)}>관계를 설정하세요</span>
+                    )}
+                </div>
+            )}
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <div className="flex items-center justify-between mb-3">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    지난 만남 횟수
+                </h4>
+                {!isEditing && (
+                    <button onClick={() => setIsEditing(true)} className="text-[11px] font-semibold text-indigo-500 hover:text-indigo-700 transition-colors px-2 py-1 rounded-lg hover:bg-indigo-50">편집하기</button>
+                )}
+            </div>
+            {isEditing ? (
+                <div className="flex flex-wrap gap-2">
+                    {['0회 (첫 만남)', '1~3회', '4회 이상'].map(freq => (
+                        <button
+                            key={freq}
+                            type="button"
+                            onClick={() => setFormData({...formData, meetingFrequency: formData.meetingFrequency === freq ? '' : freq})}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${formData.meetingFrequency === freq ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                        >
+                            {freq}
+                        </button>
+                    ))}
+                </div>
+            ) : (
+                <div>
+                    {contact.meetingFrequency ? (
+                        <span className="px-3 py-1.5 bg-emerald-50 text-emerald-700 text-sm font-medium rounded-lg">{contact.meetingFrequency}</span>
+                    ) : (
+                        <span className="text-slate-300 text-sm italic cursor-pointer hover:text-slate-400" onClick={() => setIsEditing(true)}>만남 횟수를 설정하세요</span>
+                    )}
+                </div>
+            )}
         </div>
       </div>
 

@@ -143,6 +143,8 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
             personality: "",
             contactFrequency: "Unknown",
             avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=random`,
+            relationshipType: "",
+            meetingFrequency: "",
           };
           onAddContact(newContact);
           added++;
@@ -187,7 +189,9 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
         },
         personality: formPersonality,
         contactFrequency: "Unknown",
-        avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(formName)}&background=random`
+        avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(formName)}&background=random`,
+        relationshipType: "",
+        meetingFrequency: "",
     };
 
     if (onAddContact) onAddContact(newContact);

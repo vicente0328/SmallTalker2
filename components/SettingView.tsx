@@ -15,8 +15,18 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncError, setSyncError] = useState<string | null>(null);
 
+  const [businessInput, setBusinessInput] = useState(user.interests.business.join(', '));
+  const [lifestyleInput, setLifestyleInput] = useState(user.interests.lifestyle.join(', '));
+
   const handleSaveProfile = () => {
-    onUpdateUser(profileData);
+    const updated: UserProfile = {
+      ...profileData,
+      interests: {
+        business: businessInput.split(',').map(s => s.trim()).filter(s => s),
+        lifestyle: lifestyleInput.split(',').map(s => s.trim()).filter(s => s),
+      }
+    };
+    onUpdateUser(updated);
     setIsEditingProfile(false);
   };
 
@@ -39,8 +49,8 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
     return (
       <div className="space-y-6 animate-fade-in pb-12">
         <div className="flex items-center gap-2 mb-2">
-            <button 
-                onClick={() => setIsEditingProfile(false)} 
+            <button
+                onClick={() => setIsEditingProfile(false)}
                 className="text-indigo-600 flex items-center font-medium hover:underline"
             >
                 <svg className="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -52,10 +62,10 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
 
         <div className="flex flex-col items-center py-6 bg-white rounded-2xl shadow-sm border border-slate-200">
              <div className="relative group">
-                <img 
-                    src={profileData.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=6366f1&color=fff`} 
-                    className="w-24 h-24 rounded-full object-cover border-4 border-slate-50 shadow-md" 
-                    alt="User" 
+                <img
+                    src={profileData.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=6366f1&color=fff`}
+                    className="w-24 h-24 rounded-full object-cover border-4 border-slate-50 shadow-md"
+                    alt="User"
                 />
             </div>
         </div>
@@ -66,8 +76,8 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
                 <div className="space-y-3">
                     <div>
                         <label className="block text-xs font-bold text-slate-500 mb-1">이름</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                             value={profileData.name}
                             onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
@@ -76,8 +86,8 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className="block text-xs font-bold text-slate-500 mb-1">회사/소속</label>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                                 value={profileData.company}
                                 onChange={(e) => setProfileData({ ...profileData, company: e.target.value })}
@@ -85,15 +95,80 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-slate-500 mb-1">직책/역할</label>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                                 value={profileData.role}
                                 onChange={(e) => setProfileData({ ...profileData, role: e.target.value })}
                             />
                         </div>
                     </div>
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 mb-1">업종/산업</label>
+                        <input
+                            type="text"
+                            className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                            value={profileData.industry}
+                            onChange={(e) => setProfileData({ ...profileData, industry: e.target.value })}
+                        />
+                    </div>
                 </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">관심사</h3>
+                <div className="space-y-3">
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 mb-1 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                            Business Interests
+                        </label>
+                        <input
+                            type="text"
+                            className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                            value={businessInput}
+                            onChange={(e) => setBusinessInput(e.target.value)}
+                            placeholder="비즈니스 관심사 (쉼표로 구분)"
+                        />
+                        {businessInput && (
+                            <div className="flex flex-wrap gap-1.5 mt-2">
+                                {businessInput.split(',').map(s => s.trim()).filter(s => s).map((item, i) => (
+                                    <span key={i} className="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-lg">{item}</span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 mb-1 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                            Lifestyle Interests
+                        </label>
+                        <input
+                            type="text"
+                            className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                            value={lifestyleInput}
+                            onChange={(e) => setLifestyleInput(e.target.value)}
+                            placeholder="라이프스타일 관심사 (쉼표로 구분)"
+                        />
+                        {lifestyleInput && (
+                            <div className="flex flex-wrap gap-1.5 mt-2">
+                                {lifestyleInput.split(',').map(s => s.trim()).filter(s => s).map((item, i) => (
+                                    <span key={i} className="px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded-lg">{item}</span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">메모</h3>
+                <textarea
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all min-h-[100px] text-sm"
+                    value={profileData.memo || ''}
+                    onChange={(e) => setProfileData({ ...profileData, memo: e.target.value })}
+                    placeholder="자신에 대한 메모를 자유롭게 작성하세요 (예: 대화 시 참고할 자기소개, 최근 관심사 등)"
+                />
             </div>
         </div>
 
@@ -111,7 +186,7 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       <h2 className="text-3xl font-bold text-slate-900 px-1">Settings</h2>
-      
+
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 divide-y divide-slate-100 overflow-hidden">
         <div onClick={() => setIsEditingProfile(true)} className="p-6 flex items-center justify-between hover:bg-slate-50 cursor-pointer group transition-colors">
             <div className="flex items-center gap-4">
@@ -119,6 +194,16 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
                 <div>
                     <h3 className="text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{user.name}</h3>
                     <p className="text-sm text-slate-500 font-medium">{user.role} · {user.company}</p>
+                    {(user.interests.business.length > 0 || user.interests.lifestyle.length > 0) && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                            {user.interests.business.slice(0, 2).map(i => (
+                                <span key={i} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-medium rounded">{i}</span>
+                            ))}
+                            {user.interests.lifestyle.slice(0, 2).map(i => (
+                                <span key={i} className="px-1.5 py-0.5 bg-amber-50 text-amber-600 text-[10px] font-medium rounded">{i}</span>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
             <svg className="w-5 h-5 text-slate-300 group-hover:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
@@ -126,7 +211,7 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
 
         <div className="p-6 space-y-4">
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">External Services</h3>
-            
+
             {syncError && (
                 <div className="p-4 bg-red-50 border border-red-100 rounded-2xl animate-shake">
                     <div className="flex items-center gap-2 text-red-600 mb-2">
@@ -134,13 +219,13 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
                         <p className="text-sm font-bold">연동 설정 오류</p>
                     </div>
                     <p className="text-xs text-red-500 leading-relaxed mb-3">
-                        {isProviderDisabledError 
+                        {isProviderDisabledError
                             ? "Google 로그인 서비스가 Supabase 설정에서 활성화되어 있지 않습니다."
                             : isAccessDeniedError
                             ? "Google 인증 절차를 완료할 수 없습니다 (접근 차단됨)."
                             : syncError}
                     </p>
-                    
+
                     {isProviderDisabledError && (
                         <div className="bg-white/60 p-3 rounded-xl border border-red-100 space-y-2">
                             <p className="text-[11px] font-bold text-slate-700">해결 방법:</p>
@@ -165,7 +250,7 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
                         <p className="text-[10px] text-slate-400">내 캘린더 일정과 동기화</p>
                     </div>
                 </div>
-                <button 
+                <button
                     onClick={handleSync}
                     disabled={isSyncing}
                     className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${isSyncing ? 'bg-indigo-100 text-indigo-400' : 'bg-indigo-600 text-white shadow-sm hover:bg-indigo-500'}`}

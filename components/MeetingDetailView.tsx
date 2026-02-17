@@ -9,9 +9,10 @@ import ContextualTip from './ContextualTip';
 interface MeetingDetailViewProps {
   supabase: SupabaseClient;
   meeting: Meeting;
-  contact: Contact;
+  contacts: Contact[];
   user: UserProfile;
   allMeetings: Meeting[];
+  allContacts: Contact[];
   onBack: () => void;
   onUpdateNote?: (meetingId: string, note: string) => Promise<void> | void;
   onSaveAIGuide?: (meetingId: string, guide: SmallTalkGuide) => Promise<void> | void;
@@ -25,9 +26,10 @@ interface MeetingDetailViewProps {
 const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
   supabase,
   meeting,
-  contact,
+  contacts,
   user,
   allMeetings = [],
+  allContacts = [],
   onBack,
   onUpdateNote,
   onSaveAIGuide,
@@ -37,6 +39,8 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
   dismissedTips = new Set(),
   onDismissTip = () => {}
 }) => {
+  const contact = contacts[0];
+  const additionalContacts = contacts.slice(1);
   const [guide, setGuide] = useState<SmallTalkGuide | null>(meeting.aiGuide || null);
   const [partialGuide, setPartialGuide] = useState<Partial<SmallTalkGuide>>({});
   const [loading, setLoading] = useState(!meeting.aiGuide);
@@ -56,14 +60,15 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
   const isToday = meetingDate.toDateString() === CURRENT_DATE.toDateString();
   const showAIGuide = !isPastMeeting || isToday;
 
-  // 히스토리 추출 로직: 이 연락처와 관련된 '과거'의 모든 노트를 취합하여 연속성 확보
+  // 히스토리 추출 로직: 이 미팅의 모든 참석자와 관련된 '과거'의 모든 노트를 취합하여 연속성 확보
+  const meetingContactIds = meeting.contactIds;
   const historyNotes = allMeetings
-    .filter(m => m.contactId === contact.id && new Date(m.date) < meetingDate && m.userNote && m.userNote.trim() !== "")
+    .filter(m => m.contactIds.some(id => meetingContactIds.includes(id)) && new Date(m.date) < meetingDate && m.userNote && m.userNote.trim() !== "")
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .map(m => `[${new Date(m.date).toLocaleDateString('ko-KR')}] ${m.userNote}`)
     .join("\n---\n");
 
-  const contactMeetings = allMeetings.filter(m => m.contactId === contact.id && m.id !== meeting.id);
+  const contactMeetings = allMeetings.filter(m => m.contactIds.some(id => meetingContactIds.includes(id)) && m.id !== meeting.id);
   const pastMeetings = contactMeetings.filter(m => new Date(m.date) < new Date(meeting.date)).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   const futureMeetings = contactMeetings.filter(m => new Date(m.date) > new Date(meeting.date)).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
@@ -98,7 +103,8 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
       try {
         const data = await generateGuideStreaming(
           supabase, user, contact, meeting, historyNotes,
-          (partial) => { if (mounted) setPartialGuide(partial); }
+          (partial) => { if (mounted) setPartialGuide(partial); },
+          additionalContacts,
         );
         if (mounted) {
             setGuide(data);
@@ -239,17 +245,25 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
         </p>
       </div>
 
-      <section 
-        onClick={() => onSelectContact && onSelectContact(contact)}
-        className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex items-center gap-4 cursor-pointer hover:border-indigo-300 transition-all active:scale-[0.99] group"
-      >
-        <img src={contact.avatarUrl} className="w-14 h-14 rounded-full object-cover border border-slate-100 group-hover:ring-2 group-hover:ring-indigo-100 transition-all" />
-        <div className="flex-1">
-          <h2 className="text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{contact.name}</h2>
-          <p className="text-sm text-slate-500">{contact.company} · {contact.role}</p>
-        </div>
-        <svg className="w-5 h-5 text-slate-300 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-      </section>
+      <div className="space-y-2">
+        {contacts.map(c => (
+          <section
+            key={c.id}
+            onClick={() => onSelectContact && onSelectContact(c)}
+            className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex items-center gap-4 cursor-pointer hover:border-indigo-300 transition-all active:scale-[0.99] group"
+          >
+            <img src={c.avatarUrl} className="w-14 h-14 rounded-full object-cover border border-slate-100 group-hover:ring-2 group-hover:ring-indigo-100 transition-all" />
+            <div className="flex-1">
+              <h2 className="text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{c.name}</h2>
+              <p className="text-sm text-slate-500">{c.company} · {c.role}</p>
+              {c.relationshipType && (
+                <span className="inline-block mt-1 px-2 py-0.5 bg-violet-50 text-violet-600 text-[10px] font-medium rounded">{c.relationshipType}</span>
+              )}
+            </div>
+            <svg className="w-5 h-5 text-slate-300 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+          </section>
+        ))}
+      </div>
 
       {showAIGuide && (
         <div className="space-y-4">

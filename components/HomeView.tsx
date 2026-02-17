@@ -126,14 +126,14 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const upcomingMeeting = upcomingMeetings[0];
-  const upcomingContact = upcomingMeeting ? contacts.find(c => c.id === upcomingMeeting.contactId) : null;
+  const upcomingContact = upcomingMeeting ? contacts.find(c => upcomingMeeting.contactIds.includes(c.id)) : null;
 
   // Most recent past meeting
   const pastMeetings = meetings
     .filter(m => new Date(m.date) < CURRENT_DATE)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   const lastMeeting = pastMeetings[0];
-  const lastMeetingContact = lastMeeting ? contacts.find(c => c.id === lastMeeting.contactId) : null;
+  const lastMeetingContact = lastMeeting ? contacts.find(c => lastMeeting.contactIds.includes(c.id)) : null;
 
   const isToday = upcomingMeeting &&
     new Date(upcomingMeeting.date).toDateString() === CURRENT_DATE.toDateString();
@@ -209,6 +209,8 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
         personality: `${profile.ageRange}, ${profile.gender}`,
         contactFrequency: '',
         avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name.trim())}&background=6366f1&color=fff&bold=true`,
+        relationshipType: relation || '',
+        meetingFrequency: '',
       };
       onAddContact(newContact);
     }
