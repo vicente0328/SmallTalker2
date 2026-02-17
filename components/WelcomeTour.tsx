@@ -71,59 +71,85 @@ const SWIPE_THRESHOLD = 50;
 const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView }) => {
   const [step, setStep] = useState(0);
   const [dragX, setDragX] = useState(0);
-  const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const isDragging = useRef(false);
+  const directionLocked = useRef<'h' | 'v' | null>(null);
 
   const current = STEPS[step];
   const colors = COLOR_MAP[current.color];
   const isLast = step === STEPS.length - 1;
   const isFirst = step === 0;
 
-  const goNext = useCallback(() => {
-    if (isLast) return;
-    setSlideDir('left');
+  const animateToStep = useCallback((newStep: number, direction: 'left' | 'right') => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    // Slide out current card
+    setDragX(direction === 'left' ? -400 : 400);
     setTimeout(() => {
-      setStep(s => s + 1);
-      setSlideDir(null);
+      setStep(newStep);
+      // Position new card on opposite side, then animate to center
+      setDragX(direction === 'left' ? 400 : -400);
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          setDragX(0);
+          setTimeout(() => setIsAnimating(false), 250);
+        }, 30);
+      });
     }, 200);
-  }, [isLast]);
+  }, [isAnimating]);
+
+  const goNext = useCallback(() => {
+    if (isLast || isAnimating) return;
+    animateToStep(step + 1, 'left');
+  }, [isLast, isAnimating, step, animateToStep]);
 
   const goPrev = useCallback(() => {
-    if (isFirst) return;
-    setSlideDir('right');
-    setTimeout(() => {
-      setStep(s => s - 1);
-      setSlideDir(null);
-    }, 200);
-  }, [isFirst]);
+    if (isFirst || isAnimating) return;
+    animateToStep(step - 1, 'right');
+  }, [isFirst, isAnimating, step, animateToStep]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (isAnimating) return;
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
     isDragging.current = true;
-    setDragX(0);
-  }, []);
+    directionLocked.current = null;
+  }, [isAnimating]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isDragging.current) return;
+    if (!isDragging.current || isAnimating) return;
     const dx = e.touches[0].clientX - touchStartX.current;
     const dy = e.touches[0].clientY - touchStartY.current;
-    // Only track horizontal swipes
-    if (Math.abs(dx) > Math.abs(dy)) {
-      setDragX(dx);
+
+    // Lock direction after a small movement
+    if (!directionLocked.current && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+      directionLocked.current = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
     }
-  }, []);
+
+    if (directionLocked.current === 'h') {
+      // Clamp: don't allow dragging right on first step or left on last step
+      let clampedDx = dx;
+      if (isFirst && dx > 0) clampedDx = 0;
+      if (isLast && dx < 0) clampedDx = 0;
+      setDragX(clampedDx * 0.5);
+    }
+  }, [isAnimating, isFirst, isLast]);
 
   const handleTouchEnd = useCallback(() => {
+    if (!isDragging.current) return;
     isDragging.current = false;
+    directionLocked.current = null;
+
     if (dragX < -SWIPE_THRESHOLD && !isLast) {
       goNext();
     } else if (dragX > SWIPE_THRESHOLD && !isFirst) {
       goPrev();
+    } else {
+      // Snap back to center
+      setDragX(0);
     }
-    setDragX(0);
   }, [dragX, isLast, isFirst, goNext, goPrev]);
 
   const handleAction = () => {
@@ -141,13 +167,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
     }
   };
 
-  const slideClass = slideDir === 'left'
-    ? 'translate-x-[-100%] opacity-0'
-    : slideDir === 'right'
-    ? 'translate-x-[100%] opacity-0'
-    : 'translate-x-0 opacity-100';
-
-  const dragOpacity = dragX !== 0 ? Math.max(0.3, 1 - Math.abs(dragX) / 300) : 1;
+  const dragOpacity = Math.max(0.4, 1 - Math.abs(dragX) / 500);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
@@ -157,21 +177,23 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Swipeable content area */}
-        <div
-          className={`transition-all duration-200 ease-out ${slideDir ? slideClass : ''}`}
-          style={!slideDir ? { transform: `translateX(${dragX * 0.4}px)`, opacity: dragOpacity } : undefined}
-        >
-          {/* Header area with icon */}
-          <div className={`${colors.bg} px-6 pt-10 pb-8 flex flex-col items-center text-center transition-colors duration-200`}>
-            <div className={`${colors.iconBg} ${colors.iconText} p-4 rounded-2xl mb-5 shadow-sm`}>
-              {current.icon}
+        {/* Swipeable content area — fixed height to prevent layout shift */}
+        <div className="overflow-hidden" style={{ minHeight: 280 }}>
+          <div
+            className="transition-all duration-200 ease-out"
+            style={{ transform: `translateX(${dragX}px)`, opacity: dragOpacity }}
+          >
+            {/* Header area with icon */}
+            <div className={`${colors.bg} px-6 pt-10 pb-8 flex flex-col items-center text-center transition-colors duration-200`} style={{ minHeight: 280 }}>
+              <div className={`${colors.iconBg} ${colors.iconText} p-4 rounded-2xl mb-5 shadow-sm`}>
+                {current.icon}
+              </div>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+                Step {step + 1} of {STEPS.length}
+              </p>
+              <h2 className="text-xl font-bold text-slate-900 mb-2">{current.title}</h2>
+              <p className="text-sm text-slate-500 leading-relaxed whitespace-pre-line">{current.description}</p>
             </div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
-              Step {step + 1} of {STEPS.length}
-            </p>
-            <h2 className="text-xl font-bold text-slate-900 mb-2">{current.title}</h2>
-            <p className="text-sm text-slate-500 leading-relaxed whitespace-pre-line">{current.description}</p>
           </div>
         </div>
 
