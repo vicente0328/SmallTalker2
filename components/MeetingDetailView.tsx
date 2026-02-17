@@ -316,7 +316,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                             <div className="bg-st-blue/10 p-1.5 rounded-lg text-st-blue">
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                             </div>
-                            <h4 className="text-sm font-bold text-st-ink">Business Conversation Tip</h4>
+                            <h4 className="text-sm font-bold text-st-blue">Business Conversation Tip</h4>
                         </div>
                         <p className="text-st-ink font-semibold text-base leading-relaxed">{partialGuide.businessTip.content}</p>
                     </div>
@@ -393,7 +393,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                             <div className="bg-st-blue/10 p-1.5 rounded-lg text-st-blue">
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                             </div>
-                            <h4 className="text-sm font-bold text-st-ink">Business Tip</h4>
+                            <h4 className="text-sm font-bold text-st-blue">Business Tip</h4>
                           </div>
                           <p className="text-st-ink font-semibold text-sm leading-relaxed">{attendee.businessTip.content}</p>
                           {attendee.businessTip.source && (
@@ -406,10 +406,10 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
 
                         <div className="bg-white p-5 rounded-2xl shadow-sm relative overflow-hidden">
                           <div className="flex items-center gap-2 mb-3">
-                            <div className="bg-st-purple/10 p-1.5 rounded-lg text-st-purple">
+                            <div className="bg-st-yellow/10 p-1.5 rounded-lg text-st-yellow">
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
-                            <h4 className="text-sm font-bold text-st-ink">Life Style Insight</h4>
+                            <h4 className="text-sm font-bold text-st-yellow">Life Style Insight</h4>
                           </div>
                           <p className="text-st-ink font-semibold text-sm leading-relaxed">{attendee.lifeTip}</p>
                         </div>
@@ -424,7 +424,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                         <div className="bg-st-blue/10 p-1.5 rounded-lg text-st-blue">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                         </div>
-                        <h4 className="text-sm font-bold text-st-ink">Business Conversation Tip</h4>
+                        <h4 className="text-sm font-bold text-st-blue">Business Conversation Tip</h4>
                     </div>
                     <p className="text-st-ink font-semibold text-base leading-relaxed mb-3">{guide.businessTip.content}</p>
                     {guide.businessTip.source && (
@@ -445,15 +445,15 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
 
                   <div className="bg-white p-6 rounded-2xl shadow-sm relative overflow-hidden">
                     <div className="flex items-center gap-2 mb-4">
-                        <div className="bg-st-purple/10 p-1.5 rounded-lg text-st-purple">
+                        <div className="bg-st-yellow/10 p-1.5 rounded-lg text-st-yellow">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
-                        <h4 className="text-sm font-bold text-st-ink">Life Style Insight</h4>
+                        <h4 className="text-sm font-bold text-st-yellow">Life Style Insight</h4>
                     </div>
                     <p className="text-st-ink font-semibold text-base leading-relaxed">{guide.lifeTip}</p>
                     <button
                       onClick={() => handleSearchLife(guide.lifeTip)}
-                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-transparent text-st-blue rounded-xl text-sm font-semibold hover:bg-st-blue/5 transition-all"
+                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-transparent text-st-yellow rounded-xl text-sm font-semibold hover:bg-st-yellow/5 transition-all"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                       관련 뉴스 더 알아보기

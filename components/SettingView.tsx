@@ -209,6 +209,15 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
             <svg className="w-5 h-5 text-st-muted group-hover:text-st-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
         </div>
 
+        <div className="px-6 py-3 bg-st-bg/50 flex items-start gap-2.5">
+            <svg className="w-4 h-4 text-st-blue shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-xs text-st-muted leading-relaxed">
+                위 프로필을 탭하면 이름, 회사, 직책, 관심사 등을 수정할 수 있습니다. 프로필이 정확할수록 AI가 더 맞춤형 대화 주제를 추천합니다.
+            </p>
+        </div>
+
         <div className="p-6 space-y-4">
             <h3 className="text-xs font-bold text-st-muted uppercase tracking-widest">External Services</h3>
 

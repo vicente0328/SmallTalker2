@@ -333,8 +333,11 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
         </div>
       </div>
 
-      {isEditing && (
-        <div className="sticky bottom-0 z-10 glass border-t border-st-box -mx-4 px-4 py-4 mt-6 rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+      <div
+        className={`sticky bottom-0 z-10 glass border-t border-st-box -mx-4 px-4 py-4 mt-6 rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.08)] transition-all duration-200 will-change-transform ${
+          isEditing ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none h-0 py-0 mt-0 border-t-0 overflow-hidden'
+        }`}
+      >
           <div className="flex gap-3 max-w-2xl mx-auto">
             <button
               onClick={() => setIsEditing(false)}
@@ -357,8 +360,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
               이 연락처 삭제하기
             </button>
           )}
-        </div>
-      )}
+      </div>
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center glass-overlay p-4 animate-fade-in">
