@@ -99,18 +99,23 @@ const App: React.FC = () => {
 
         if (!userData) {
           const meta = session.user.user_metadata;
-          const { data: newProfile } = await supabase
+          const { data: newProfile, error: insertError } = await supabase
             .from('user_profiles')
             .insert([{
               id: session.user.id,
               name: meta?.full_name || meta?.name || "New User",
               email: session.user.email,
               avatar_url: meta?.avatar_url || "",
+              role: "",
+              company: "",
+              industry: "",
+              phone_number: "",
               interests: { business: [], lifestyle: [] },
               memo: "",
             }])
             .select()
             .single();
+          if (insertError) console.error("User profile insert error:", insertError);
           if (newProfile) userData = newProfile;
         }
 
@@ -199,14 +204,17 @@ const App: React.FC = () => {
   const handleUpdateUser = async (updatedUser: UserProfile) => {
     setUser(updatedUser);
     if (session) {
-      await supabase.from('user_profiles').update({
+      const { error } = await supabase.from('user_profiles').update({
         name: updatedUser.name,
         role: updatedUser.role,
         company: updatedUser.company,
         industry: updatedUser.industry,
+        phone_number: updatedUser.phoneNumber,
+        email: updatedUser.email,
         interests: updatedUser.interests,
         memo: updatedUser.memo,
       }).eq('id', session.user.id);
+      if (error) console.error("User profile update error:", error);
     }
   };
 

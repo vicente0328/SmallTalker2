@@ -4,7 +4,7 @@ import { UserProfile } from '../types';
 
 interface SettingViewProps {
   user: UserProfile;
-  onUpdateUser: (user: UserProfile) => void;
+  onUpdateUser: (user: UserProfile) => Promise<void> | void;
   onLogout?: () => void;
   onGoogleSync?: () => Promise<void>;
 }
@@ -18,7 +18,9 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
   const [businessInput, setBusinessInput] = useState(user.interests.business.join(', '));
   const [lifestyleInput, setLifestyleInput] = useState(user.interests.lifestyle.join(', '));
 
-  const handleSaveProfile = () => {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveProfile = async () => {
     const updated: UserProfile = {
       ...profileData,
       interests: {
@@ -26,8 +28,15 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
         lifestyle: lifestyleInput.split(',').map(s => s.trim()).filter(s => s),
       }
     };
-    onUpdateUser(updated);
-    setIsEditingProfile(false);
+    setIsSaving(true);
+    try {
+      await onUpdateUser(updated);
+      setIsEditingProfile(false);
+    } catch (e) {
+      console.error("Profile save failed:", e);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleSync = async () => {
@@ -173,8 +182,8 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
         </div>
 
         <div className="flex gap-3 pt-4">
-            <button onClick={() => setIsEditingProfile(false)} className="flex-1 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl">취소</button>
-            <button onClick={handleSaveProfile} className="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl">저장</button>
+            <button onClick={() => setIsEditingProfile(false)} className="flex-1 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl" disabled={isSaving}>취소</button>
+            <button onClick={handleSaveProfile} className="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl disabled:opacity-50" disabled={isSaving}>{isSaving ? '저장 중...' : '저장'}</button>
         </div>
       </div>
     );
