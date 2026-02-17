@@ -200,7 +200,7 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (currentView) {
       case ViewState.HOME:
-        return <HomeView user={user} meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} />;
+        return <HomeView user={user} meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onUpdateContact={handleUpdateContact} onAddContact={handleAddContact} />;
       case ViewState.CALENDAR:
         return <CalendarView meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onAddMeeting={handleAddMeeting} onEditMeeting={()=>{}} onAddContact={handleAddContact} />;
       case ViewState.MEETING_DETAIL:
