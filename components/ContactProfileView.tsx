@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Contact, Meeting } from '../types';
 import { CURRENT_DATE } from '../constants';
+import Avatar from './Avatar';
 
 interface ContactProfileViewProps {
   contact: Contact;
@@ -32,6 +33,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
       personality: contact.personality,
       relationshipType: contact.relationshipType || '',
       meetingFrequency: contact.meetingFrequency || '',
+      avatarUrl: contact.avatarUrl || '',
   });
 
   const contactMeetings = meetings.filter(m => m.contactIds.includes(contact.id));
@@ -78,6 +80,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
           personality: formData.personality,
           relationshipType: formData.relationshipType,
           meetingFrequency: formData.meetingFrequency,
+          avatarUrl: formData.avatarUrl,
       };
       onUpdateContact(updated);
       setIsEditing(false);
@@ -111,7 +114,14 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
 
       <div className="flex flex-col items-center pt-4 pb-6">
         <div className="w-28 h-28 rounded-full p-1 bg-gradient-to-tr from-st-box to-st-bg mb-4 shadow-lg">
-            <img src={contact.avatarUrl} alt={contact.name} className="w-full h-full rounded-full object-cover border-4 border-white" />
+            <Avatar
+              src={isEditing ? formData.avatarUrl : contact.avatarUrl}
+              name={contact.name}
+              size={104}
+              className="border-4 border-white"
+              editable={isEditing}
+              onChangePhoto={(url) => setFormData({...formData, avatarUrl: url})}
+            />
         </div>
 
         {isEditing ? (

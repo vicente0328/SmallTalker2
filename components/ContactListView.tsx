@@ -2,6 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { Contact } from '../types';
 import ContextualTip from './ContextualTip';
+import Avatar from './Avatar';
 
 interface ContactListViewProps {
   contacts: Contact[];
@@ -142,7 +143,7 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
             interests: { business: [], lifestyle: [] },
             personality: "",
             contactFrequency: "Unknown",
-            avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=random`,
+            avatarUrl: '',
             relationshipType: "",
             meetingFrequency: "",
           };
@@ -189,7 +190,7 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
         },
         personality: formPersonality,
         contactFrequency: "Unknown",
-        avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(formName)}&background=random`,
+        avatarUrl: '',
         relationshipType: "",
         meetingFrequency: "",
     };
@@ -278,7 +279,7 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
         {sortedContacts.length > 0 ? (
             sortedContacts.map((contact) => (
                 <div key={contact.id} onClick={() => onSelectContact(contact)} className="p-4 flex items-center gap-4 hover:bg-st-box/30 cursor-pointer transition-colors group">
-                    <img src={contact.avatarUrl} alt={contact.name} className="w-12 h-12 rounded-full object-cover border-2 border-transparent group-hover:border-st-muted transition-all" />
+                    <Avatar src={contact.avatarUrl} name={contact.name} size={48} className="border-2 border-transparent group-hover:border-st-muted transition-all" />
                     <div className="flex-1 min-w-0">
                         <h3 className="text-base font-bold text-st-ink truncate group-hover:text-st-ink transition-colors">{contact.name}</h3>
                         <p className="text-xs truncate">

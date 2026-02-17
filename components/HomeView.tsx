@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { UserProfile, Meeting, Contact } from '../types';
 import { CURRENT_DATE } from '../constants';
+import Avatar from './Avatar';
 
 interface HomeViewProps {
   user: UserProfile;
@@ -208,7 +209,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
         },
         personality: `${profile.ageRange}, ${profile.gender}`,
         contactFrequency: '',
-        avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name.trim())}&background=6366f1&color=fff&bold=true`,
+        avatarUrl: '',
         relationshipType: relation || '',
         meetingFrequency: '',
       };
@@ -291,7 +292,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
             <div className="w-full mt-4 md:mt-0">
                 <div className="flex items-center gap-3 md:gap-4 mb-3 md:mb-6 bg-white/5 p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/5 backdrop-blur-sm">
                     {upcomingContact && (
-                        <img src={upcomingContact.avatarUrl} className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-white/10 shrink-0 object-cover" alt={upcomingContact.name} />
+                        <Avatar src={upcomingContact.avatarUrl} name={upcomingContact.name} size={40} className="md:!w-12 md:!h-12 border-2 border-white/10" />
                     )}
                     <div className="min-w-0 flex-1">
                         <p className="text-white font-bold text-base md:text-lg truncate">{upcomingMeeting.title}</p>
@@ -341,7 +342,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
           </p>
 
           <div className="flex items-center gap-3 bg-st-bg p-3 md:p-4 rounded-xl border border-st-box">
-            <img src={lastMeetingContact.avatarUrl} className="w-10 h-10 md:w-11 md:h-11 rounded-full border-2 border-white shrink-0 object-cover shadow-sm" alt={lastMeetingContact.name} />
+            <Avatar src={lastMeetingContact.avatarUrl} name={lastMeetingContact.name} size={40} className="md:!w-11 md:!h-11 border-2 border-white shadow-sm" />
             <div className="min-w-0 flex-1">
               <p className="text-st-ink font-bold text-sm md:text-base truncate">{lastMeeting.title}</p>
               <p className="text-st-muted text-xs md:text-sm truncate">

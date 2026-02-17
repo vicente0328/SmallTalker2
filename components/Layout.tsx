@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { ViewState, UserProfile } from '../types';
+import Avatar from './Avatar';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -55,7 +56,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, user })
           </nav>
           <div className="p-4 border-t border-st-box">
             <div className="flex items-center gap-3">
-              <img src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=DCDADD&color=191519`} className="w-8 h-8 rounded-full object-cover" alt={user.name} />
+              <Avatar src={user.avatarUrl} name={user.name} size={32} />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-st-ink truncate">{user.name}</p>
                 <p className="text-xs text-st-muted truncate">{user.role || user.industry || '사용자'}</p>

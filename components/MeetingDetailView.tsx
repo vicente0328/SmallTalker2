@@ -5,6 +5,7 @@ import { Contact, Meeting, UserProfile, SmallTalkGuide } from '../types';
 import { generateGuideStreaming, searchRelatedArticles, RelatedArticle } from '../services/geminiService';
 import { CURRENT_DATE } from '../constants';
 import ContextualTip from './ContextualTip';
+import Avatar from './Avatar';
 
 interface MeetingDetailViewProps {
   supabase: SupabaseClient;
@@ -252,7 +253,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
             onClick={() => onSelectContact && onSelectContact(c)}
             className="bg-st-card rounded-2xl p-4 shadow-sm border border-st-box flex items-center gap-4 cursor-pointer hover:border-st-muted transition-all active:scale-[0.99] group"
           >
-            <img src={c.avatarUrl} className="w-14 h-14 rounded-full object-cover border border-st-box group-hover:ring-2 group-hover:ring-st-box transition-all" />
+            <Avatar src={c.avatarUrl} name={c.name} size={56} className="border border-st-box group-hover:ring-2 group-hover:ring-st-box transition-all" />
             <div className="flex-1">
               <h2 className="text-lg font-bold text-st-ink group-hover:text-st-ink transition-colors">{c.name}</h2>
               <p className="text-sm text-st-muted">{c.company} · {c.role}</p>
@@ -380,9 +381,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                     return (
                       <div key={idx} className="space-y-3">
                         <div className="flex items-center gap-2 px-1 pt-2">
-                          {attendeeContact?.avatarUrl && (
-                            <img src={attendeeContact.avatarUrl} className="w-6 h-6 rounded-full object-cover border border-st-box" />
-                          )}
+                          <Avatar src={attendeeContact?.avatarUrl} name={attendee.name} size={24} className="border border-st-box" />
                           <h4 className="text-sm font-bold text-st-ink">{attendee.name}</h4>
                           {attendeeContact?.relationshipType && (
                             <span className="px-2 py-0.5 bg-st-box text-st-ink text-[10px] font-medium rounded">{attendeeContact.relationshipType}</span>

@@ -213,6 +213,7 @@ const App: React.FC = () => {
         email: updatedUser.email,
         interests: updatedUser.interests,
         memo: updatedUser.memo,
+        avatar_url: updatedUser.avatarUrl || '',
       }).eq('id', session.user.id);
       if (error) console.error("User profile update error:", error);
     }
@@ -226,6 +227,7 @@ const App: React.FC = () => {
         phone_number: updatedContact.phoneNumber, email: updatedContact.email,
         tags: updatedContact.tags, interests: updatedContact.interests, personality: updatedContact.personality,
         relationship_type: updatedContact.relationshipType, meeting_frequency: updatedContact.meetingFrequency,
+        avatar_url: updatedContact.avatarUrl,
     }).eq('id', updatedContact.id);
 
     // 연락처 정보 변경 시, 해당 연락처의 미래 미팅 가이드 무효화

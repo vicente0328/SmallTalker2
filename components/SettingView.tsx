@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { UserProfile } from '../types';
+import Avatar from './Avatar';
 
 interface SettingViewProps {
   user: UserProfile;
@@ -59,13 +60,14 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
         </div>
 
         <div className="flex flex-col items-center py-6 bg-st-card rounded-2xl shadow-sm border border-st-box">
-             <div className="relative group">
-                <img
-                    src={profileData.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=6366f1&color=fff`}
-                    className="w-24 h-24 rounded-full object-cover border-4 border-st-bg shadow-md"
-                    alt="User"
-                />
-            </div>
+             <Avatar
+                src={profileData.avatarUrl}
+                name={user.name}
+                size={96}
+                className="border-4 border-st-bg shadow-md"
+                editable
+                onChangePhoto={(url) => setProfileData({...profileData, avatarUrl: url})}
+             />
         </div>
 
         <div className="space-y-4">
@@ -188,7 +190,7 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
       <div className="bg-st-card rounded-2xl shadow-sm border border-st-box divide-y divide-st-box overflow-hidden">
         <div onClick={() => setIsEditingProfile(true)} className="p-6 flex items-center justify-between hover:bg-st-box/30 cursor-pointer group transition-colors">
             <div className="flex items-center gap-4">
-                <img src={user.avatarUrl} className="w-16 h-16 rounded-full object-cover border-2 border-st-box shadow-sm" alt={user.name} />
+                <Avatar src={user.avatarUrl} name={user.name} size={64} className="border-2 border-st-box shadow-sm" />
                 <div>
                     <h3 className="text-xl font-bold text-st-ink group-hover:text-st-ink transition-colors">{user.name}</h3>
                     <p className="text-sm text-st-muted font-medium">{user.role} · {user.company}</p>

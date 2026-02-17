@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { Meeting, Contact } from '../types';
 import { CURRENT_DATE } from '../constants';
 import ContextualTip from './ContextualTip';
+import Avatar from './Avatar';
 
 interface CalendarViewProps {
   meetings: Meeting[];
@@ -146,7 +147,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         interests: { business: [], lifestyle: [] },
         personality: "",
         contactFrequency: "Unknown",
-        avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(manualPartnerName)}&background=random`,
+        avatarUrl: '',
         relationshipType: "",
         meetingFrequency: "",
     };
@@ -181,7 +182,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
           interests: { business: [], lifestyle: [] },
           personality: "",
           contactFrequency: "Unknown",
-          avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(manualPartnerName)}&background=random`,
+          avatarUrl: '',
           relationshipType: "",
           meetingFrequency: "",
       };
@@ -340,7 +341,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                                   <div className="flex items-center gap-1.5 mt-0.5">
                                        <div className="flex -space-x-1">
                                          {meetingContacts.slice(0, 3).map(c => (
-                                           <img key={c.id} src={c.avatarUrl} className="w-4 h-4 rounded-full shrink-0 border border-st-card" />
+                                           <Avatar key={c.id} src={c.avatarUrl} name={c.name} size={16} className="border border-st-card" />
                                          ))}
                                        </div>
                                        <p className="text-xs text-st-muted truncate">
@@ -387,7 +388,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                           if (!c) return null;
                           return (
                             <div key={cId} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-st-box border border-st-box rounded-lg animate-fade-in">
-                              <img src={c.avatarUrl} className="w-5 h-5 rounded-full" />
+                              <Avatar src={c.avatarUrl} name={c.name} size={20} />
                               <span className="text-xs font-medium text-st-ink">{c.name}</span>
                               <button type="button" onClick={() => handleRemoveContact(cId)} className="ml-0.5 text-st-muted hover:text-st-red transition-colors">
                                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -440,7 +441,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                           {existingContactMatch ? (
                             <div className="mt-2 p-3 bg-st-bg border border-st-box rounded-xl flex items-center justify-between shadow-sm animate-fade-in">
                               <div className="flex items-center gap-2 overflow-hidden">
-                                <img src={existingContactMatch.avatarUrl} className="w-6 h-6 rounded-full shrink-0" />
+                                <Avatar src={existingContactMatch.avatarUrl} name={existingContactMatch.name} size={24} />
                                 <p className="text-[11px] text-st-muted truncate">이미 등록된 <strong>{existingContactMatch.name}</strong>님이 있습니다.</p>
                               </div>
                               <button type="button" onClick={handleLinkExisting} className="shrink-0 text-[10px] font-bold text-white bg-st-ink px-2 py-1 rounded-md hover:bg-st-muted ml-2">연동하기</button>
