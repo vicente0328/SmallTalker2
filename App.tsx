@@ -191,6 +191,18 @@ const App: React.FC = () => {
         phone_number: updatedContact.phoneNumber, email: updatedContact.email,
         tags: updatedContact.tags, interests: updatedContact.interests, personality: updatedContact.personality
     }).eq('id', updatedContact.id);
+
+    // 연락처 정보 변경 시, 해당 연락처의 미래 미팅 가이드 무효화
+    const now = new Date();
+    const futureMeetingIds = meetings
+      .filter(m => m.contactId === updatedContact.id && new Date(m.date) >= now && m.aiGuide)
+      .map(m => m.id);
+    if (futureMeetingIds.length > 0) {
+      setMeetings(prev => prev.map(m => futureMeetingIds.includes(m.id) ? { ...m, aiGuide: undefined } : m));
+      for (const id of futureMeetingIds) {
+        await supabase.from('meetings').update({ ai_guide: null }).eq('id', id);
+      }
+    }
   };
 
   const handleAddContact = async (newContact: Contact) => {
@@ -209,6 +221,18 @@ const App: React.FC = () => {
     const meeting = meetings.find(m => m.id === meetingId);
     const contact = contacts.find(c => c.id === meeting?.contactId);
     if (meeting && contact) {
+        // 노트 변경 시, 이 미팅 이후의 같은 연락처 미래 미팅 가이드 무효화
+        const meetingDate = new Date(meeting.date);
+        const futureMeetingIds = meetings
+          .filter(m => m.contactId === contact.id && new Date(m.date) > meetingDate && m.aiGuide)
+          .map(m => m.id);
+        if (futureMeetingIds.length > 0) {
+          setMeetings(prev => prev.map(m => futureMeetingIds.includes(m.id) ? { ...m, aiGuide: undefined } : m));
+          for (const id of futureMeetingIds) {
+            await supabase.from('meetings').update({ ai_guide: null }).eq('id', id);
+          }
+        }
+
         try {
             const updates = await analyzeNoteForProfileUpdate(supabase, newNote, contact);
             const updatedContact: Contact = {
@@ -228,6 +252,11 @@ const App: React.FC = () => {
   const handleSaveAIGuide = async (meetingId: string, guide: SmallTalkGuide) => {
     setMeetings(prev => prev.map(m => m.id === meetingId ? { ...m, aiGuide: guide } : m));
     await supabase.from('meetings').update({ ai_guide: guide }).eq('id', meetingId);
+  };
+
+  const handleClearAIGuide = async (meetingId: string) => {
+    setMeetings(prev => prev.map(m => m.id === meetingId ? { ...m, aiGuide: undefined } : m));
+    await supabase.from('meetings').update({ ai_guide: null }).eq('id', meetingId);
   };
 
   const handleEditMeeting = async (updatedMeeting: Meeting, newContact?: Contact) => {
@@ -262,7 +291,7 @@ const App: React.FC = () => {
       case ViewState.MEETING_DETAIL:
         const selectedMeeting = meetings.find(m => m.id === selectedMeetingId);
         if (!selectedMeeting || !selectedContact) return null;
-        return <MeetingDetailView supabase={supabase} meeting={selectedMeeting} contact={selectedContact} user={user} allMeetings={meetings} onBack={() => setView(ViewState.CALENDAR)} onUpdateNote={handleUpdateMeetingNote} onSaveAIGuide={handleSaveAIGuide} onNavigateToMeeting={handleSelectMeeting} onSelectContact={handleSelectContact} dismissedTips={dismissedTips} onDismissTip={handleDismissTip} />;
+        return <MeetingDetailView supabase={supabase} meeting={selectedMeeting} contact={selectedContact} user={user} allMeetings={meetings} onBack={() => setView(ViewState.CALENDAR)} onUpdateNote={handleUpdateMeetingNote} onSaveAIGuide={handleSaveAIGuide} onClearAIGuide={handleClearAIGuide} onNavigateToMeeting={handleSelectMeeting} onSelectContact={handleSelectContact} dismissedTips={dismissedTips} onDismissTip={handleDismissTip} />;
       case ViewState.CONTACT_LIST:
         return <ContactListView contacts={contacts} onSelectContact={handleSelectContact} onAddContact={handleAddContact} dismissedTips={dismissedTips} onDismissTip={handleDismissTip} />;
       case ViewState.CONTACT_PROFILE:
