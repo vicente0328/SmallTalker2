@@ -362,47 +362,107 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                 <p className="text-slate-700 text-sm leading-relaxed font-medium">{guide.pastReview}</p>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-blue-50 relative overflow-hidden">
-                <div className="flex items-center gap-2 mb-4">
-                    <div className="bg-blue-100 p-1.5 rounded-lg text-blue-600">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+              {guide.attendees && guide.attendees.length > 0 ? (
+                <>
+                  {/* 공통 팁 (간략) */}
+                  <div className="bg-gradient-to-r from-blue-50 to-amber-50 p-4 rounded-2xl border border-slate-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">공통 대화 주제</h4>
                     </div>
-                    <h4 className="text-sm font-bold text-blue-900">Business Conversation Tip</h4>
-                </div>
-                <p className="text-slate-800 font-semibold text-base leading-relaxed mb-3">{guide.businessTip.content}</p>
-                {guide.businessTip.source && (
-                    <div className="flex items-center gap-1 text-[10px] text-slate-400 border-t border-slate-50 pt-3">
-                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                        출처: {guide.businessTip.source}
-                    </div>
-                )}
-                <button
-                  onClick={() => handleSearchBusiness(guide.businessTip.content)}
-                  className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md hover:shadow-lg transition-all"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                  관련 뉴스 더 알아보기
-                </button>
-                {showBusinessArticles && renderArticleList(businessArticles, loadingBusinessArticles)}
-              </div>
+                    <p className="text-slate-700 text-sm leading-relaxed font-medium mb-1">{guide.businessTip.content}</p>
+                    <p className="text-slate-600 text-sm leading-relaxed">{guide.lifeTip}</p>
+                  </div>
 
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-amber-50 relative overflow-hidden">
-                <div className="flex items-center gap-2 mb-4">
-                    <div className="bg-amber-100 p-1.5 rounded-lg text-amber-600">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  {/* 참석자별 개별 가이드 */}
+                  {guide.attendees.map((attendee, idx) => {
+                    const attendeeContact = contacts.find(c => c.name === attendee.name);
+                    return (
+                      <div key={idx} className="space-y-3">
+                        <div className="flex items-center gap-2 px-1 pt-2">
+                          {attendeeContact?.avatarUrl && (
+                            <img src={attendeeContact.avatarUrl} className="w-6 h-6 rounded-full object-cover border border-slate-200" />
+                          )}
+                          <h4 className="text-sm font-bold text-slate-700">{attendee.name}</h4>
+                          {attendeeContact?.relationshipType && (
+                            <span className="px-2 py-0.5 bg-violet-50 text-violet-600 text-[10px] font-medium rounded">{attendeeContact.relationshipType}</span>
+                          )}
+                        </div>
+
+                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-blue-50 relative overflow-hidden">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="bg-blue-100 p-1.5 rounded-lg text-blue-600">
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                            </div>
+                            <h4 className="text-sm font-bold text-blue-900">Business Tip</h4>
+                          </div>
+                          <p className="text-slate-800 font-semibold text-sm leading-relaxed">{attendee.businessTip.content}</p>
+                          {attendee.businessTip.source && (
+                            <div className="flex items-center gap-1 text-[10px] text-slate-400 border-t border-slate-50 pt-2 mt-2">
+                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                              출처: {attendee.businessTip.source}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-amber-50 relative overflow-hidden">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="bg-amber-100 p-1.5 rounded-lg text-amber-600">
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            </div>
+                            <h4 className="text-sm font-bold text-amber-900">Life Style Insight</h4>
+                          </div>
+                          <p className="text-slate-800 font-semibold text-sm leading-relaxed">{attendee.lifeTip}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </>
+              ) : (
+                <>
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-blue-50 relative overflow-hidden">
+                    <div className="flex items-center gap-2 mb-4">
+                        <div className="bg-blue-100 p-1.5 rounded-lg text-blue-600">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                        </div>
+                        <h4 className="text-sm font-bold text-blue-900">Business Conversation Tip</h4>
                     </div>
-                    <h4 className="text-sm font-bold text-amber-900">Life Style Insight</h4>
-                </div>
-                <p className="text-slate-800 font-semibold text-base leading-relaxed">{guide.lifeTip}</p>
-                <button
-                  onClick={() => handleSearchLife(guide.lifeTip)}
-                  className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500 text-white rounded-xl text-sm font-bold hover:bg-amber-600 shadow-md hover:shadow-lg transition-all"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                  관련 뉴스 더 알아보기
-                </button>
-                {showLifeArticles && renderArticleList(lifeArticles, loadingLifeArticles)}
-              </div>
+                    <p className="text-slate-800 font-semibold text-base leading-relaxed mb-3">{guide.businessTip.content}</p>
+                    {guide.businessTip.source && (
+                        <div className="flex items-center gap-1 text-[10px] text-slate-400 border-t border-slate-50 pt-3">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                            출처: {guide.businessTip.source}
+                        </div>
+                    )}
+                    <button
+                      onClick={() => handleSearchBusiness(guide.businessTip.content)}
+                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md hover:shadow-lg transition-all"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                      관련 뉴스 더 알아보기
+                    </button>
+                    {showBusinessArticles && renderArticleList(businessArticles, loadingBusinessArticles)}
+                  </div>
+
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-amber-50 relative overflow-hidden">
+                    <div className="flex items-center gap-2 mb-4">
+                        <div className="bg-amber-100 p-1.5 rounded-lg text-amber-600">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <h4 className="text-sm font-bold text-amber-900">Life Style Insight</h4>
+                    </div>
+                    <p className="text-slate-800 font-semibold text-base leading-relaxed">{guide.lifeTip}</p>
+                    <button
+                      onClick={() => handleSearchLife(guide.lifeTip)}
+                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500 text-white rounded-xl text-sm font-bold hover:bg-amber-600 shadow-md hover:shadow-lg transition-all"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                      관련 뉴스 더 알아보기
+                    </button>
+                    {showLifeArticles && renderArticleList(lifeArticles, loadingLifeArticles)}
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>

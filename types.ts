@@ -49,6 +49,15 @@ export interface Meeting {
   };
 }
 
+export interface PersonGuide {
+  name: string;
+  businessTip: {
+    content: string;
+    source?: string;
+  };
+  lifeTip: string;
+}
+
 export interface SmallTalkGuide {
   pastReview: string;
   businessTip: {
@@ -56,6 +65,7 @@ export interface SmallTalkGuide {
     source?: string;
   };
   lifeTip: string;
+  attendees?: PersonGuide[];
 }
 
 export enum ViewState {

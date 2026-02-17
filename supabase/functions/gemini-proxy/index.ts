@@ -136,6 +136,8 @@ Deno.serve(async (req) => {
   - 나(${user.name})와의 관계: ${c.relationshipType || '정보 없음'}, 만남 횟수: ${c.meetingFrequency || '정보 없음'}`;
       }).join('\n');
 
+      const isMultiPerson = allContacts.length > 1;
+
       const prompt = `비즈니스 미팅 전 스몰토크에서 꺼낼 수 있는 구체적인 대화 주제를 추천하세요. 반드시 존댓말(~합니다, ~하세요, ~드립니다)로 작성하세요.
 
 중요 규칙:
@@ -145,6 +147,12 @@ Deno.serve(async (req) => {
 - lifeTip: 파트너의 관심사/취미/라이프스타일과 관련된 구체적 대화 주제를 추천하세요. (예: "요즘 인기 있는 XX 맛집/여행지/취미 이야기를 꺼내보세요")
 - 각 팁은 반드시 구체적인 주제명이나 키워드를 포함해야 합니다.
 
+=== 핵심 원칙: 상대방(파트너) 중심의 가이드 ===
+- 이 가이드는 미팅에 참석하는 상대방(파트너)에 대한 정보를 중심으로 작성해야 합니다.
+- 사용자(나) 본인의 정보(직업, 관심사 등)를 가이드에 포함하지 마세요.
+- 사용자 정보는 참고용으로만 제공되며, 가이드 내용에는 파트너의 정보만 반영하세요.
+- 파트너의 관심사, 성격, 직업, 회사 정보를 기반으로 대화 주제를 추천하세요.
+
 === 절대 준수 사항: 사용자(나)와 파트너(상대방) 정보 구분 ===
 아래 "나(사용자) 정보"는 대화 가이드를 받는 사용자 본인의 정보입니다.
 아래 "파트너(상대방) 정보"는 미팅 상대방의 정보입니다.
@@ -152,6 +160,7 @@ Deno.serve(async (req) => {
 - 사용자의 관심사, 직업, 특징을 파트너의 것으로 혼동하지 마세요.
 - 예: 파트너가 유튜브 채널을 운영한다면, "상대방의 유튜브 채널"이라고 표현해야 하며, 사용자가 유튜브를 운영한다고 오해하면 안 됩니다.
 - 대화 주제 추천 시 파트너의 특성을 기반으로 하되, 사용자가 파트너에게 물어보거나 대화할 주제로 추천하세요.
+- 가이드 출력에 사용자 본인의 직업, 관심사, 회사명 등을 언급하지 마세요. 오직 파트너에 대한 내용만 포함하세요.
 
 === 히스토리 노트 해석 규칙 ===
 - 히스토리 노트는 "나(${user.name})"가 "파트너"와의 미팅 후 기록한 메모입니다.
@@ -161,20 +170,30 @@ Deno.serve(async (req) => {
 - 예: "최근 승진했다" → 파트너가 최근 승진했다는 뜻
 - 나(${user.name}) 자신에 대한 이야기와 절대 혼동하지 마세요.
 
-=== 나(사용자) 정보 ===
+=== 나(사용자) 정보 (참고용, 가이드에 포함하지 마세요) ===
 이름: ${user.name}, 직책: ${user.role}, 회사: ${user.company}, 업종: ${user.industry || '정보 없음'}
-비즈니스 관심사: ${(user.interests?.business || []).join(', ') || '정보 없음'}
-라이프스타일 관심사: ${(user.interests?.lifestyle || []).join(', ') || '정보 없음'}
 
 === 파트너(상대방) 정보 ===
 ${contactInfoLines}
+${isMultiPerson ? `
+=== 다수 참석자 규칙 ===
+이 미팅에는 ${allContacts.length}명의 파트너가 참석합니다.
+- pastReview: 전체 관계 맥락을 종합적으로 요약하세요.
+- attendees 배열에 각 파트너별로 개별 businessTip과 lifeTip을 작성하세요.
+- 각 파트너의 name, 관심사, 직업, 성격을 정확히 반영하여 개인화된 대화 주제를 추천하세요.
+- businessTip과 lifeTip의 최상위 필드에는 전체 참석자를 아우르는 공통 주제를 작성하세요.` : ''}
 
 === 미팅 정보 ===
 제목: ${meeting.title}
 ${hasHistory ? `히스토리:\n${historyNotes}` : "첫 만남"}
 ${hasHistory ? "주의: 이미 아는 사이. 초면 인사 금지. 지난 대화 연속성 강조." : ""}`;
 
-      const schema = {
+      const schema = isMultiPerson ? {
+        pastReview: "전체 관계 맥락 요약 (string)",
+        businessTip: { content: "전체 참석자 공통 비즈니스 스몰토크 주제 (string)", source: "출처나 근거 (string)" },
+        lifeTip: "전체 참석자 공통 라이프스타일 스몰토크 주제 (string)",
+        attendees: [{ name: "파트너 이름 (string)", businessTip: { content: "개인별 비즈니스 주제 (string)", source: "출처 (string)" }, lifeTip: "개인별 라이프스타일 주제 (string)" }]
+      } : {
         pastReview: "관계 맥락 요약 (string)",
         businessTip: { content: "구체적인 비즈니스 스몰토크 주제 추천 (string)", source: "출처나 근거 (string)" },
         lifeTip: "구체적인 라이프스타일 스몰토크 주제 추천 (string)"
