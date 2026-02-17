@@ -4,31 +4,36 @@ import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@^2.45.4';
 import { Contact, Meeting, UserProfile, SmallTalkGuide } from '../types';
 import { generateGuideStreaming, searchRelatedArticles, RelatedArticle } from '../services/geminiService';
 import { CURRENT_DATE } from '../constants';
+import ContextualTip from './ContextualTip';
 
 interface MeetingDetailViewProps {
   supabase: SupabaseClient;
   meeting: Meeting;
   contact: Contact;
   user: UserProfile;
-  allMeetings: Meeting[]; 
+  allMeetings: Meeting[];
   onBack: () => void;
-  onUpdateNote?: (meetingId: string, note: string) => Promise<void> | void; 
+  onUpdateNote?: (meetingId: string, note: string) => Promise<void> | void;
   onSaveAIGuide?: (meetingId: string, guide: SmallTalkGuide) => Promise<void> | void;
-  onNavigateToMeeting?: (meeting: Meeting) => void; 
+  onNavigateToMeeting?: (meeting: Meeting) => void;
   onSelectContact?: (contact: Contact) => void;
+  dismissedTips?: Set<string>;
+  onDismissTip?: (key: string) => void;
 }
 
-const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({ 
+const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
   supabase,
-  meeting, 
-  contact, 
-  user, 
-  allMeetings = [], 
+  meeting,
+  contact,
+  user,
+  allMeetings = [],
   onBack,
   onUpdateNote,
   onSaveAIGuide,
   onNavigateToMeeting,
-  onSelectContact
+  onSelectContact,
+  dismissedTips = new Set(),
+  onDismissTip = () => {}
 }) => {
   const [guide, setGuide] = useState<SmallTalkGuide | null>(meeting.aiGuide || null);
   const [partialGuide, setPartialGuide] = useState<Partial<SmallTalkGuide>>({});
@@ -241,6 +246,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
             </div>
             <h3 className="font-bold text-slate-900 text-lg tracking-tight">AI 미팅 서포트 가이드</h3>
+            <ContextualTip tipKey="ai-guide" message="AI가 상대방의 관심사, 과거 만남 기록, 최신 트렌드를 분석하여 자연스러운 대화 주제를 제안합니다." position="bottom" dismissedTips={dismissedTips} onDismiss={onDismissTip} />
           </div>
 
           {loading ? (
@@ -401,6 +407,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
             <div className="flex items-center gap-2">
                 <div className="bg-white/10 p-1.5 rounded-lg text-indigo-300"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></div>
                 <h3 className="font-bold text-white tracking-tight">오늘의 만남 기록</h3>
+                <ContextualTip tipKey="meeting-note" message="미팅 후 메모를 남기면 AI가 내용을 분석하여 연락처 프로필에 자동 반영합니다. 다음 만남 준비에 활용됩니다." position="bottom" dismissedTips={dismissedTips} onDismiss={onDismissTip} />
             </div>
             <button onClick={() => isEditing ? handleSaveNote() : setIsEditing(true)} className={`text-xs font-bold px-4 py-1.5 rounded-full transition-all ${isEditing ? 'bg-indigo-500 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
               {isEditing ? '저장하기' : '기록 수정'}

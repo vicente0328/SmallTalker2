@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Meeting, Contact } from '../types';
 import { CURRENT_DATE } from '../constants';
+import ContextualTip from './ContextualTip';
 
 interface CalendarViewProps {
   meetings: Meeting[];
@@ -10,15 +11,19 @@ interface CalendarViewProps {
   onAddMeeting: (meeting: Meeting, newContact?: Contact) => void;
   onEditMeeting: (meeting: Meeting, newContact?: Contact) => void;
   onAddContact?: (contact: Contact) => void;
+  dismissedTips?: Set<string>;
+  onDismissTip?: (key: string) => void;
 }
 
-const CalendarView: React.FC<CalendarViewProps> = ({ 
-  meetings, 
-  contacts, 
+const CalendarView: React.FC<CalendarViewProps> = ({
+  meetings,
+  contacts,
   onSelectMeeting,
   onAddMeeting,
   onEditMeeting,
-  onAddContact
+  onAddContact,
+  dismissedTips = new Set(),
+  onDismissTip = () => {}
 }) => {
   const [currentDate, setCurrentDate] = useState(CURRENT_DATE); 
   const [selectedDate, setSelectedDate] = useState<Date | null>(CURRENT_DATE);
@@ -237,7 +242,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   return (
     <div className="space-y-6 animate-fade-in h-full flex flex-col relative">
        <div className="flex justify-between items-center px-1 shrink-0">
-         <h2 className="text-3xl font-bold text-slate-900">Calendar</h2>
+         <div className="flex items-center gap-2">
+           <h2 className="text-3xl font-bold text-slate-900">Calendar</h2>
+           <ContextualTip tipKey="calendar-add" message="미팅을 추가하면 AI가 상대방의 관심사와 과거 만남을 분석하여 맞춤 스몰토크 가이드를 준비합니다." position="bottom" dismissedTips={dismissedTips} onDismiss={onDismissTip} />
+         </div>
          <button onClick={openCreateModal} className="p-2 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-500 transition-colors">
            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
          </button>
@@ -256,6 +264,24 @@ const CalendarView: React.FC<CalendarViewProps> = ({
        </div>
 
        <div className="flex-1 overflow-y-auto space-y-3 min-h-[200px] pb-24">
+          {/* Global empty state when no meetings exist at all */}
+          {meetings.length === 0 && !selectedDate && (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-4">
+                <svg className="w-8 h-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-1">아직 등록된 미팅이 없습니다</h3>
+              <p className="text-sm text-slate-400 mb-5 leading-relaxed">첫 미팅을 추가하면 AI가 맞춤형<br/>스몰토크 가이드를 준비합니다.</p>
+              <button
+                onClick={openCreateModal}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-200"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+                첫 미팅 추가하기
+              </button>
+            </div>
+          )}
+
           {selectedDate ? (
             <>
               <div className="flex items-center justify-between px-1">

@@ -1,11 +1,14 @@
 
 import React, { useState, useRef } from 'react';
 import { Contact } from '../types';
+import ContextualTip from './ContextualTip';
 
 interface ContactListViewProps {
   contacts: Contact[];
   onSelectContact: (contact: Contact) => void;
   onAddContact?: (contact: Contact) => void;
+  dismissedTips?: Set<string>;
+  onDismissTip?: (key: string) => void;
 }
 
 // Parse vCard (.vcf) text into Contact objects
@@ -47,7 +50,7 @@ const parseVCard = (vcfText: string): Partial<Contact>[] => {
   return cards;
 };
 
-const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectContact, onAddContact }) => {
+const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectContact, onAddContact, dismissedTips = new Set(), onDismissTip = () => {} }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -203,7 +206,10 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
       />
 
       <div className="flex justify-between items-center px-1">
-        <h2 className="text-3xl font-bold text-slate-900">Contacts</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-3xl font-bold text-slate-900">Contacts</h2>
+          <ContextualTip tipKey="contacts-info" message="연락처에 관심사와 성격을 기록할수록 AI 스몰토크 가이드가 더 정확해집니다." position="bottom" dismissedTips={dismissedTips} onDismiss={onDismissTip} />
+        </div>
         <div className="flex gap-2">
             <button
                 onClick={handleImportFromDevice}
@@ -234,6 +240,35 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
         />
       </div>
 
+      {contacts.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl shadow-sm border border-dashed border-indigo-200">
+          <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-bold text-slate-900 mb-1">아직 등록된 연락처가 없습니다</h3>
+          <p className="text-sm text-slate-400 mb-5 leading-relaxed">
+            자주 만나는 분들을 등록하면<br/>AI가 대화 맥락을 기억합니다.
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={handleOpenModal}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-md"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+              직접 추가
+            </button>
+            <button
+              onClick={handleImportFromDevice}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-50 transition-all"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+              가져오기
+            </button>
+          </div>
+        </div>
+      ) : (
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 divide-y divide-slate-100 overflow-hidden">
         {sortedContacts.length > 0 ? (
             sortedContacts.map((contact) => (
@@ -250,6 +285,7 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
             <div className="p-12 text-center text-slate-400">검색 결과가 없습니다.</div>
         )}
       </div>
+      )}
 
       {/* Import Guide Modal */}
       {isGuideOpen && (

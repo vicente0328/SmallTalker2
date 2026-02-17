@@ -10,6 +10,7 @@ import ContactProfileView from './components/ContactProfileView';
 import ContactListView from './components/ContactListView';
 import SettingView from './components/SettingView';
 import AuthView from './components/AuthView';
+import WelcomeTour from './components/WelcomeTour';
 import { ViewState, Meeting, Contact, UserProfile, SmallTalkGuide } from './types';
 import { CURRENT_USER } from './constants';
 import { analyzeNoteForProfileUpdate, prefetchGuides } from './services/geminiService';
@@ -61,6 +62,15 @@ const App: React.FC = () => {
   
   const [selectedMeetingId, setSelectedMeetingId] = useState<string | null>(null);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+
+  // Onboarding state
+  const [showWelcomeTour, setShowWelcomeTour] = useState(false);
+  const [dismissedTips, setDismissedTips] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem('smalltalker_dismissed_tips');
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch { return new Set(); }
+  });
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -114,6 +124,29 @@ const App: React.FC = () => {
     };
     fetchData();
   }, [session]);
+
+  // Welcome tour: show on first login (no contacts + no meetings = new user)
+  useEffect(() => {
+    if (loading || !session) return;
+    const tourDone = localStorage.getItem('smalltalker_tour_done');
+    if (!tourDone && contacts.length === 0 && meetings.length === 0) {
+      setShowWelcomeTour(true);
+    }
+  }, [loading, session]);
+
+  const handleCompleteTour = () => {
+    setShowWelcomeTour(false);
+    localStorage.setItem('smalltalker_tour_done', 'true');
+  };
+
+  const handleDismissTip = (key: string) => {
+    setDismissedTips(prev => {
+      const next = new Set(prev);
+      next.add(key);
+      localStorage.setItem('smalltalker_dismissed_tips', JSON.stringify([...next]));
+      return next;
+    });
+  };
 
   // 프리페치: 데이터 로드 완료 후 오늘/내일 미팅 가이드를 백그라운드로 미리 생성 (1회만)
   const [prefetched, setPrefetched] = useState(false);
@@ -218,15 +251,15 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (currentView) {
       case ViewState.HOME:
-        return <HomeView user={user} meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onUpdateContact={handleUpdateContact} onAddContact={handleAddContact} />;
+        return <HomeView user={user} meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onUpdateContact={handleUpdateContact} onAddContact={handleAddContact} onNavigateToCalendar={() => setView(ViewState.CALENDAR)} onNavigateToContacts={() => setView(ViewState.CONTACT_LIST)} />;
       case ViewState.CALENDAR:
-        return <CalendarView meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onAddMeeting={handleAddMeeting} onEditMeeting={handleEditMeeting} onAddContact={handleAddContact} />;
+        return <CalendarView meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onAddMeeting={handleAddMeeting} onEditMeeting={handleEditMeeting} onAddContact={handleAddContact} dismissedTips={dismissedTips} onDismissTip={handleDismissTip} />;
       case ViewState.MEETING_DETAIL:
         const selectedMeeting = meetings.find(m => m.id === selectedMeetingId);
         if (!selectedMeeting || !selectedContact) return null;
-        return <MeetingDetailView supabase={supabase} meeting={selectedMeeting} contact={selectedContact} user={user} allMeetings={meetings} onBack={() => setView(ViewState.CALENDAR)} onUpdateNote={handleUpdateMeetingNote} onSaveAIGuide={handleSaveAIGuide} onNavigateToMeeting={handleSelectMeeting} onSelectContact={handleSelectContact} />;
+        return <MeetingDetailView supabase={supabase} meeting={selectedMeeting} contact={selectedContact} user={user} allMeetings={meetings} onBack={() => setView(ViewState.CALENDAR)} onUpdateNote={handleUpdateMeetingNote} onSaveAIGuide={handleSaveAIGuide} onNavigateToMeeting={handleSelectMeeting} onSelectContact={handleSelectContact} dismissedTips={dismissedTips} onDismissTip={handleDismissTip} />;
       case ViewState.CONTACT_LIST:
-        return <ContactListView contacts={contacts} onSelectContact={handleSelectContact} onAddContact={handleAddContact} />;
+        return <ContactListView contacts={contacts} onSelectContact={handleSelectContact} onAddContact={handleAddContact} dismissedTips={dismissedTips} onDismissTip={handleDismissTip} />;
       case ViewState.CONTACT_PROFILE:
         if (!selectedContact) return null;
         return <ContactProfileView contact={selectedContact} meetings={meetings} onBack={() => setView(ViewState.CONTACT_LIST)} onSelectMeeting={handleSelectMeeting} onUpdateContact={handleUpdateContact} />;
@@ -236,7 +269,12 @@ const App: React.FC = () => {
     }
   };
 
-  return <Layout currentView={currentView} setView={setView} user={user}>{renderContent()}</Layout>;
+  return (
+    <>
+      <Layout currentView={currentView} setView={setView} user={user}>{renderContent()}</Layout>
+      {showWelcomeTour && <WelcomeTour userName={user.name} onComplete={handleCompleteTour} setView={setView} />}
+    </>
+  );
 };
 
 export default App;

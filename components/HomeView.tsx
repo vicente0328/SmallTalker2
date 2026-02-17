@@ -9,6 +9,8 @@ interface HomeViewProps {
   onSelectMeeting: (meeting: Meeting) => void;
   onUpdateContact?: (updatedContact: Contact) => void;
   onAddContact?: (newContact: Contact) => void;
+  onNavigateToCalendar?: () => void;
+  onNavigateToContacts?: () => void;
 }
 
 interface QuickProfile {
@@ -106,7 +108,7 @@ const detectExisting = (contact: Contact | null | undefined) => {
   };
 };
 
-const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectMeeting, onUpdateContact, onAddContact }) => {
+const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectMeeting, onUpdateContact, onAddContact, onNavigateToCalendar, onNavigateToContacts }) => {
   const [profile, setProfile] = useState<QuickProfile>(INITIAL_PROFILE);
   const [submitted, setSubmitted] = useState(false);
 
@@ -255,7 +257,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
             )}
           </div>
 
-          {upcomingMeeting && (
+          {upcomingMeeting ? (
             <div className="w-full mt-4 md:mt-0">
                 <div className="flex items-center gap-3 md:gap-4 mb-3 md:mb-6 bg-white/5 p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/5 backdrop-blur-sm">
                     {upcomingContact && (
@@ -274,6 +276,18 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                     <svg className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
+                </button>
+            </div>
+          ) : (
+            <div className="w-full mt-4 md:mt-0">
+                <button
+                    onClick={(e) => { e.stopPropagation(); onNavigateToCalendar?.(); }}
+                    className="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-base md:text-lg font-bold py-3 md:py-4 rounded-xl md:rounded-2xl transition-all shadow-lg shadow-indigo-900/30 flex items-center justify-center gap-2"
+                >
+                    <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                    </svg>
+                    첫 미팅 추가하기
                 </button>
             </div>
           )}
@@ -310,6 +324,28 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
           </div>
         </div>
       </section>
+      )}
+
+      {/* Empty State: No Contacts */}
+      {contacts.length === 0 && (
+        <section className="mt-6 bg-white rounded-2xl shadow-sm border border-dashed border-indigo-200 p-6 text-center shrink-0">
+          <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
+            <svg className="w-7 h-7 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+          <h3 className="text-base font-bold text-slate-900 mb-1">연락처를 추가해보세요</h3>
+          <p className="text-sm text-slate-400 mb-4">자주 만나는 분들의 정보를 등록하면<br/>AI가 맞춤형 대화 주제를 준비합니다.</p>
+          <button
+            onClick={() => onNavigateToContacts?.()}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-md"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+            연락처 추가하기
+          </button>
+        </section>
       )}
 
       {/* Quick Profile Questionnaire — hide entirely if all info is already filled */}
