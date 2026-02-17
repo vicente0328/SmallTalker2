@@ -218,7 +218,7 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
         <div className="flex gap-2">
             <button
                 onClick={handleImportFromDevice}
-                className="flex items-center gap-1.5 px-3 py-2 bg-st-card border border-st-box text-st-muted rounded-xl shadow-sm text-xs font-bold hover:bg-st-box/30 transition-all"
+                className="flex items-center gap-1.5 px-3 py-2 bg-st-bg text-st-muted rounded-xl text-xs font-bold hover:bg-st-box/50 transition-all"
             >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                 가져오기
@@ -247,8 +247,8 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
       </div>
 
       {contacts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center bg-st-card rounded-2xl shadow-sm border border-dashed border-st-box">
-          <div className="w-16 h-16 bg-st-box rounded-2xl flex items-center justify-center mb-4">
+        <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl shadow-sm">
+          <div className="w-16 h-16 bg-st-bg rounded-2xl flex items-center justify-center mb-4">
             <svg className="w-8 h-8 text-st-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
@@ -267,7 +267,7 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
             </button>
             <button
               onClick={handleImportFromDevice}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-st-card border border-st-box text-st-muted text-sm font-bold rounded-xl hover:bg-st-box/30 transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-st-bg text-st-muted text-sm font-bold rounded-xl hover:bg-st-box/50 transition-all"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
               가져오기
@@ -275,7 +275,7 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
           </div>
         </div>
       ) : (
-      <div className="bg-st-card rounded-2xl shadow-sm border border-st-box divide-y divide-st-box overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm divide-y divide-st-box/50 overflow-hidden">
         {sortedContacts.length > 0 ? (
             sortedContacts.map((contact) => (
                 <div key={contact.id} onClick={() => onSelectContact(contact)} className="p-4 flex items-center gap-4 hover:bg-st-box/30 cursor-pointer transition-colors group">
@@ -309,7 +309,7 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
             </div>
 
             <div className="space-y-4">
-              <div className="bg-st-box rounded-xl p-4">
+              <div className="bg-st-bg rounded-xl p-4">
                 <p className="text-sm font-bold text-st-ink mb-2">vCard 파일(.vcf)로 가져오기</p>
                 <ol className="text-sm text-st-ink space-y-2 list-decimal list-inside">
                   <li><strong>연락처 앱</strong>을 열어주세요</li>
@@ -321,13 +321,13 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
 
               <button
                 onClick={() => { setIsGuideOpen(false); vcfInputRef.current?.click(); }}
-                className="w-full py-3 bg-st-ink text-white font-bold rounded-xl hover:bg-st-muted transition-all shadow-md flex items-center justify-center gap-2"
+                className="w-full py-3 bg-st-blue text-white font-bold rounded-xl hover:bg-st-blue/80 transition-all shadow-md flex items-center justify-center gap-2"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                 .vcf 파일 선택하기
               </button>
 
-              <div className="bg-st-bg rounded-xl p-4 border border-st-box">
+              <div className="bg-st-bg rounded-xl p-4">
                 <div className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-st-muted shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   <p className="text-xs text-st-muted leading-relaxed">
@@ -380,7 +380,7 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
 
                     <div className="flex gap-3 pt-4">
                         <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 bg-st-box text-st-muted font-bold rounded-xl">취소</button>
-                        <button type="submit" className="flex-1 py-3 bg-st-green text-white font-bold rounded-xl transition-all shadow-md active:scale-95">추가하기</button>
+                        <button type="submit" className="flex-1 py-3 bg-st-blue text-white font-bold rounded-xl transition-all shadow-md active:scale-95">추가하기</button>
                     </div>
                 </form>
             </div>

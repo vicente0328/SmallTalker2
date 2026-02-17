@@ -63,7 +63,7 @@ const ChipGroup: React.FC<{
         value={textValue || ''}
         onChange={(e) => onTextChange?.(e.target.value)}
         placeholder={textPlaceholder}
-        className="w-full px-4 py-2.5 bg-st-bg border border-st-box rounded-xl text-sm text-st-ink placeholder-st-muted focus:outline-none focus:ring-2 focus:ring-st-box focus:border-transparent transition"
+        className="w-full px-4 py-2.5 bg-st-bg border border-st-box/50 rounded-xl text-sm text-st-ink placeholder-st-muted focus:outline-none focus:ring-2 focus:ring-st-box focus:border-transparent transition"
       />
     ) : (
       <div className="flex flex-wrap gap-2">
@@ -73,8 +73,8 @@ const ChipGroup: React.FC<{
             onClick={() => onSelect(opt)}
             className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${
               selected === opt
-                ? 'bg-st-ink text-white shadow-md shadow-st-box'
-                : 'bg-st-box text-st-muted hover:bg-st-box'
+                ? 'bg-st-blue text-white shadow-sm'
+                : 'bg-st-bg text-st-ink hover:bg-st-box/50'
             }`}
           >
             {opt}
@@ -231,7 +231,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
           {isNewUser && onRestartTour && (
             <button
               onClick={onRestartTour}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-st-box text-st-ink text-xs font-bold rounded-lg hover:bg-st-box transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-st-bg text-st-muted text-xs font-bold rounded-lg hover:bg-st-box transition-colors"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -252,8 +252,8 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
         className="relative w-full min-h-[380px] bg-st-ink rounded-[2rem] md:rounded-[2.5rem] shadow-2xl shadow-st-box/50 cursor-pointer active:scale-[0.98] transition-all group flex flex-col justify-between shrink-0"
       >
         <div className="absolute inset-0 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden pointer-events-none">
-            <div className="absolute top-0 right-0 w-64 h-64 md:w-80 md:h-80 bg-st-muted/20 rounded-full blur-[60px] md:blur-[80px] -mr-16 -mt-16 mix-blend-screen"></div>
-            <div className="absolute bottom-0 left-0 w-56 h-56 md:w-64 md:h-64 bg-st-box/30 rounded-full blur-[50px] md:blur-[60px] -ml-16 -mb-8 mix-blend-screen"></div>
+            <div className="absolute top-0 right-0 w-64 h-64 md:w-80 md:h-80 bg-st-blue/15 rounded-full blur-[60px] md:blur-[80px] -mr-16 -mt-16 mix-blend-screen"></div>
+            <div className="absolute bottom-0 left-0 w-56 h-56 md:w-64 md:h-64 bg-st-blue/10 rounded-full blur-[50px] md:blur-[60px] -ml-16 -mb-8 mix-blend-screen"></div>
         </div>
 
         <div className="relative z-10 flex flex-col h-full justify-between p-6 md:p-8">
@@ -301,7 +301,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                 </div>
 
                 <button
-                    className="w-full bg-st-card hover:bg-st-card text-st-ink text-base md:text-lg font-bold py-3 md:py-4 rounded-xl md:rounded-2xl transition-all shadow-lg shadow-st-ink/30 flex items-center justify-center gap-2 group-hover:bg-st-card group-hover:shadow-st-box/20"
+                    className="w-full bg-white text-st-blue text-base md:text-lg font-bold py-3 md:py-4 rounded-xl md:rounded-2xl transition-all shadow-lg shadow-st-ink/30 flex items-center justify-center gap-2 group-hover:bg-white/90"
                 >
                     일정 준비하기
                     <svg className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -313,7 +313,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
             <div className="w-full">
                 <button
                     onClick={(e) => { e.stopPropagation(); onNavigateToCalendar?.(); }}
-                    className="w-full bg-st-card hover:bg-st-card text-st-ink text-base md:text-lg font-bold py-3 md:py-4 rounded-xl md:rounded-2xl transition-all shadow-lg shadow-st-ink/30 flex items-center justify-center gap-2"
+                    className="w-full bg-white text-st-blue text-base md:text-lg font-bold py-3 md:py-4 rounded-xl md:rounded-2xl transition-all shadow-lg shadow-st-ink/30 flex items-center justify-center gap-2"
                 >
                     <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
@@ -329,10 +329,10 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
       {lastMeeting && lastMeetingContact && (
       <section
         onClick={() => onSelectMeeting(lastMeeting)}
-        className="mt-6 relative w-full bg-st-card rounded-2xl shadow-sm border border-st-box cursor-pointer active:scale-[0.98] transition-all group overflow-hidden shrink-0"
+        className="mt-6 relative w-full bg-white rounded-2xl shadow-sm cursor-pointer active:scale-[0.98] transition-all group overflow-hidden shrink-0"
       >
         <div className="p-5 md:p-6">
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-st-box text-[10px] md:text-xs font-bold text-st-muted mb-3 tracking-wide">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-st-bg text-[10px] md:text-xs font-bold text-st-muted mb-3 tracking-wide">
             <span className="w-1.5 h-1.5 rounded-full bg-st-muted"></span>
             PREVIOUS SCHEDULE
           </div>
@@ -341,7 +341,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
             지난 만남은 어떠셨나요? 공유해주시는 내용을 바탕으로 다음 만남을 더욱 세심하게 준비하겠습니다.
           </p>
 
-          <div className="flex items-center gap-3 bg-st-bg p-3 md:p-4 rounded-xl border border-st-box">
+          <div className="flex items-center gap-3 bg-st-bg p-3 md:p-4 rounded-xl">
             <Avatar src={lastMeetingContact.avatarUrl} name={lastMeetingContact.name} size={40} className="md:!w-11 md:!h-11 border-2 border-white shadow-sm" />
             <div className="min-w-0 flex-1">
               <p className="text-st-ink font-bold text-sm md:text-base truncate">{lastMeeting.title}</p>
@@ -359,8 +359,8 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
 
       {/* Empty State: No Contacts */}
       {contacts.length === 0 && (
-        <section className="mt-6 bg-st-card rounded-2xl shadow-sm border border-dashed border-st-box p-6 text-center shrink-0">
-          <div className="w-14 h-14 bg-st-box rounded-2xl flex items-center justify-center mx-auto mb-3">
+        <section className="mt-6 bg-white rounded-2xl shadow-sm border border-dashed border-st-box/50 p-6 text-center shrink-0">
+          <div className="w-14 h-14 bg-st-bg rounded-2xl flex items-center justify-center mx-auto mb-3">
             <svg className="w-7 h-7 text-st-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
@@ -381,7 +381,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
 
       {/* Quick Profile Questionnaire — hide entirely if all info is already filled */}
       {!allFilled && (
-      <section className="mt-6 bg-st-card rounded-2xl shadow-sm border border-st-box p-5 md:p-6" onClick={(e) => e.stopPropagation()}>
+      <section className="mt-6 bg-white rounded-2xl shadow-sm p-5 md:p-6" onClick={(e) => e.stopPropagation()}>
         {submitted ? (
           <div className="text-center py-8">
             <div className="w-14 h-14 bg-st-green rounded-full flex items-center justify-center mx-auto mb-3">
@@ -411,7 +411,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                     value={profile.name}
                     onChange={(e) => setProfile(p => ({ ...p, name: e.target.value }))}
                     placeholder="만나는 분의 이름을 입력해주세요"
-                    className="w-full px-4 py-2.5 bg-st-bg border border-st-box rounded-xl text-sm text-st-ink placeholder-st-muted focus:outline-none focus:ring-2 focus:ring-st-box focus:border-transparent transition"
+                    className="w-full px-4 py-2.5 bg-st-bg border border-st-box/50 rounded-xl text-sm text-st-ink placeholder-st-muted focus:outline-none focus:ring-2 focus:ring-st-box focus:border-transparent transition"
                   />
                 </div>
               )}
@@ -476,7 +476,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                 disabled={!isFormValid()}
                 className={`w-full py-3 rounded-xl text-base font-bold transition-all ${
                   isFormValid()
-                    ? 'bg-st-green text-white hover:bg-st-green/80 shadow-lg shadow-st-box'
+                    ? 'bg-st-blue text-white hover:bg-st-blue/80 shadow-lg shadow-st-box'
                     : 'bg-st-box text-st-muted cursor-not-allowed'
                 }`}
               >

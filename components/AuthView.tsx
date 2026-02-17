@@ -73,7 +73,7 @@ const AuthView: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-st-bg p-4">
-      <div className="w-full max-w-md bg-st-card rounded-[2.5rem] shadow-xl p-8 border border-st-box">
+      <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-xl p-8">
         <h1 className="text-3xl font-bold text-st-ink mb-8 text-center">SmallTalker<span className="text-st-muted font-light">.ai</span></h1>
         <form onSubmit={handleAuth} className="space-y-4">
           {!isLogin && (
@@ -95,7 +95,7 @@ const AuthView: React.FC = () => {
 
         {inAppName ? (
           <div className="space-y-3">
-            <div className="bg-st-card border-l-[3px] border-l-st-yellow rounded-2xl p-4">
+            <div className="bg-st-yellow/10 rounded-2xl p-4">
               <div className="flex items-start gap-2.5">
                 <svg className="w-5 h-5 text-st-yellow shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -112,7 +112,7 @@ const AuthView: React.FC = () => {
             </div>
 
             {/* App-specific instructions */}
-            <div className="bg-st-bg border border-st-box rounded-2xl p-4 space-y-2.5">
+            <div className="bg-st-bg rounded-2xl p-4 space-y-2.5">
               <p className="text-xs font-bold text-st-ink">외부 브라우저로 여는 방법</p>
               {inAppName === '카카오톡' ? (
                 <div className="flex items-start gap-2">
@@ -149,7 +149,7 @@ const AuthView: React.FC = () => {
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
               }}
-              className="w-full py-3.5 bg-st-ink text-white font-bold rounded-2xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+              className="w-full py-3.5 bg-st-blue text-white font-bold rounded-2xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
@@ -161,7 +161,7 @@ const AuthView: React.FC = () => {
         <button
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="w-full py-4 bg-st-card border-2 border-st-box text-st-ink font-bold rounded-2xl flex items-center justify-center gap-3 hover:bg-st-box/50 transition-all active:scale-[0.98]"
+          className="w-full py-4 bg-white border-2 border-st-box/50 text-st-ink font-bold rounded-2xl flex items-center justify-center gap-3 hover:bg-st-bg transition-all active:scale-[0.98]"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>

@@ -198,7 +198,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
             rel="noopener noreferrer"
             className="flex items-center gap-2 p-2.5 rounded-xl hover:bg-st-box/30 transition-colors group"
           >
-            <div className="bg-st-box p-1 rounded-md text-st-muted flex-shrink-0">
+            <div className="bg-st-bg p-1 rounded-md text-st-muted flex-shrink-0">
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
             </div>
             <span className="text-xs font-medium text-st-muted group-hover:text-st-ink transition-colors flex-1">{article.title}</span>
@@ -228,7 +228,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
         </button>
         <button
             onClick={handleExportToICS}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-st-card border border-st-box text-st-muted rounded-lg text-xs font-bold hover:bg-st-box/30 transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-st-muted rounded-lg text-xs font-bold hover:bg-st-box/30 transition-all"
         >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
             시스템 캘린더에 추가
@@ -251,7 +251,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
           <section
             key={c.id}
             onClick={() => onSelectContact && onSelectContact(c)}
-            className="bg-st-card rounded-2xl p-4 shadow-sm border border-st-box flex items-center gap-4 cursor-pointer hover:border-st-muted transition-all active:scale-[0.99] group"
+            className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-4 cursor-pointer hover:border-st-muted transition-all active:scale-[0.99] group"
           >
             <Avatar src={c.avatarUrl} name={c.name} size={56} className="border border-st-box group-hover:ring-2 group-hover:ring-st-box transition-all" />
             <div className="flex-1">
@@ -289,7 +289,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
             <div className="space-y-4">
                 {/* 아직 아무 필드도 없으면 스피너 표시 */}
                 {!partialGuide.pastReview && (
-                    <div className="bg-st-card p-6 rounded-3xl border border-st-box shadow-xl flex items-center gap-3">
+                    <div className="bg-white p-6 rounded-3xl shadow-xl flex items-center gap-3">
                         <div className="relative w-8 h-8 flex-shrink-0">
                             <div className="absolute inset-0 border-3 border-st-box rounded-full"></div>
                             <div className="absolute inset-0 border-3 border-st-ink rounded-full border-t-transparent animate-spin" style={{ animationDuration: '0.8s' }}></div>
@@ -300,7 +300,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
 
                 {/* pastReview 카드 - 첫 번째로 나타남 */}
                 {partialGuide.pastReview && (
-                    <div className="bg-st-card p-5 rounded-2xl shadow-sm border border-st-box animate-fade-in">
+                    <div className="bg-white p-5 rounded-2xl shadow-sm animate-fade-in">
                         <div className="flex items-center gap-2 mb-3">
                             <span className="w-1.5 h-1.5 rounded-full bg-st-muted"></span>
                             <h4 className="text-xs font-bold text-st-muted uppercase tracking-widest">만남 복기 및 관계 맥락</h4>
@@ -311,17 +311,17 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
 
                 {/* businessTip 카드 - 두 번째로 나타남 */}
                 {partialGuide.businessTip ? (
-                    <div className="bg-st-card p-6 rounded-2xl shadow-sm border-l-[3px] border-l-st-blue animate-fade-in">
+                    <div className="bg-white p-6 rounded-2xl shadow-sm animate-fade-in">
                         <div className="flex items-center gap-2 mb-4">
-                            <div className="bg-st-blue p-1.5 rounded-lg text-white">
+                            <div className="bg-st-blue/10 p-1.5 rounded-lg text-st-blue">
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                             </div>
-                            <h4 className="text-sm font-bold text-st-blue">Business Conversation Tip</h4>
+                            <h4 className="text-sm font-bold text-st-ink">Business Conversation Tip</h4>
                         </div>
                         <p className="text-st-ink font-semibold text-base leading-relaxed">{partialGuide.businessTip.content}</p>
                     </div>
                 ) : partialGuide.pastReview && (
-                    <div className="bg-st-card p-6 rounded-2xl shadow-sm border border-st-box flex items-center gap-3 animate-pulse">
+                    <div className="bg-white p-6 rounded-2xl shadow-sm flex items-center gap-3 animate-pulse">
                         <div className="relative w-6 h-6 flex-shrink-0">
                             <div className="absolute inset-0 border-2 border-st-ink rounded-full border-t-transparent animate-spin" style={{ animationDuration: '0.8s' }}></div>
                         </div>
@@ -331,7 +331,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
 
                 {/* lifeTip 로딩 표시 */}
                 {partialGuide.businessTip && !partialGuide.lifeTip && (
-                    <div className="bg-st-card p-6 rounded-2xl shadow-sm border border-st-box flex items-center gap-3 animate-pulse">
+                    <div className="bg-white p-6 rounded-2xl shadow-sm flex items-center gap-3 animate-pulse">
                         <div className="relative w-6 h-6 flex-shrink-0">
                             <div className="absolute inset-0 border-2 border-st-ink rounded-full border-t-transparent animate-spin" style={{ animationDuration: '0.8s' }}></div>
                         </div>
@@ -340,7 +340,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                 )}
             </div>
           ) : error ? (
-            <div className="bg-st-card p-6 rounded-3xl border-l-[3px] border-l-st-red flex flex-col items-center text-center space-y-3">
+            <div className="bg-white p-6 rounded-3xl flex flex-col items-center text-center space-y-3">
                 <div className="bg-st-red p-2 rounded-full text-white">
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                 </div>
@@ -348,14 +348,14 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                 <p className="text-sm text-st-muted leading-relaxed">{error}</p>
                 <button
                     onClick={() => window.location.reload()}
-                    className="mt-2 px-4 py-2 bg-st-red text-white text-xs font-bold rounded-xl shadow-md hover:bg-st-red/80 transition-all"
+                    className="mt-2 px-4 py-2 bg-st-blue text-white text-xs font-bold rounded-xl shadow-md hover:bg-st-blue/80 transition-all"
                 >
                     다시 시도하기
                 </button>
             </div>
           ) : guide && (
             <div className="space-y-4 animate-fade-in">
-              <div className="bg-st-card p-5 rounded-2xl shadow-sm border border-st-box">
+              <div className="bg-white p-5 rounded-2xl shadow-sm">
                 <div className="flex items-center gap-2 mb-3">
                     <span className="w-1.5 h-1.5 rounded-full bg-st-muted"></span>
                     <h4 className="text-xs font-bold text-st-muted uppercase tracking-widest">만남 복기 및 관계 맥락</h4>
@@ -366,7 +366,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
               {guide.attendees && guide.attendees.length > 0 ? (
                 <>
                   {/* 공통 팁 (간략) */}
-                  <div className="bg-st-box p-4 rounded-2xl border border-st-box">
+                  <div className="bg-st-bg p-4 rounded-2xl">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-st-muted"></span>
                       <h4 className="text-xs font-bold text-st-muted uppercase tracking-widest">공통 대화 주제</h4>
@@ -388,12 +388,12 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                           )}
                         </div>
 
-                        <div className="bg-st-card p-5 rounded-2xl shadow-sm border-l-[3px] border-l-st-blue relative overflow-hidden">
+                        <div className="bg-white p-5 rounded-2xl shadow-sm relative overflow-hidden">
                           <div className="flex items-center gap-2 mb-3">
-                            <div className="bg-st-blue p-1.5 rounded-lg text-white">
+                            <div className="bg-st-blue/10 p-1.5 rounded-lg text-st-blue">
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                             </div>
-                            <h4 className="text-sm font-bold text-st-blue">Business Tip</h4>
+                            <h4 className="text-sm font-bold text-st-ink">Business Tip</h4>
                           </div>
                           <p className="text-st-ink font-semibold text-sm leading-relaxed">{attendee.businessTip.content}</p>
                           {attendee.businessTip.source && (
@@ -404,12 +404,12 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                           )}
                         </div>
 
-                        <div className="bg-st-card p-5 rounded-2xl shadow-sm border-l-[3px] border-l-st-purple relative overflow-hidden">
+                        <div className="bg-white p-5 rounded-2xl shadow-sm relative overflow-hidden">
                           <div className="flex items-center gap-2 mb-3">
-                            <div className="bg-st-purple p-1.5 rounded-lg text-white">
+                            <div className="bg-st-purple/10 p-1.5 rounded-lg text-st-purple">
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
-                            <h4 className="text-sm font-bold text-st-purple">Life Style Insight</h4>
+                            <h4 className="text-sm font-bold text-st-ink">Life Style Insight</h4>
                           </div>
                           <p className="text-st-ink font-semibold text-sm leading-relaxed">{attendee.lifeTip}</p>
                         </div>
@@ -419,12 +419,12 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                 </>
               ) : (
                 <>
-                  <div className="bg-st-card p-6 rounded-2xl shadow-sm border-l-[3px] border-l-st-blue relative overflow-hidden">
+                  <div className="bg-white p-6 rounded-2xl shadow-sm relative overflow-hidden">
                     <div className="flex items-center gap-2 mb-4">
-                        <div className="bg-st-blue p-1.5 rounded-lg text-white">
+                        <div className="bg-st-blue/10 p-1.5 rounded-lg text-st-blue">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                         </div>
-                        <h4 className="text-sm font-bold text-st-blue">Business Conversation Tip</h4>
+                        <h4 className="text-sm font-bold text-st-ink">Business Conversation Tip</h4>
                     </div>
                     <p className="text-st-ink font-semibold text-base leading-relaxed mb-3">{guide.businessTip.content}</p>
                     {guide.businessTip.source && (
@@ -435,7 +435,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                     )}
                     <button
                       onClick={() => handleSearchBusiness(guide.businessTip.content)}
-                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-st-blue text-white rounded-xl text-sm font-bold hover:bg-st-blue/80 shadow-md hover:shadow-lg transition-all"
+                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-transparent text-st-blue rounded-xl text-sm font-semibold hover:bg-st-blue/5 transition-all"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                       관련 뉴스 더 알아보기
@@ -443,17 +443,17 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                     {showBusinessArticles && renderArticleList(businessArticles, loadingBusinessArticles)}
                   </div>
 
-                  <div className="bg-st-card p-6 rounded-2xl shadow-sm border-l-[3px] border-l-st-purple relative overflow-hidden">
+                  <div className="bg-white p-6 rounded-2xl shadow-sm relative overflow-hidden">
                     <div className="flex items-center gap-2 mb-4">
-                        <div className="bg-st-purple p-1.5 rounded-lg text-white">
+                        <div className="bg-st-purple/10 p-1.5 rounded-lg text-st-purple">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
-                        <h4 className="text-sm font-bold text-st-purple">Life Style Insight</h4>
+                        <h4 className="text-sm font-bold text-st-ink">Life Style Insight</h4>
                     </div>
                     <p className="text-st-ink font-semibold text-base leading-relaxed">{guide.lifeTip}</p>
                     <button
                       onClick={() => handleSearchLife(guide.lifeTip)}
-                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-st-purple text-white rounded-xl text-sm font-bold hover:bg-st-purple/80 shadow-md hover:shadow-lg transition-all"
+                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-transparent text-st-blue rounded-xl text-sm font-semibold hover:bg-st-blue/5 transition-all"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                       관련 뉴스 더 알아보기
@@ -472,7 +472,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
               <h3 className="text-sm font-bold text-st-muted uppercase tracking-widest px-1">Partner Meeting Timeline</h3>
               <div className="space-y-2">
                   {futureMeetings.slice(0, 1).map(m => (
-                      <div key={m.id} onClick={() => onNavigateToMeeting && onNavigateToMeeting(m)} className="bg-st-card p-4 rounded-2xl border-l-[3px] border-l-st-green cursor-pointer hover:bg-st-box/30 transition-all group flex justify-between items-center">
+                      <div key={m.id} onClick={() => onNavigateToMeeting && onNavigateToMeeting(m)} className="bg-white p-4 rounded-2xl cursor-pointer hover:bg-st-box/30 transition-all group flex justify-between items-center">
                           <div>
                               <p className="text-[10px] font-bold text-st-ink uppercase tracking-wide">Next Meeting</p>
                               <p className="text-sm font-bold text-st-ink mt-0.5">{m.title}</p>
@@ -482,7 +482,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                       </div>
                   ))}
                   {pastMeetings.slice(0, 1).map(m => (
-                      <div key={m.id} onClick={() => onNavigateToMeeting && onNavigateToMeeting(m)} className="bg-st-card p-4 rounded-2xl border border-st-box cursor-pointer hover:border-st-muted transition-all group flex justify-between items-center">
+                      <div key={m.id} onClick={() => onNavigateToMeeting && onNavigateToMeeting(m)} className="bg-white p-4 rounded-2xl cursor-pointer hover:border-st-muted transition-all group flex justify-between items-center">
                           <div>
                               <p className="text-[10px] font-bold text-st-muted uppercase tracking-wide">Last Met</p>
                               <p className="text-sm font-bold text-st-ink mt-0.5">{m.title}</p>
@@ -503,7 +503,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                 <h3 className="font-bold text-white tracking-tight">오늘의 만남 기록</h3>
                 <ContextualTip tipKey="meeting-note" message="미팅 후 메모를 남기면 AI가 내용을 분석하여 연락처 프로필에 자동 반영합니다. 다음 만남 준비에 활용됩니다." position="bottom" dismissedTips={dismissedTips} onDismiss={onDismissTip} />
             </div>
-            <button onClick={() => isEditing ? handleSaveNote() : setIsEditing(true)} className={`text-xs font-bold px-4 py-1.5 rounded-full transition-all ${isEditing ? 'bg-st-green text-white' : 'bg-white/10 text-st-muted hover:bg-white/20'}`}>
+            <button onClick={() => isEditing ? handleSaveNote() : setIsEditing(true)} className={`text-xs font-bold px-4 py-1.5 rounded-full transition-all ${isEditing ? 'bg-st-blue text-white' : 'bg-white/10 text-st-muted hover:bg-white/20'}`}>
               {isEditing ? '저장하기' : '기록 수정'}
             </button>
           </div>

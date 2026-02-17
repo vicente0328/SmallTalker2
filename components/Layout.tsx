@@ -23,7 +23,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, user })
     <div className="min-h-screen bg-st-bg text-st-ink font-sans pb-24 md:pb-0 md:pl-64 transition-all duration-300">
 
       {/* Desktop Sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-50 hidden w-64 bg-st-card border-r border-st-box md:block">
+      <aside className="fixed inset-y-0 left-0 z-50 hidden w-64 bg-white border-r border-st-box/50 md:block">
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-center h-20 border-b border-st-box">
             <h1 className="text-2xl font-bold text-st-ink tracking-tight">SmallTalker<span className="text-st-muted font-light">.ai</span></h1>
@@ -111,7 +111,7 @@ const NavButton = ({ active, onClick, icon, label }: any) => (
   <button
     onClick={onClick}
     className={`flex items-center w-full gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
-      active ? 'bg-st-box text-st-ink' : 'text-st-muted hover:bg-st-box/50 hover:text-st-ink'
+      active ? 'bg-st-bg text-st-blue font-semibold' : 'text-st-muted hover:bg-st-bg hover:text-st-ink'
     }`}
   >
     {React.cloneElement(icon, { className: "w-5 h-5" })}
@@ -123,7 +123,7 @@ const MobileNavButton = ({ active, onClick, icon, label }: any) => (
   <button
     onClick={onClick}
     className={`flex flex-col items-center justify-center w-16 gap-1.5 transition-colors ${
-      active ? 'text-st-ink' : 'text-st-muted'
+      active ? 'text-st-blue' : 'text-st-muted'
     }`}
   >
     {React.cloneElement(icon, { className: active ? "w-6 h-6 stroke-2" : "w-6 h-6 stroke-[1.5]" })}

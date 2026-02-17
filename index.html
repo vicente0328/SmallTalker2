@@ -14,20 +14,20 @@
           extend: {
             colors: {
               st: {
-                bg: 'rgb(248, 246, 249)',
-                card: 'rgb(240, 238, 240)',
-                box: 'rgb(220, 218, 221)',
-                muted: 'rgb(137, 135, 138)',
-                ink: 'rgb(25, 21, 25)',
-                blue: 'rgb(80, 135, 195)',
-                yellow: 'rgb(195, 165, 75)',
-                red: 'rgb(200, 80, 80)',
-                green: 'rgb(85, 170, 65)',
-                purple: 'rgb(145, 100, 175)',
+                bg: 'rgb(242, 242, 247)',
+                card: 'rgb(255, 255, 255)',
+                box: 'rgb(229, 229, 234)',
+                muted: 'rgb(142, 142, 147)',
+                ink: 'rgb(0, 0, 0)',
+                blue: 'rgb(0, 122, 255)',
+                yellow: 'rgb(255, 149, 0)',
+                red: 'rgb(255, 59, 48)',
+                green: 'rgb(52, 199, 89)',
+                purple: 'rgb(175, 82, 222)',
               }
             },
             fontFamily: {
-              sans: ['Helvetica', 'Pretendard Variable', 'Pretendard', 'system-ui', 'sans-serif'],
+              sans: ['-apple-system', 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Pretendard Variable', 'Pretendard', 'system-ui', 'sans-serif'],
             }
           }
         }
@@ -35,26 +35,27 @@
     </script>
     <style>
       body {
-        font-family: 'Helvetica', 'Pretendard Variable', 'Pretendard', system-ui, sans-serif;
-        background-color: #F8F6F9;
+        font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Pretendard Variable', 'Pretendard', system-ui, sans-serif;
+        background-color: #F2F2F7;
         overscroll-behavior-y: none;
-        color: #89878A;
+        color: #8E8E93;
+        -webkit-font-smoothing: antialiased;
       }
       /* Glass morphism utility */
       .glass {
-        background: rgba(248, 246, 249, 0.82);
+        background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
       }
       .glass-dark {
-        background: rgba(25, 21, 25, 0.78);
+        background: rgba(0, 0, 0, 0.78);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
       }
       .glass-overlay {
-        background: rgba(25, 21, 25, 0.3);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        background: rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
       }
     </style>
 

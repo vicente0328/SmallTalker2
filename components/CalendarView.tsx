@@ -255,10 +255,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     const meetingExists = hasMeeting(day);
     gridCells.push(
       <div key={day} onClick={() => setSelectedDate(dateObj)} className="h-10 w-10 mx-auto flex flex-col items-center justify-center cursor-pointer relative">
-        <div className={`h-8 w-8 flex items-center justify-center rounded-full text-sm font-medium transition-colors ${isSelected ? 'bg-st-ink text-white shadow-md' : isSimulatedToday ? 'text-st-green font-bold bg-st-green/20' : 'text-st-ink hover:bg-st-box/50'}`}>
+        <div className={`h-8 w-8 flex items-center justify-center rounded-full text-sm font-medium transition-colors ${isSelected ? 'bg-st-ink text-white shadow-md' : isSimulatedToday ? 'bg-st-blue text-white font-semibold' : 'text-st-ink hover:bg-st-box/50'}`}>
           {day}
         </div>
-        {meetingExists && !isSelected && <div className="absolute bottom-1 w-1 h-1 bg-st-muted rounded-full"></div>}
+        {meetingExists && !isSelected && <div className="absolute bottom-1 w-1 h-1 bg-st-blue rounded-full"></div>}
         {meetingExists && isSelected && <div className="absolute bottom-1 w-1 h-1 bg-white/70 rounded-full"></div>}
       </div>
     );
@@ -280,7 +280,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
          </div>
        </div>
 
-       <div className="bg-st-card rounded-2xl shadow-sm border border-st-box p-4 shrink-0">
+       <div className="bg-white rounded-2xl shadow-sm p-4 shrink-0">
          <div className="flex items-center justify-between mb-4 px-2">
             <h3 className="font-semibold text-lg text-st-ink">{currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}</h3>
             <div className="flex gap-1">
@@ -293,7 +293,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
        </div>
 
        <div className="flex-1 overflow-y-auto min-h-[200px] pb-24">
-          <div className="bg-st-card rounded-2xl shadow-sm border border-st-box p-3 space-y-2">
+          <div className="bg-white rounded-2xl shadow-sm p-3 space-y-2">
             {/* Header with date and add button */}
             <div className="flex items-center justify-between px-1">
               {selectedDate ? (
@@ -332,7 +332,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                       const primaryContact = meetingContacts[0];
                       const date = new Date(meeting.date);
                       return (
-                          <div key={meeting.id} onClick={() => onSelectMeeting(meeting)} className="flex items-center bg-st-bg rounded-xl p-3 cursor-pointer active:scale-[0.98] transition-all hover:bg-st-box/50 group relative">
+                          <div key={meeting.id} onClick={() => onSelectMeeting(meeting)} className="flex items-center bg-st-bg rounded-xl p-3 cursor-pointer active:scale-[0.98] transition-all hover:bg-st-bg group relative">
                               <div className="shrink-0 w-12 text-center mr-3">
                                   <span className="text-[11px] font-bold text-st-muted group-hover:text-st-ink transition-colors">{date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false})}</span>
                               </div>
@@ -487,7 +487,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                <div className="space-y-2 pt-2">
                  <div className="flex gap-3">
                    <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 bg-st-box text-st-muted font-bold rounded-xl hover:bg-st-box/50 transition-colors">Cancel</button>
-                   <button type="submit" className="flex-1 py-3 bg-st-green text-white font-bold rounded-xl hover:bg-st-green/80 transition-colors">Save</button>
+                   <button type="submit" className="flex-1 py-3 bg-st-blue text-white font-bold rounded-xl hover:bg-st-blue/80 transition-colors">Save</button>
                  </div>
                  {editingMeetingId && onDeleteMeeting && (
                    showDeleteConfirm ? (

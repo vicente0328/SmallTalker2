@@ -166,13 +166,13 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
         )}
 
         <div className="flex gap-4 w-full max-w-sm justify-center mt-6">
-            <a href={`tel:${contact.phoneNumber}`} className="flex-1 flex flex-col items-center gap-2 bg-st-card p-3 rounded-xl shadow-sm border border-st-box hover:bg-st-bg transition">
+            <a href={`tel:${contact.phoneNumber}`} className="flex-1 flex flex-col items-center gap-2 bg-white p-3 rounded-xl shadow-sm hover:bg-st-bg transition">
                 <div className="w-8 h-8 bg-st-green text-st-ink rounded-full flex items-center justify-center">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                 </div>
                 <span className="text-xs font-medium text-st-muted">Call</span>
             </a>
-            <a href={`mailto:${contact.email}`} className="flex-1 flex flex-col items-center gap-2 bg-st-card p-3 rounded-xl shadow-sm border border-st-box hover:bg-st-bg transition">
+            <a href={`mailto:${contact.email}`} className="flex-1 flex flex-col items-center gap-2 bg-white p-3 rounded-xl shadow-sm hover:bg-st-bg transition">
                 <div className="w-8 h-8 bg-st-blue text-st-ink rounded-full flex items-center justify-center">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                 </div>
@@ -184,9 +184,9 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
       <div className="space-y-4">
         <h3 className="text-lg font-bold text-st-ink px-1">나(User)와의 관계</h3>
 
-        <div className="bg-st-card p-5 rounded-2xl shadow-sm border-l-[3px] border-l-st-purple">
+        <div className="bg-white p-5 rounded-2xl shadow-sm">
             <div className="flex items-center justify-between mb-3">
-                <h4 className="text-xs font-bold text-st-purple uppercase tracking-wide flex items-center gap-2">
+                <h4 className="text-xs font-bold text-st-muted uppercase tracking-wide flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-st-purple"></span>
                     관계 유형
                 </h4>
@@ -218,9 +218,9 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
             )}
         </div>
 
-        <div className="bg-st-card p-5 rounded-2xl shadow-sm border-l-[3px] border-l-st-green">
+        <div className="bg-white p-5 rounded-2xl shadow-sm">
             <div className="flex items-center justify-between mb-3">
-                <h4 className="text-xs font-bold text-st-green uppercase tracking-wide flex items-center gap-2">
+                <h4 className="text-xs font-bold text-st-muted uppercase tracking-wide flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-st-green"></span>
                     지난 만남 횟수
                 </h4>
@@ -256,9 +256,9 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
       <div className="space-y-4">
         <h3 className="text-lg font-bold text-st-ink px-1">Interests & Details</h3>
 
-        <div className="bg-st-card p-5 rounded-2xl shadow-sm border-l-[3px] border-l-st-blue">
+        <div className="bg-white p-5 rounded-2xl shadow-sm">
             <div className="flex items-center justify-between mb-3">
-                <h4 className="text-xs font-bold text-st-blue uppercase tracking-wide flex items-center gap-2">
+                <h4 className="text-xs font-bold text-st-muted uppercase tracking-wide flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-st-blue"></span>
                     Business Interests
                 </h4>
@@ -284,9 +284,9 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
             )}
         </div>
 
-        <div className="bg-st-card p-5 rounded-2xl shadow-sm border-l-[3px] border-l-st-yellow">
+        <div className="bg-white p-5 rounded-2xl shadow-sm">
             <div className="flex items-center justify-between mb-3">
-                <h4 className="text-xs font-bold text-st-yellow uppercase tracking-wide flex items-center gap-2">
+                <h4 className="text-xs font-bold text-st-muted uppercase tracking-wide flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-st-yellow"></span>
                     Lifestyle Interests
                 </h4>
@@ -344,7 +344,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
             </button>
             <button
               onClick={handleSave}
-              className="flex-1 py-3.5 bg-st-green text-white font-bold rounded-xl hover:bg-st-green/80 transition-all shadow-lg active:scale-95"
+              className="flex-1 py-3.5 bg-st-blue text-white font-bold rounded-xl hover:bg-st-blue/80 transition-all shadow-lg active:scale-95"
             >
               저장하기
             </button>
@@ -396,7 +396,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
       )}
 
       {!isEditing && (
-        <div className="bg-st-card rounded-2xl p-5 shadow-sm border border-st-box">
+        <div className="bg-white rounded-2xl p-5 shadow-sm">
             <h3 className="text-sm font-bold text-st-ink mb-4 flex justify-between items-center">
                 Meeting History
                 <span className="text-xs font-medium text-st-muted bg-st-bg px-2 py-0.5 rounded-full">{contactMeetings.length} Total</span>
@@ -410,7 +410,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
                             <div
                                 key={meeting.id}
                                 onClick={() => onSelectMeeting(meeting)}
-                                className="flex flex-col gap-1 p-4 bg-st-card rounded-xl border-l-[3px] border-l-st-green cursor-pointer active:scale-[0.98] transition-all hover:bg-st-box/30 group shadow-sm"
+                                className="flex flex-col gap-1 p-4 bg-st-green/10 rounded-xl cursor-pointer active:scale-[0.98] transition-all hover:bg-st-box/30 group shadow-sm"
                             >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
@@ -438,7 +438,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
                         <p className="text-[10px] font-bold text-st-muted uppercase tracking-widest pl-1">Upcoming</p>
                         <div
                             onClick={() => onSelectMeeting(nextMeeting)}
-                            className="flex flex-col gap-1 p-4 bg-st-box/50 rounded-xl border border-st-box cursor-pointer active:scale-[0.98] transition-all hover:bg-st-box/50 group"
+                            className="flex flex-col gap-1 p-4 bg-st-box/50 rounded-xl border border-st-box/50 cursor-pointer active:scale-[0.98] transition-all hover:bg-st-box/50 group"
                         >
                             <div className="flex items-center justify-between">
                                 <p className="text-xs font-bold text-st-muted uppercase tracking-wide">Scheduled</p>
@@ -462,7 +462,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
                         <p className="text-[10px] font-bold text-st-muted uppercase tracking-widest pl-1">History</p>
                         <div
                             onClick={() => onSelectMeeting(lastMeeting)}
-                            className="flex flex-col gap-1 p-4 bg-st-card rounded-xl border border-st-box cursor-pointer active:scale-[0.98] transition-all hover:border-st-muted hover:shadow-sm group"
+                            className="flex flex-col gap-1 p-4 bg-white rounded-xl cursor-pointer active:scale-[0.98] transition-all hover:shadow-sm group"
                         >
                             <div className="flex items-center justify-between">
                                 <p className="text-xs font-bold text-st-muted uppercase tracking-wide">Last Met</p>
@@ -480,7 +480,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
                 )}
 
                 {todayMeetings.length === 0 && !nextMeeting && !lastMeeting && (
-                    <div className="p-8 bg-st-bg rounded-xl border border-dashed border-st-box text-center text-st-muted text-sm">
+                    <div className="p-8 bg-st-bg rounded-xl border border-dashed border-st-box/50 text-center text-st-muted text-sm">
                         No meetings recorded.
                     </div>
                 )}
