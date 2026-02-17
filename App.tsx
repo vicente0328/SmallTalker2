@@ -143,6 +143,7 @@ const App: React.FC = () => {
 
   const handleUpdateContact = async (updatedContact: Contact) => {
     setContacts(prev => prev.map(c => c.id === updatedContact.id ? updatedContact : c));
+    setSelectedContact(prev => prev?.id === updatedContact.id ? updatedContact : prev);
     await supabase.from('contacts').update({
         name: updatedContact.name, company: updatedContact.company, role: updatedContact.role,
         phone_number: updatedContact.phoneNumber, email: updatedContact.email,
