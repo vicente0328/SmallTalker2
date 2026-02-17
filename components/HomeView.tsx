@@ -253,9 +253,9 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
             <div className="absolute bottom-0 left-0 w-56 h-56 md:w-64 md:h-64 bg-violet-600/20 rounded-full blur-[50px] md:blur-[60px] -ml-16 -mb-8 mix-blend-screen"></div>
         </div>
 
-        <div className={`relative z-10 flex flex-col h-full p-6 md:p-8 ${upcomingMeeting ? 'justify-between' : 'justify-center items-center text-center'}`}>
+        <div className="relative z-10 flex flex-col h-full justify-between p-6 md:p-8">
           <div>
-            <div className={`inline-flex items-center gap-2 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-[10px] md:text-xs font-bold text-indigo-200 mb-4 md:mb-6 tracking-wide ${!upcomingMeeting ? 'mx-auto' : ''}`}>
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-[10px] md:text-xs font-bold text-indigo-200 mb-4 md:mb-6 tracking-wide">
                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_8px_rgba(129,140,248,0.8)]"></span>
                UPCOMING SCHEDULE
             </div>
@@ -276,6 +276,12 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                         {new Date(upcomingMeeting.date).toLocaleString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short', hour: 'numeric', minute: 'numeric' })}
                     </p>
                 </div>
+            )}
+
+            {!upcomingMeeting && (
+                <p className="mt-3 text-indigo-300/60 text-sm font-medium">
+                    캘린더에서 미팅을 추가하고 AI 스몰토크 가이드를 받아보세요.
+                </p>
             )}
           </div>
 
@@ -301,7 +307,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                 </button>
             </div>
           ) : (
-            <div className="w-full mt-6">
+            <div className="w-full">
                 <button
                     onClick={(e) => { e.stopPropagation(); onNavigateToCalendar?.(); }}
                     className="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-base md:text-lg font-bold py-3 md:py-4 rounded-xl md:rounded-2xl transition-all shadow-lg shadow-indigo-900/30 flex items-center justify-center gap-2"
