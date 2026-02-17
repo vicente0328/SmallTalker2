@@ -211,20 +211,20 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
 
       <div className="flex justify-between items-center px-1">
         <div className="flex items-center gap-2">
-          <h2 className="text-3xl font-bold text-slate-900">Contacts</h2>
+          <h2 className="text-3xl font-bold text-st-ink">Contacts</h2>
           <ContextualTip tipKey="contacts-info" message="연락처에 관심사와 성격을 기록할수록 AI 스몰토크 가이드가 더 정확해집니다." position="bottom" dismissedTips={dismissedTips} onDismiss={onDismissTip} />
         </div>
         <div className="flex gap-2">
             <button
                 onClick={handleImportFromDevice}
-                className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl shadow-sm text-xs font-bold hover:bg-slate-50 transition-all"
+                className="flex items-center gap-1.5 px-3 py-2 bg-st-card border border-st-box text-st-muted rounded-xl shadow-sm text-xs font-bold hover:bg-st-box/30 transition-all"
             >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                 가져오기
             </button>
             <button
                 onClick={handleOpenModal}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-md shadow-indigo-200 active:scale-95"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-st-ink text-white text-xs font-bold rounded-xl hover:bg-st-muted transition-all shadow-md active:scale-95"
             >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
                 추가하기
@@ -234,39 +234,39 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
 
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <svg className="h-5 w-5 text-st-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
         </div>
         <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full pl-10 pr-3 py-3 border-none rounded-xl bg-slate-200/60 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base transition-shadow"
+            className="block w-full pl-10 pr-3 py-3 border-none rounded-xl bg-st-box/60 text-st-ink placeholder-st-muted focus:outline-none focus:ring-2 focus:ring-st-muted text-base transition-shadow"
             placeholder="Search contacts..."
         />
       </div>
 
       {contacts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl shadow-sm border border-dashed border-indigo-200">
-          <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="flex flex-col items-center justify-center py-16 text-center bg-st-card rounded-2xl shadow-sm border border-dashed border-st-box">
+          <div className="w-16 h-16 bg-st-box rounded-2xl flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-st-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
           </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-1">아직 등록된 연락처가 없습니다</h3>
-          <p className="text-sm text-slate-400 mb-5 leading-relaxed">
+          <h3 className="text-lg font-bold text-st-ink mb-1">아직 등록된 연락처가 없습니다</h3>
+          <p className="text-sm text-st-muted mb-5 leading-relaxed">
             자주 만나는 분들을 등록하면<br/>AI가 대화 맥락을 기억합니다.
           </p>
           <div className="flex gap-3">
             <button
               onClick={handleOpenModal}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-md"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-st-ink text-white text-sm font-bold rounded-xl hover:bg-st-muted transition-all shadow-md"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
               직접 추가
             </button>
             <button
               onClick={handleImportFromDevice}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-50 transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-st-card border border-st-box text-st-muted text-sm font-bold rounded-xl hover:bg-st-box/30 transition-all"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
               가져오기
@@ -274,43 +274,43 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
           </div>
         </div>
       ) : (
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 divide-y divide-slate-100 overflow-hidden">
+      <div className="bg-st-card rounded-2xl shadow-sm border border-st-box divide-y divide-st-box overflow-hidden">
         {sortedContacts.length > 0 ? (
             sortedContacts.map((contact) => (
-                <div key={contact.id} onClick={() => onSelectContact(contact)} className="p-4 flex items-center gap-4 hover:bg-slate-50 cursor-pointer transition-colors group">
-                    <img src={contact.avatarUrl} alt={contact.name} className="w-12 h-12 rounded-full object-cover border-2 border-transparent group-hover:border-indigo-100 transition-all" />
+                <div key={contact.id} onClick={() => onSelectContact(contact)} className="p-4 flex items-center gap-4 hover:bg-st-box/30 cursor-pointer transition-colors group">
+                    <img src={contact.avatarUrl} alt={contact.name} className="w-12 h-12 rounded-full object-cover border-2 border-transparent group-hover:border-st-muted transition-all" />
                     <div className="flex-1 min-w-0">
-                        <h3 className="text-base font-bold text-slate-900 truncate group-hover:text-indigo-600 transition-colors">{contact.name}</h3>
+                        <h3 className="text-base font-bold text-st-ink truncate group-hover:text-st-ink transition-colors">{contact.name}</h3>
                         <p className="text-xs truncate">
-                          <span className={contact.company && contact.company !== 'Unknown' ? 'text-slate-500' : 'text-slate-300 italic'}>{contact.company && contact.company !== 'Unknown' ? contact.company : '회사/소속'}</span>
+                          <span className={contact.company && contact.company !== 'Unknown' ? 'text-st-muted' : 'text-st-muted italic'}>{contact.company && contact.company !== 'Unknown' ? contact.company : '회사/소속'}</span>
                           {' · '}
-                          <span className={contact.role && contact.role !== 'Unknown' ? 'text-slate-500' : 'text-slate-300 italic'}>{contact.role && contact.role !== 'Unknown' ? contact.role : '직책'}</span>
+                          <span className={contact.role && contact.role !== 'Unknown' ? 'text-st-muted' : 'text-st-muted italic'}>{contact.role && contact.role !== 'Unknown' ? contact.role : '직책'}</span>
                         </p>
                     </div>
-                    <svg className="w-5 h-5 text-slate-300 group-hover:text-indigo-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                    <svg className="w-5 h-5 text-st-muted group-hover:text-st-ink transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                 </div>
             ))
         ) : (
-            <div className="p-12 text-center text-slate-400">검색 결과가 없습니다.</div>
+            <div className="p-12 text-center text-st-muted">검색 결과가 없습니다.</div>
         )}
       </div>
       )}
 
       {/* Import Guide Modal */}
       {isGuideOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 animate-fade-in backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center glass-overlay p-4 animate-fade-in">
+          <div className="glass rounded-2xl w-full max-w-sm p-6 shadow-2xl">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold text-slate-900">연락처 가져오기</h3>
-              <button onClick={() => setIsGuideOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <h3 className="text-lg font-bold text-st-ink">연락처 가져오기</h3>
+              <button onClick={() => setIsGuideOpen(false)} className="text-st-muted hover:text-st-ink">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
 
             <div className="space-y-4">
-              <div className="bg-indigo-50 rounded-xl p-4">
-                <p className="text-sm font-bold text-indigo-900 mb-2">vCard 파일(.vcf)로 가져오기</p>
-                <ol className="text-sm text-indigo-800 space-y-2 list-decimal list-inside">
+              <div className="bg-st-box rounded-xl p-4">
+                <p className="text-sm font-bold text-st-ink mb-2">vCard 파일(.vcf)로 가져오기</p>
+                <ol className="text-sm text-st-ink space-y-2 list-decimal list-inside">
                   <li><strong>연락처 앱</strong>을 열어주세요</li>
                   <li>가져올 연락처를 선택 후 <strong>"연락처 공유"</strong>를 탭하세요</li>
                   <li><strong>"파일에 저장"</strong>을 선택하세요</li>
@@ -320,16 +320,16 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
 
               <button
                 onClick={() => { setIsGuideOpen(false); vcfInputRef.current?.click(); }}
-                className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-md flex items-center justify-center gap-2"
+                className="w-full py-3 bg-st-ink text-white font-bold rounded-xl hover:bg-st-muted transition-all shadow-md flex items-center justify-center gap-2"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                 .vcf 파일 선택하기
               </button>
 
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+              <div className="bg-st-bg rounded-xl p-4 border border-st-box">
                 <div className="flex items-start gap-2">
-                  <svg className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  <p className="text-xs text-slate-500 leading-relaxed">
+                  <svg className="w-5 h-5 text-st-muted shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <p className="text-xs text-st-muted leading-relaxed">
                     추후 Native App 출시 시, 시스템 연락처에서 바로 가져올 수 있는 더욱 편리한 연동 기능이 업데이트될 예정입니다.
                   </p>
                 </div>
@@ -340,11 +340,11 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 animate-fade-in backdrop-blur-sm">
-            <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center glass-overlay p-4 animate-fade-in">
+            <div className="glass rounded-2xl w-full max-w-md p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-bold text-slate-900">New Contact</h3>
-                    <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                    <h3 className="text-xl font-bold text-st-ink">New Contact</h3>
+                    <button onClick={() => setIsModalOpen(false)} className="text-st-muted hover:text-st-ink">
                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>
@@ -352,34 +352,34 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Name *</label>
-                            <input type="text" value={formName} onChange={(e) => setFormName(e.target.value)} className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base" placeholder="홍길동" required />
+                            <label className="block text-xs font-bold text-st-muted uppercase mb-1">Name *</label>
+                            <input type="text" value={formName} onChange={(e) => setFormName(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-base" placeholder="홍길동" required />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Company</label>
-                            <input type="text" value={formCompany} onChange={(e) => setFormCompany(e.target.value)} className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base" placeholder="(주)회사명" />
+                            <label className="block text-xs font-bold text-st-muted uppercase mb-1">Company</label>
+                            <input type="text" value={formCompany} onChange={(e) => setFormCompany(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-base" placeholder="(주)회사명" />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Role</label>
-                        <input type="text" value={formRole} onChange={(e) => setFormRole(e.target.value)} className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base" placeholder="직함" />
+                        <label className="block text-xs font-bold text-st-muted uppercase mb-1">Role</label>
+                        <input type="text" value={formRole} onChange={(e) => setFormRole(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-base" placeholder="직함" />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Phone</label>
-                            <input type="tel" value={formPhone} onChange={(e) => setFormPhone(e.target.value)} className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base" placeholder="010-0000-0000" />
+                            <label className="block text-xs font-bold text-st-muted uppercase mb-1">Phone</label>
+                            <input type="tel" value={formPhone} onChange={(e) => setFormPhone(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-base" placeholder="010-0000-0000" />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Email</label>
-                            <input type="email" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base" placeholder="example@mail.com" />
+                            <label className="block text-xs font-bold text-st-muted uppercase mb-1">Email</label>
+                            <input type="email" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-base" placeholder="example@mail.com" />
                         </div>
                     </div>
 
                     <div className="flex gap-3 pt-4">
-                        <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl">취소</button>
-                        <button type="submit" className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl transition-all shadow-md active:scale-95">추가하기</button>
+                        <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 bg-st-box text-st-muted font-bold rounded-xl">취소</button>
+                        <button type="submit" className="flex-1 py-3 bg-st-ink text-white font-bold rounded-xl transition-all shadow-md active:scale-95">추가하기</button>
                     </div>
                 </form>
             </div>

@@ -6,13 +6,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>SmallTalker AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet" type="text/css" />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              st: {
+                bg: '#F8F6F9',
+                card: '#F0EEF0',
+                box: '#DCDADD',
+                muted: '#89878A',
+                ink: '#191519',
+              }
+            },
+            fontFamily: {
+              sans: ['Helvetica', 'Pretendard Variable', 'Pretendard', 'system-ui', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
     <style>
       body {
-        font-family: 'Pretendard', sans-serif;
-        background-color: #f8fafc;
-        /* Prevent elastic scrolling/bounce effect on some mobile browsers */
+        font-family: 'Helvetica', 'Pretendard Variable', 'Pretendard', system-ui, sans-serif;
+        background-color: #F8F6F9;
         overscroll-behavior-y: none;
+        color: #89878A;
+      }
+      /* Glass morphism utility */
+      .glass {
+        background: rgba(248, 246, 249, 0.82);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      .glass-dark {
+        background: rgba(25, 21, 25, 0.78);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      .glass-overlay {
+        background: rgba(25, 21, 25, 0.3);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
       }
     </style>
 

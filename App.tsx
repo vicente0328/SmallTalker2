@@ -179,10 +179,10 @@ const App: React.FC = () => {
   if (!session) return <AuthView />;
 
   if (loading) return (
-    <div className="h-screen flex items-center justify-center bg-slate-50">
+    <div className="h-screen flex items-center justify-center bg-st-bg">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-        <p className="text-sm text-slate-400 font-medium">Loading...</p>
+        <div className="w-10 h-10 border-4 border-st-box border-t-st-ink rounded-full animate-spin"></div>
+        <p className="text-sm text-st-muted font-medium">Loading...</p>
       </div>
     </div>
   );

@@ -60,10 +60,10 @@ const STEPS = [
 ];
 
 const COLOR_MAP: Record<string, { bg: string; iconBg: string; iconText: string; dot: string; btn: string; btnHover: string }> = {
-  indigo: { bg: 'bg-indigo-50', iconBg: 'bg-indigo-100', iconText: 'text-indigo-600', dot: 'bg-indigo-600', btn: 'bg-indigo-600', btnHover: 'hover:bg-indigo-500' },
-  violet: { bg: 'bg-violet-50', iconBg: 'bg-violet-100', iconText: 'text-violet-600', dot: 'bg-violet-600', btn: 'bg-violet-600', btnHover: 'hover:bg-violet-500' },
-  emerald: { bg: 'bg-emerald-50', iconBg: 'bg-emerald-100', iconText: 'text-emerald-600', dot: 'bg-emerald-600', btn: 'bg-emerald-600', btnHover: 'hover:bg-emerald-500' },
-  amber: { bg: 'bg-amber-50', iconBg: 'bg-amber-100', iconText: 'text-amber-600', dot: 'bg-amber-600', btn: 'bg-amber-600', btnHover: 'hover:bg-amber-500' },
+  indigo: { bg: 'bg-st-bg', iconBg: 'bg-st-box', iconText: 'text-st-ink', dot: 'bg-st-ink', btn: 'bg-st-ink', btnHover: 'hover:bg-st-muted' },
+  violet: { bg: 'bg-st-bg', iconBg: 'bg-st-box', iconText: 'text-st-ink', dot: 'bg-st-ink', btn: 'bg-st-ink', btnHover: 'hover:bg-st-muted' },
+  emerald: { bg: 'bg-st-bg', iconBg: 'bg-st-box', iconText: 'text-st-ink', dot: 'bg-st-ink', btn: 'bg-st-ink', btnHover: 'hover:bg-st-muted' },
+  amber: { bg: 'bg-st-bg', iconBg: 'bg-st-box', iconText: 'text-st-ink', dot: 'bg-st-ink', btn: 'bg-st-ink', btnHover: 'hover:bg-st-muted' },
 };
 
 const SWIPE_THRESHOLD = 50;
@@ -170,9 +170,9 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
   const dragOpacity = Math.max(0.4, 1 - Math.abs(dragX) / 500);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center glass-overlay p-4 animate-fade-in">
       <div
-        className="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden select-none"
+        className="glass rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden select-none"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -188,11 +188,11 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
               <div className={`${colors.iconBg} ${colors.iconText} p-4 rounded-2xl mb-5 shadow-sm`}>
                 {current.icon}
               </div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+              <p className="text-xs font-bold text-st-muted uppercase tracking-widest mb-2">
                 Step {step + 1} of {STEPS.length}
               </p>
-              <h2 className="text-xl font-bold text-slate-900 mb-2">{current.title}</h2>
-              <p className="text-sm text-slate-500 leading-relaxed whitespace-pre-line">{current.description}</p>
+              <h2 className="text-xl font-bold text-st-ink mb-2">{current.title}</h2>
+              <p className="text-sm text-st-muted leading-relaxed whitespace-pre-line">{current.description}</p>
             </div>
           </div>
         </div>
@@ -221,14 +221,14 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
 
           {/* Swipe hint + Skip */}
           {!isLast ? (
-            <p className="w-full py-2 text-slate-300 font-medium text-xs text-center">
+            <p className="w-full py-2 text-st-muted font-medium text-xs text-center">
               밀어서 다음으로
               <span className="inline-block ml-1 animate-pulse">→</span>
             </p>
           ) : (
             <button
               onClick={onComplete}
-              className="w-full py-3 text-slate-400 font-semibold text-sm hover:text-slate-600 transition-colors"
+              className="w-full py-3 text-st-muted font-semibold text-sm hover:text-st-ink transition-colors"
             >
               건너뛰기
             </button>
@@ -240,7 +240,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
               <div
                 key={i}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === step ? `w-6 ${colors.dot}` : 'w-1.5 bg-slate-200'
+                  i === step ? `w-6 ${colors.dot}` : 'w-1.5 bg-st-box'
                 }`}
               />
             ))}
@@ -252,7 +252,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
           <div className="px-6 pb-5 -mt-2">
             <button
               onClick={onComplete}
-              className="w-full text-xs text-slate-300 hover:text-slate-500 transition-colors"
+              className="w-full text-xs text-st-muted hover:text-st-ink transition-colors"
             >
               투어 건너뛰기
             </button>

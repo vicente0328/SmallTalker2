@@ -19,46 +19,46 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, user })
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-24 md:pb-0 md:pl-64 transition-all duration-300">
-      
+    <div className="min-h-screen bg-st-bg text-st-ink font-sans pb-24 md:pb-0 md:pl-64 transition-all duration-300">
+
       {/* Desktop Sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-50 hidden w-64 bg-white border-r border-slate-200 md:block">
+      <aside className="fixed inset-y-0 left-0 z-50 hidden w-64 bg-st-card border-r border-st-box md:block">
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-center h-20 border-b border-slate-100">
-            <h1 className="text-2xl font-bold text-indigo-600 tracking-tight">SmallTalker<span className="text-slate-400 font-light">.ai</span></h1>
+          <div className="flex items-center justify-center h-20 border-b border-st-box">
+            <h1 className="text-2xl font-bold text-st-ink tracking-tight">SmallTalker<span className="text-st-muted font-light">.ai</span></h1>
           </div>
           <nav className="flex-1 px-4 py-6 space-y-2">
-            <NavButton 
-              active={isTabActive('HOME')} 
+            <NavButton
+              active={isTabActive('HOME')}
               onClick={() => setView(ViewState.HOME)}
               icon={<HomeIcon />}
               label="Home"
             />
-            <NavButton 
-              active={isTabActive('CALENDAR')} 
+            <NavButton
+              active={isTabActive('CALENDAR')}
               onClick={() => setView(ViewState.CALENDAR)}
               icon={<CalendarIcon />}
               label="Calendar"
             />
-            <NavButton 
-              active={isTabActive('CONTACTS')} 
+            <NavButton
+              active={isTabActive('CONTACTS')}
               onClick={() => setView(ViewState.CONTACT_LIST)}
               icon={<UsersIcon />}
               label="Contacts"
             />
-            <NavButton 
-              active={isTabActive('SETTINGS')} 
+            <NavButton
+              active={isTabActive('SETTINGS')}
               onClick={() => setView(ViewState.SETTINGS)}
               icon={<CogIcon />}
               label="Settings"
             />
           </nav>
-          <div className="p-4 border-t border-slate-100">
+          <div className="p-4 border-t border-st-box">
             <div className="flex items-center gap-3">
-              <img src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=6366f1&color=fff`} className="w-8 h-8 rounded-full object-cover" alt={user.name} />
+              <img src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=DCDADD&color=191519`} className="w-8 h-8 rounded-full object-cover" alt={user.name} />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-slate-700 truncate">{user.name}</p>
-                <p className="text-xs text-slate-500 truncate">{user.role || user.industry || '사용자'}</p>
+                <p className="text-sm font-bold text-st-ink truncate">{user.name}</p>
+                <p className="text-xs text-st-muted truncate">{user.role || user.industry || '사용자'}</p>
               </div>
             </div>
           </div>
@@ -66,8 +66,8 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, user })
       </aside>
 
       {/* Mobile Header */}
-      <header className="md:hidden fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-slate-200 z-40 h-14 flex items-center justify-center px-4">
-        <h1 className="text-lg font-bold text-indigo-600">SmallTalker<span className="text-slate-400 font-light">.ai</span></h1>
+      <header className="md:hidden fixed top-0 left-0 right-0 glass border-b border-st-box z-40 h-14 flex items-center justify-center px-4">
+        <h1 className="text-lg font-bold text-st-ink">SmallTalker<span className="text-st-muted font-light">.ai</span></h1>
       </header>
 
       {/* Main Content Area */}
@@ -76,27 +76,27 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, user })
       </main>
 
       {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 h-20 flex items-start justify-around pt-3 pb-safe">
-        <MobileNavButton 
-          active={isTabActive('HOME')} 
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 glass border-t border-st-box z-50 h-20 flex items-start justify-around pt-3 pb-safe">
+        <MobileNavButton
+          active={isTabActive('HOME')}
           onClick={() => setView(ViewState.HOME)}
           icon={<HomeIcon />}
           label="Home"
         />
-        <MobileNavButton 
-          active={isTabActive('CALENDAR')} 
+        <MobileNavButton
+          active={isTabActive('CALENDAR')}
           onClick={() => setView(ViewState.CALENDAR)}
           icon={<CalendarIcon />}
           label="Calendar"
         />
-        <MobileNavButton 
-          active={isTabActive('CONTACTS')} 
+        <MobileNavButton
+          active={isTabActive('CONTACTS')}
           onClick={() => setView(ViewState.CONTACT_LIST)}
           icon={<UsersIcon />}
           label="Contacts"
         />
-        <MobileNavButton 
-          active={isTabActive('SETTINGS')} 
+        <MobileNavButton
+          active={isTabActive('SETTINGS')}
           onClick={() => setView(ViewState.SETTINGS)}
           icon={<CogIcon />}
           label="Settings"
@@ -110,7 +110,7 @@ const NavButton = ({ active, onClick, icon, label }: any) => (
   <button
     onClick={onClick}
     className={`flex items-center w-full gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
-      active ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+      active ? 'bg-st-box text-st-ink' : 'text-st-muted hover:bg-st-box/50 hover:text-st-ink'
     }`}
   >
     {React.cloneElement(icon, { className: "w-5 h-5" })}
@@ -122,7 +122,7 @@ const MobileNavButton = ({ active, onClick, icon, label }: any) => (
   <button
     onClick={onClick}
     className={`flex flex-col items-center justify-center w-16 gap-1.5 transition-colors ${
-      active ? 'text-indigo-600' : 'text-slate-400'
+      active ? 'text-st-ink' : 'text-st-muted'
     }`}
   >
     {React.cloneElement(icon, { className: active ? "w-6 h-6 stroke-2" : "w-6 h-6 stroke-[1.5]" })}
