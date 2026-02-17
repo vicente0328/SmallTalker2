@@ -188,6 +188,15 @@ const App: React.FC = () => {
     await supabase.from('meetings').update({ ai_guide: guide }).eq('id', meetingId);
   };
 
+  const handleEditMeeting = async (updatedMeeting: Meeting, newContact?: Contact) => {
+    if (newContact) await handleAddContact(newContact);
+    setMeetings(prev => prev.map(m => m.id === updatedMeeting.id ? updatedMeeting : m));
+    await supabase.from('meetings').update({
+        contact_id: updatedMeeting.contactId, title: updatedMeeting.title,
+        date: updatedMeeting.date, location: updatedMeeting.location
+    }).eq('id', updatedMeeting.id);
+  };
+
   const handleAddMeeting = async (newMeeting: Meeting, newContact?: Contact) => {
     if (newContact) await handleAddContact(newContact);
     setMeetings(prev => [...prev, newMeeting]);
@@ -202,7 +211,7 @@ const App: React.FC = () => {
       case ViewState.HOME:
         return <HomeView user={user} meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onUpdateContact={handleUpdateContact} onAddContact={handleAddContact} />;
       case ViewState.CALENDAR:
-        return <CalendarView meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onAddMeeting={handleAddMeeting} onEditMeeting={()=>{}} onAddContact={handleAddContact} />;
+        return <CalendarView meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onAddMeeting={handleAddMeeting} onEditMeeting={handleEditMeeting} onAddContact={handleAddContact} />;
       case ViewState.MEETING_DETAIL:
         const selectedMeeting = meetings.find(m => m.id === selectedMeetingId);
         if (!selectedMeeting || !selectedContact) return null;

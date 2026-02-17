@@ -338,14 +338,14 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                  </div>
                </div>
 
-               <div className="grid grid-cols-2 gap-2">
+               <div className="grid grid-cols-2 gap-3">
                  <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Date</label>
-                    <input type="date" value={formDate} onChange={(e) => setFormDate(e.target.value)} className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base" />
+                    <input type="date" value={formDate} onChange={(e) => setFormDate(e.target.value)} className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
                  </div>
                  <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Time</label>
-                    <input type="time" value={formTime} onChange={(e) => setFormTime(e.target.value)} className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base" />
+                    <input type="time" value={formTime} onChange={(e) => setFormTime(e.target.value)} className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-left" />
                  </div>
                </div>
 
