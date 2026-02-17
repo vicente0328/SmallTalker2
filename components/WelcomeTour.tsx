@@ -72,7 +72,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
   const [step, setStep] = useState(0);
   const [dragX, setDragX] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [isUserDragging, setIsUserDragging] = useState(false);
+  const [transitionOn, setTransitionOn] = useState(false);
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const isDragging = useRef(false);
@@ -86,20 +86,23 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
   const animateToStep = useCallback((newStep: number, direction: 'left' | 'right') => {
     if (isAnimating) return;
     setIsAnimating(true);
-    setIsUserDragging(false);
+    setTransitionOn(true);
     // Slide out current card
     setDragX(direction === 'left' ? -400 : 400);
     setTimeout(() => {
+      // Disable transition for instant reposition
+      setTransitionOn(false);
       setStep(newStep);
-      // Position new card on opposite side, then animate to center
       setDragX(direction === 'left' ? 400 : -400);
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
+          // Re-enable transition for smooth slide-in
+          setTransitionOn(true);
           setDragX(0);
           setTimeout(() => setIsAnimating(false), 350);
         });
       });
-    }, 250);
+    }, 300);
   }, [isAnimating]);
 
   const goNext = useCallback(() => {
@@ -118,7 +121,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
     touchStartY.current = e.touches[0].clientY;
     isDragging.current = true;
     directionLocked.current = null;
-    setIsUserDragging(true);
+    setTransitionOn(false);
   }, [isAnimating]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
@@ -146,7 +149,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
     if (!isDragging.current) return;
     isDragging.current = false;
     directionLocked.current = null;
-    setIsUserDragging(false);
+    setTransitionOn(true);
 
     if (dragX < -SWIPE_THRESHOLD && !isLast) {
       goNext();
@@ -190,7 +193,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
             style={{
               transform: `translateX(${dragX}px)`,
               opacity: dragOpacity,
-              transition: isUserDragging ? 'none' : 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.35s ease-out',
+              transition: transitionOn ? 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.35s ease-out' : 'none',
               willChange: 'transform, opacity',
             }}
           >
