@@ -12,11 +12,23 @@ const STEPS = [
   {
     icon: (
       <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
+    ),
+    title: '먼저, 내 프로필을 설정하세요',
+    description: '회사/소속, 직책, 관심사를 입력하면\nAI가 나에게 맞는 대화 주제를 추천합니다.\n프로필이 정확할수록 추천이 정교해져요!',
+    action: '프로필 설정하기',
+    targetView: ViewState.SETTINGS,
+    color: 'violet',
+  },
+  {
+    icon: (
+      <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
     ),
-    title: '캘린더에 일정을 등록하세요',
-    description: '다가올 미팅을 캘린더에 추가하면,\nAI가 맞춤형 스몰토크 주제를 준비합니다.',
+    title: '캘린더에 첫 미팅을 등록하세요',
+    description: '캘린더에서 날짜를 선택한 뒤\n"추가하기" 버튼을 눌러 미팅을 등록하세요.\n미팅 제목, 상대방, 장소를 입력하면\nAI가 맞춤형 스몰토크 가이드를 준비합니다.',
     action: '캘린더 바로가기',
     targetView: ViewState.CALENDAR,
     color: 'indigo',
@@ -31,7 +43,7 @@ const STEPS = [
     description: '자주 만나는 분들의 정보를 등록하면,\n만남의 맥락을 AI가 기억합니다.',
     action: '연락처 바로가기',
     targetView: ViewState.CONTACT_LIST,
-    color: 'violet',
+    color: 'emerald',
   },
   {
     icon: (
@@ -40,7 +52,7 @@ const STEPS = [
       </svg>
     ),
     title: 'AI 스몰토크 가이드를 확인하세요',
-    description: '미팅 상세 화면에서 AI가 준비한\n비즈니스 팁과 라이프스타일 인사이트를 확인하세요.',
+    description: '등록한 미팅을 클릭하면 AI가 준비한\n비즈니스 팁과 라이프스타일 인사이트를\n확인할 수 있습니다.',
     action: '시작하기',
     targetView: null,
     color: 'amber',
@@ -50,6 +62,7 @@ const STEPS = [
 const COLOR_MAP: Record<string, { bg: string; iconBg: string; iconText: string; dot: string; btn: string; btnHover: string }> = {
   indigo: { bg: 'bg-indigo-50', iconBg: 'bg-indigo-100', iconText: 'text-indigo-600', dot: 'bg-indigo-600', btn: 'bg-indigo-600', btnHover: 'hover:bg-indigo-500' },
   violet: { bg: 'bg-violet-50', iconBg: 'bg-violet-100', iconText: 'text-violet-600', dot: 'bg-violet-600', btn: 'bg-violet-600', btnHover: 'hover:bg-violet-500' },
+  emerald: { bg: 'bg-emerald-50', iconBg: 'bg-emerald-100', iconText: 'text-emerald-600', dot: 'bg-emerald-600', btn: 'bg-emerald-600', btnHover: 'hover:bg-emerald-500' },
   amber: { bg: 'bg-amber-50', iconBg: 'bg-amber-100', iconText: 'text-amber-600', dot: 'bg-amber-600', btn: 'bg-amber-600', btnHover: 'hover:bg-amber-500' },
 };
 
