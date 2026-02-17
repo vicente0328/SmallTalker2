@@ -239,6 +239,11 @@ const App: React.FC = () => {
     }).eq('id', updatedMeeting.id);
   };
 
+  const handleDeleteMeeting = async (meetingId: string) => {
+    setMeetings(prev => prev.filter(m => m.id !== meetingId));
+    await supabase.from('meetings').delete().eq('id', meetingId);
+  };
+
   const handleAddMeeting = async (newMeeting: Meeting, newContact?: Contact) => {
     if (newContact) await handleAddContact(newContact);
     setMeetings(prev => [...prev, newMeeting]);
@@ -253,7 +258,7 @@ const App: React.FC = () => {
       case ViewState.HOME:
         return <HomeView user={user} meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onUpdateContact={handleUpdateContact} onAddContact={handleAddContact} onNavigateToCalendar={() => setView(ViewState.CALENDAR)} onNavigateToContacts={() => setView(ViewState.CONTACT_LIST)} />;
       case ViewState.CALENDAR:
-        return <CalendarView meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onAddMeeting={handleAddMeeting} onEditMeeting={handleEditMeeting} onAddContact={handleAddContact} dismissedTips={dismissedTips} onDismissTip={handleDismissTip} />;
+        return <CalendarView meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onAddMeeting={handleAddMeeting} onEditMeeting={handleEditMeeting} onDeleteMeeting={handleDeleteMeeting} onAddContact={handleAddContact} dismissedTips={dismissedTips} onDismissTip={handleDismissTip} />;
       case ViewState.MEETING_DETAIL:
         const selectedMeeting = meetings.find(m => m.id === selectedMeetingId);
         if (!selectedMeeting || !selectedContact) return null;

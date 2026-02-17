@@ -213,16 +213,17 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
         <div className="flex gap-2">
             <button
                 onClick={handleImportFromDevice}
-                className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl shadow-sm text-xs font-bold hover:bg-slate-50 transition-all"
+                className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl shadow-sm text-xs font-bold hover:bg-slate-50 transition-all"
             >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                 가져오기
             </button>
             <button
                 onClick={handleOpenModal}
-                className="p-2.5 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-500 transition-all"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-md shadow-indigo-200 active:scale-95"
             >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+                추가하기
             </button>
         </div>
       </div>
@@ -276,7 +277,11 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
                     <img src={contact.avatarUrl} alt={contact.name} className="w-12 h-12 rounded-full object-cover border-2 border-transparent group-hover:border-indigo-100 transition-all" />
                     <div className="flex-1 min-w-0">
                         <h3 className="text-base font-bold text-slate-900 truncate group-hover:text-indigo-600 transition-colors">{contact.name}</h3>
-                        <p className="text-xs text-slate-500 truncate">{contact.company} · {contact.role}</p>
+                        <p className="text-xs truncate">
+                          <span className={contact.company && contact.company !== 'Unknown' ? 'text-slate-500' : 'text-slate-300 italic'}>{contact.company && contact.company !== 'Unknown' ? contact.company : '회사/소속'}</span>
+                          {' · '}
+                          <span className={contact.role && contact.role !== 'Unknown' ? 'text-slate-500' : 'text-slate-300 italic'}>{contact.role && contact.role !== 'Unknown' ? contact.role : '직책'}</span>
+                        </p>
                     </div>
                     <svg className="w-5 h-5 text-slate-300 group-hover:text-indigo-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                 </div>

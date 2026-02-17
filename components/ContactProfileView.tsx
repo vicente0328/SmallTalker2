@@ -92,28 +92,13 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
             </svg>
             Back
         </button>
-        {!isEditing ? (
-            <button 
+        {!isEditing && (
+            <button
                 onClick={() => setIsEditing(true)}
                 className="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition"
             >
                 편집하기
             </button>
-        ) : (
-            <div className="flex gap-2">
-                <button 
-                    onClick={() => setIsEditing(false)}
-                    className="px-4 py-2 bg-slate-100 text-slate-500 font-bold rounded-xl"
-                >
-                    취소
-                </button>
-                <button 
-                    onClick={handleSave}
-                    className="px-4 py-2 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition shadow-md"
-                >
-                    저장
-                </button>
-            </div>
         )}
       </div>
 
@@ -150,8 +135,16 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
         ) : (
             <>
                 <h1 className="text-2xl font-bold text-slate-900 mb-1">{contact.name}</h1>
-                <p className="text-slate-500 font-medium">{contact.role}</p>
-                <p className="text-slate-400 text-sm mb-6">{contact.company}</p>
+                {contact.role && contact.role !== 'Unknown' ? (
+                  <p className="text-slate-500 font-medium">{contact.role}</p>
+                ) : (
+                  <p className="text-slate-300 font-medium italic cursor-pointer hover:text-slate-400 transition-colors" onClick={() => setIsEditing(true)}>직책</p>
+                )}
+                {contact.company && contact.company !== 'Unknown' ? (
+                  <p className="text-slate-400 text-sm mb-6">{contact.company}</p>
+                ) : (
+                  <p className="text-slate-300 text-sm mb-6 italic cursor-pointer hover:text-slate-400 transition-colors" onClick={() => setIsEditing(true)}>회사/소속</p>
+                )}
             </>
         )}
 
@@ -235,6 +228,25 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
             )}
         </div>
       </div>
+
+      {isEditing && (
+        <div className="sticky bottom-0 z-10 bg-white/90 backdrop-blur-md border-t border-slate-200 -mx-4 px-4 py-4 mt-6 rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+          <div className="flex gap-3 max-w-2xl mx-auto">
+            <button
+              onClick={() => setIsEditing(false)}
+              className="flex-1 py-3.5 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+            >
+              취소
+            </button>
+            <button
+              onClick={handleSave}
+              className="flex-1 py-3.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-200 active:scale-95"
+            >
+              저장하기
+            </button>
+          </div>
+        </div>
+      )}
 
       {!isEditing && (
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">

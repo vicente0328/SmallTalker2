@@ -207,6 +207,7 @@ ${hasHistory ? "주의: 이미 아는 사이. 초면 인사 금지. 지난 대�
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200
+
     })
   }
 })

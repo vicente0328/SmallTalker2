@@ -2,6 +2,21 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 
+// Detect in-app browsers that block Google OAuth
+const isInAppBrowser = (): string | null => {
+  const ua = navigator.userAgent || '';
+  if (/KAKAOTALK/i.test(ua)) return '카카오톡';
+  if (/FBAN|FBAV/i.test(ua)) return 'Facebook';
+  if (/Instagram/i.test(ua)) return 'Instagram';
+  if (/Line\//i.test(ua)) return 'LINE';
+  if (/NAVER/i.test(ua)) return '네이버';
+  if (/DaumApps/i.test(ua)) return '다음';
+  if (/Twitter|X\//i.test(ua)) return 'X(Twitter)';
+  // Generic WebView detection
+  if (/wv\)/.test(ua) && /Android/.test(ua)) return '인앱 브라우저';
+  return null;
+};
+
 const AuthView: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -9,6 +24,9 @@ const AuthView: React.FC = () => {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const inAppName = isInAppBrowser();
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -75,6 +93,71 @@ const AuthView: React.FC = () => {
           <div className="flex-1 h-px bg-slate-200"></div>
         </div>
 
+        {inAppName ? (
+          <div className="space-y-3">
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+              <div className="flex items-start gap-2.5">
+                <svg className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div>
+                  <p className="text-sm font-bold text-amber-900 mb-1">
+                    {inAppName}에서는 Google 로그인이 제한됩니다
+                  </p>
+                  <p className="text-xs text-amber-700 leading-relaxed">
+                    Google 보안 정책으로 인해 인앱 브라우저에서는 Google 로그인이 차단됩니다. 아래 방법으로 외부 브라우저에서 열어주세요.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* App-specific instructions */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5">
+              <p className="text-xs font-bold text-slate-700">외부 브라우저로 여는 방법</p>
+              {inAppName === '카카오톡' ? (
+                <div className="flex items-start gap-2">
+                  <span className="text-xs font-bold text-indigo-600 shrink-0">1.</span>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    우측 하단 <strong className="bg-slate-200 px-1.5 py-0.5 rounded text-slate-800">···</strong> 버튼을 탭한 후 <strong>"기본 브라우저로 열기"</strong>를 선택하세요.
+                  </p>
+                </div>
+              ) : inAppName === 'Instagram' ? (
+                <div className="flex items-start gap-2">
+                  <span className="text-xs font-bold text-indigo-600 shrink-0">1.</span>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    우측 상단 <strong className="bg-slate-200 px-1.5 py-0.5 rounded text-slate-800">···</strong> 버튼을 탭한 후 <strong>"브라우저에서 열기"</strong>를 선택하세요.
+                  </p>
+                </div>
+              ) : (
+                <div className="flex items-start gap-2">
+                  <span className="text-xs font-bold text-indigo-600 shrink-0">1.</span>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    메뉴(<strong className="bg-slate-200 px-1.5 py-0.5 rounded text-slate-800">···</strong>)에서 <strong>"외부 브라우저로 열기"</strong>를 선택하세요.
+                  </p>
+                </div>
+              )}
+              <div className="flex items-center gap-2 pt-1">
+                <div className="flex-1 h-px bg-slate-200"></div>
+                <span className="text-[10px] text-slate-400">또는</span>
+                <div className="flex-1 h-px bg-slate-200"></div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className="w-full py-3.5 bg-slate-900 text-white font-bold rounded-2xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+              </svg>
+              {copied ? '복사 완료!' : '링크 복사하여 브라우저에서 열기'}
+            </button>
+          </div>
+        ) : (
         <button
           onClick={handleGoogleLogin}
           disabled={loading}
@@ -88,6 +171,7 @@ const AuthView: React.FC = () => {
           </svg>
           Google로 계속하기
         </button>
+        )}
 
         <button onClick={() => setIsLogin(!isLogin)} className="w-full mt-6 text-sm font-bold text-slate-400">
           {isLogin ? 'No account? Sign Up' : 'Have account? Login'}
