@@ -1,12 +1,16 @@
 import React, { useRef } from 'react';
 
-// Pastel background colors for initials (deterministic based on name)
-const INITIAL_COLORS = [
-  'bg-st-blue', 'bg-st-purple', 'bg-st-green', 'bg-st-yellow', 'bg-st-red',
-  'bg-st-box',
+// Muted pastel palette for default avatars (soft, non-distracting)
+const INITIAL_COLORS: { bg: string; text: string }[] = [
+  { bg: '#D6E4F0', text: '#4A6FA5' },  // soft blue
+  { bg: '#E0D4E8', text: '#7B5EA7' },  // soft purple
+  { bg: '#D4EDDA', text: '#5A9A6E' },  // soft green
+  { bg: '#FDE8CD', text: '#B8863E' },  // soft amber
+  { bg: '#F5D5D5', text: '#B85C5C' },  // soft rose
+  { bg: '#E8E8ED', text: '#8E8E93' },  // soft gray
 ];
 
-function getColorForName(name: string): string {
+function getColorForName(name: string): { bg: string; text: string } {
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
   return INITIAL_COLORS[Math.abs(hash) % INITIAL_COLORS.length];
@@ -82,10 +86,10 @@ export default function Avatar({ src, name, size = 40, className = '', editable 
         <img src={src} alt={name} className="w-full h-full object-cover" />
       ) : (
         <div
-          className={`w-full h-full flex items-center justify-center ${getColorForName(name)}`}
-          style={{ fontSize }}
+          className="w-full h-full flex items-center justify-center"
+          style={{ fontSize, backgroundColor: getColorForName(name).bg }}
         >
-          <span className="font-bold text-st-ink leading-none">{getInitial(name)}</span>
+          <span className="font-semibold leading-none" style={{ color: getColorForName(name).text }}>{getInitial(name)}</span>
         </div>
       )}
 
