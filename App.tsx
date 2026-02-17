@@ -129,6 +129,15 @@ const App: React.FC = () => {
 
   if (!session) return <AuthView />;
 
+  if (loading) return (
+    <div className="h-screen flex items-center justify-center bg-slate-50">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+        <p className="text-sm text-slate-400 font-medium">Loading...</p>
+      </div>
+    </div>
+  );
+
   const handleSelectMeeting = (meeting: Meeting) => {
     setSelectedMeetingId(meeting.id);
     const contact = contacts.find(c => c.id === meeting.contactId);
