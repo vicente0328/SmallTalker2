@@ -117,6 +117,13 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
   const upcomingMeeting = upcomingMeetings[0];
   const upcomingContact = upcomingMeeting ? contacts.find(c => c.id === upcomingMeeting.contactId) : null;
 
+  // Most recent past meeting
+  const pastMeetings = meetings
+    .filter(m => new Date(m.date) < CURRENT_DATE)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const lastMeeting = pastMeetings[0];
+  const lastMeetingContact = lastMeeting ? contacts.find(c => c.id === lastMeeting.contactId) : null;
+
   const isToday = upcomingMeeting &&
     new Date(upcomingMeeting.date).toDateString() === CURRENT_DATE.toDateString();
 
@@ -272,6 +279,38 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
           )}
         </div>
       </section>
+
+      {/* Previous Schedule Card */}
+      {lastMeeting && lastMeetingContact && (
+      <section
+        onClick={() => onSelectMeeting(lastMeeting)}
+        className="mt-6 relative w-full bg-white rounded-2xl shadow-sm border border-slate-200 cursor-pointer active:scale-[0.98] transition-all group overflow-hidden shrink-0"
+      >
+        <div className="p-5 md:p-6">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-100 text-[10px] md:text-xs font-bold text-slate-500 mb-3 tracking-wide">
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+            PREVIOUS SCHEDULE
+          </div>
+
+          <p className="text-sm md:text-base text-slate-600 leading-relaxed mb-4">
+            지난 만남은 어떠셨나요? 공유해주시는 내용을 바탕으로 다음 만남을 더욱 세심하게 준비하겠습니다.
+          </p>
+
+          <div className="flex items-center gap-3 bg-slate-50 p-3 md:p-4 rounded-xl border border-slate-100">
+            <img src={lastMeetingContact.avatarUrl} className="w-10 h-10 md:w-11 md:h-11 rounded-full border-2 border-white shrink-0 object-cover shadow-sm" alt={lastMeetingContact.name} />
+            <div className="min-w-0 flex-1">
+              <p className="text-slate-900 font-bold text-sm md:text-base truncate">{lastMeeting.title}</p>
+              <p className="text-slate-400 text-xs md:text-sm truncate">
+                {lastMeetingContact.name} · {new Date(lastMeeting.date).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' })}
+              </p>
+            </div>
+            <svg className="w-5 h-5 text-slate-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </div>
+      </section>
+      )}
 
       {/* Quick Profile Questionnaire — hide entirely if all info is already filled */}
       {!allFilled && (
