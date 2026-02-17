@@ -66,12 +66,13 @@ const COLOR_MAP: Record<string, { bg: string; iconBg: string; iconText: string; 
   amber: { bg: 'bg-white', iconBg: 'bg-st-yellow/10', iconText: 'text-st-yellow', dot: 'bg-st-blue', btn: 'bg-st-blue', btnHover: 'hover:bg-st-blue/80' },
 };
 
-const SWIPE_THRESHOLD = 50;
+const SWIPE_THRESHOLD = 40;
 
 const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView }) => {
   const [step, setStep] = useState(0);
   const [dragX, setDragX] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isUserDragging, setIsUserDragging] = useState(false);
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const isDragging = useRef(false);
@@ -85,6 +86,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
   const animateToStep = useCallback((newStep: number, direction: 'left' | 'right') => {
     if (isAnimating) return;
     setIsAnimating(true);
+    setIsUserDragging(false);
     // Slide out current card
     setDragX(direction === 'left' ? -400 : 400);
     setTimeout(() => {
@@ -92,12 +94,12 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
       // Position new card on opposite side, then animate to center
       setDragX(direction === 'left' ? 400 : -400);
       requestAnimationFrame(() => {
-        setTimeout(() => {
+        requestAnimationFrame(() => {
           setDragX(0);
-          setTimeout(() => setIsAnimating(false), 250);
-        }, 30);
+          setTimeout(() => setIsAnimating(false), 350);
+        });
       });
-    }, 200);
+    }, 250);
   }, [isAnimating]);
 
   const goNext = useCallback(() => {
@@ -116,6 +118,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
     touchStartY.current = e.touches[0].clientY;
     isDragging.current = true;
     directionLocked.current = null;
+    setIsUserDragging(true);
   }, [isAnimating]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
@@ -129,11 +132,13 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
     }
 
     if (directionLocked.current === 'h') {
+      // Prevent background page from scrolling during horizontal swipe
+      e.preventDefault();
       // Clamp: don't allow dragging right on first step or left on last step
       let clampedDx = dx;
-      if (isFirst && dx > 0) clampedDx = 0;
-      if (isLast && dx < 0) clampedDx = 0;
-      setDragX(clampedDx * 0.5);
+      if (isFirst && dx > 0) clampedDx = dx * 0.15; // rubber band effect
+      if (isLast && dx < 0) clampedDx = dx * 0.15;
+      setDragX(clampedDx * 0.6);
     }
   }, [isAnimating, isFirst, isLast]);
 
@@ -141,6 +146,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
     if (!isDragging.current) return;
     isDragging.current = false;
     directionLocked.current = null;
+    setIsUserDragging(false);
 
     if (dragX < -SWIPE_THRESHOLD && !isLast) {
       goNext();
@@ -167,12 +173,13 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
     }
   };
 
-  const dragOpacity = Math.max(0.4, 1 - Math.abs(dragX) / 500);
+  const dragOpacity = Math.max(0.5, 1 - Math.abs(dragX) / 600);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center glass-overlay p-4 animate-fade-in">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center glass-overlay p-4 animate-fade-in" style={{ touchAction: 'none', overscrollBehavior: 'contain' }}>
       <div
         className="glass rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden select-none"
+        style={{ touchAction: 'pan-y' }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -180,8 +187,12 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
         {/* Swipeable content area — fixed height to prevent layout shift */}
         <div className="overflow-hidden" style={{ minHeight: 280 }}>
           <div
-            className="transition-all duration-200 ease-out"
-            style={{ transform: `translateX(${dragX}px)`, opacity: dragOpacity }}
+            style={{
+              transform: `translateX(${dragX}px)`,
+              opacity: dragOpacity,
+              transition: isUserDragging ? 'none' : 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.35s ease-out',
+              willChange: 'transform, opacity',
+            }}
           >
             {/* Header area with icon */}
             <div className={`${colors.bg} px-6 pt-10 pb-8 flex flex-col items-center text-center transition-colors duration-200`} style={{ minHeight: 280 }}>
