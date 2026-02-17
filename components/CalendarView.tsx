@@ -389,7 +389,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                             <div key={cId} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-st-box border border-st-box rounded-lg animate-fade-in">
                               <img src={c.avatarUrl} className="w-5 h-5 rounded-full" />
                               <span className="text-xs font-medium text-st-ink">{c.name}</span>
-                              <button type="button" onClick={() => handleRemoveContact(cId)} className="ml-0.5 text-st-muted hover:text-red-500 transition-colors">
+                              <button type="button" onClick={() => handleRemoveContact(cId)} className="ml-0.5 text-st-muted hover:text-st-red transition-colors">
                                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                               </button>
                             </div>
@@ -492,10 +492,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                    showDeleteConfirm ? (
                      <div className="flex gap-3 animate-fade-in">
                        <button type="button" onClick={() => setShowDeleteConfirm(false)} className="flex-1 py-3 bg-st-box text-st-muted font-bold rounded-xl hover:bg-st-box/50 transition-colors text-sm">취소</button>
-                       <button type="button" onClick={() => { onDeleteMeeting(editingMeetingId); setIsModalOpen(false); setShowDeleteConfirm(false); }} className="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-500 transition-colors text-sm">정말 삭제하기</button>
+                       <button type="button" onClick={() => { onDeleteMeeting(editingMeetingId); setIsModalOpen(false); setShowDeleteConfirm(false); }} className="flex-1 py-3 bg-st-red text-st-ink font-bold rounded-xl hover:bg-st-red/80 transition-colors text-sm">정말 삭제하기</button>
                      </div>
                    ) : (
-                     <button type="button" onClick={() => setShowDeleteConfirm(true)} className="w-full py-3 bg-st-bg text-red-500 font-bold rounded-xl border border-red-200 hover:bg-red-50 transition-colors text-sm flex items-center justify-center gap-2">
+                     <button type="button" onClick={() => setShowDeleteConfirm(true)} className="w-full py-3 bg-st-bg text-st-red font-bold rounded-xl border border-st-red/50 hover:bg-st-red/20 transition-colors text-sm flex items-center justify-center gap-2">
                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                        이 일정 삭제하기
                      </button>

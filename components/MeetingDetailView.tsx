@@ -312,7 +312,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                 {partialGuide.businessTip ? (
                     <div className="bg-st-card p-6 rounded-2xl shadow-sm border border-st-box animate-fade-in">
                         <div className="flex items-center gap-2 mb-4">
-                            <div className="bg-st-box p-1.5 rounded-lg text-st-ink">
+                            <div className="bg-st-blue p-1.5 rounded-lg text-st-ink">
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                             </div>
                             <h4 className="text-sm font-bold text-st-ink">Business Conversation Tip</h4>
@@ -339,15 +339,15 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                 )}
             </div>
           ) : error ? (
-            <div className="bg-red-50 p-6 rounded-3xl border border-red-100 flex flex-col items-center text-center space-y-3">
-                <div className="bg-red-100 p-2 rounded-full text-red-600">
+            <div className="bg-st-red/30 p-6 rounded-3xl border border-st-red flex flex-col items-center text-center space-y-3">
+                <div className="bg-st-red p-2 rounded-full text-st-ink">
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                 </div>
-                <h4 className="font-bold text-red-900">분석에 실패했습니다</h4>
-                <p className="text-sm text-red-700 leading-relaxed">{error}</p>
+                <h4 className="font-bold text-st-ink">분석에 실패했습니다</h4>
+                <p className="text-sm text-st-muted leading-relaxed">{error}</p>
                 <button
                     onClick={() => window.location.reload()}
-                    className="mt-2 px-4 py-2 bg-red-600 text-white text-xs font-bold rounded-xl shadow-md hover:bg-red-700 transition-all"
+                    className="mt-2 px-4 py-2 bg-st-red text-st-ink text-xs font-bold rounded-xl shadow-md hover:bg-st-red/80 transition-all"
                 >
                     다시 시도하기
                 </button>
@@ -391,7 +391,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
 
                         <div className="bg-st-card p-5 rounded-2xl shadow-sm border border-st-box relative overflow-hidden">
                           <div className="flex items-center gap-2 mb-3">
-                            <div className="bg-st-box p-1.5 rounded-lg text-st-ink">
+                            <div className="bg-st-blue p-1.5 rounded-lg text-st-ink">
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                             </div>
                             <h4 className="text-sm font-bold text-st-ink">Business Tip</h4>
@@ -407,7 +407,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
 
                         <div className="bg-st-card p-5 rounded-2xl shadow-sm border border-st-box relative overflow-hidden">
                           <div className="flex items-center gap-2 mb-3">
-                            <div className="bg-st-box p-1.5 rounded-lg text-st-ink">
+                            <div className="bg-st-purple p-1.5 rounded-lg text-st-ink">
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
                             <h4 className="text-sm font-bold text-st-ink">Life Style Insight</h4>
@@ -422,7 +422,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                 <>
                   <div className="bg-st-card p-6 rounded-2xl shadow-sm border border-st-box relative overflow-hidden">
                     <div className="flex items-center gap-2 mb-4">
-                        <div className="bg-st-box p-1.5 rounded-lg text-st-ink">
+                        <div className="bg-st-blue p-1.5 rounded-lg text-st-ink">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                         </div>
                         <h4 className="text-sm font-bold text-st-ink">Business Conversation Tip</h4>
@@ -436,7 +436,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                     )}
                     <button
                       onClick={() => handleSearchBusiness(guide.businessTip.content)}
-                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-st-ink text-white rounded-xl text-sm font-bold hover:bg-st-muted shadow-md hover:shadow-lg transition-all"
+                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-st-blue text-st-ink rounded-xl text-sm font-bold hover:bg-st-muted shadow-md hover:shadow-lg transition-all"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                       관련 뉴스 더 알아보기
@@ -446,7 +446,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
 
                   <div className="bg-st-card p-6 rounded-2xl shadow-sm border border-st-box relative overflow-hidden">
                     <div className="flex items-center gap-2 mb-4">
-                        <div className="bg-st-box p-1.5 rounded-lg text-st-ink">
+                        <div className="bg-st-purple p-1.5 rounded-lg text-st-ink">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
                         <h4 className="text-sm font-bold text-st-ink">Life Style Insight</h4>
@@ -454,7 +454,7 @@ const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                     <p className="text-st-ink font-semibold text-base leading-relaxed">{guide.lifeTip}</p>
                     <button
                       onClick={() => handleSearchLife(guide.lifeTip)}
-                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-st-ink text-white rounded-xl text-sm font-bold hover:bg-st-muted shadow-md hover:shadow-lg transition-all"
+                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-st-purple text-st-ink rounded-xl text-sm font-bold hover:bg-st-muted shadow-md hover:shadow-lg transition-all"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                       관련 뉴스 더 알아보기

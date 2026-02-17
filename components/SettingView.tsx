@@ -211,12 +211,12 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
             <h3 className="text-xs font-bold text-st-muted uppercase tracking-widest">External Services</h3>
 
             {syncError && (
-                <div className="p-4 bg-red-50 border border-red-100 rounded-2xl animate-shake">
-                    <div className="flex items-center gap-2 text-red-600 mb-2">
+                <div className="p-4 bg-st-red/30 border border-st-red rounded-2xl animate-shake">
+                    <div className="flex items-center gap-2 text-st-red mb-2">
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         <p className="text-sm font-bold">연동 설정 오류</p>
                     </div>
-                    <p className="text-xs text-red-500 leading-relaxed mb-3">
+                    <p className="text-xs text-st-red leading-relaxed mb-3">
                         {isProviderDisabledError
                             ? "Google 로그인 서비스가 Supabase 설정에서 활성화되어 있지 않습니다."
                             : isAccessDeniedError
@@ -225,7 +225,7 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
                     </p>
 
                     {isProviderDisabledError && (
-                        <div className="bg-white/60 p-3 rounded-xl border border-red-100 space-y-2">
+                        <div className="bg-white/60 p-3 rounded-xl border border-st-red/50 space-y-2">
                             <p className="text-[11px] font-bold text-st-ink">해결 방법:</p>
                             <ol className="text-[10px] text-st-muted space-y-1 list-decimal list-inside">
                                 <li>Supabase Dashboard → Authentication → Providers 접속</li>
@@ -257,12 +257,12 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
             </div>
         </div>
 
-        <div onClick={onLogout} className="p-5 flex items-center justify-between hover:bg-red-50 cursor-pointer transition-colors group">
+        <div onClick={onLogout} className="p-5 flex items-center justify-between hover:bg-st-red/20 cursor-pointer transition-colors group">
             <div className="flex items-center gap-3">
-                <div className="bg-red-50 p-2 rounded-lg text-red-500"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-6 0v-1m6-10V7a3 3 0 00-6 0v1" /></svg></div>
-                <span className="font-bold text-red-500">Log Out</span>
+                <div className="bg-st-red/30 p-2 rounded-lg text-st-red"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-6 0v-1m6-10V7a3 3 0 00-6 0v1" /></svg></div>
+                <span className="font-bold text-st-red">Log Out</span>
             </div>
-            <svg className="w-5 h-5 text-red-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            <svg className="w-5 h-5 text-st-red/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
         </div>
       </div>
     </div>

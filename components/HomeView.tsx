@@ -383,8 +383,8 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
       <section className="mt-6 bg-st-card rounded-2xl shadow-sm border border-st-box p-5 md:p-6" onClick={(e) => e.stopPropagation()}>
         {submitted ? (
           <div className="text-center py-8">
-            <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <svg className="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="w-14 h-14 bg-st-green rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg className="w-7 h-7 text-st-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
               </svg>
             </div>

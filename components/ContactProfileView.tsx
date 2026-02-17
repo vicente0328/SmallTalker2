@@ -157,13 +157,13 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
 
         <div className="flex gap-4 w-full max-w-sm justify-center mt-6">
             <a href={`tel:${contact.phoneNumber}`} className="flex-1 flex flex-col items-center gap-2 bg-st-card p-3 rounded-xl shadow-sm border border-st-box hover:bg-st-bg transition">
-                <div className="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-st-green text-st-ink rounded-full flex items-center justify-center">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                 </div>
                 <span className="text-xs font-medium text-st-muted">Call</span>
             </a>
             <a href={`mailto:${contact.email}`} className="flex-1 flex flex-col items-center gap-2 bg-st-card p-3 rounded-xl shadow-sm border border-st-box hover:bg-st-bg transition">
-                <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-st-blue text-st-ink rounded-full flex items-center justify-center">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                 </div>
                 <span className="text-xs font-medium text-st-muted">Email</span>
@@ -177,7 +177,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
         <div className="bg-st-card p-5 rounded-2xl shadow-sm border border-st-box">
             <div className="flex items-center justify-between mb-3">
                 <h4 className="text-xs font-bold text-st-muted uppercase tracking-wide flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-violet-500"></span>
+                    <span className="w-2 h-2 rounded-full bg-st-purple"></span>
                     관계 유형
                 </h4>
                 {!isEditing && (
@@ -211,7 +211,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
         <div className="bg-st-card p-5 rounded-2xl shadow-sm border border-st-box">
             <div className="flex items-center justify-between mb-3">
                 <h4 className="text-xs font-bold text-st-muted uppercase tracking-wide flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span className="w-2 h-2 rounded-full bg-st-green"></span>
                     지난 만남 횟수
                 </h4>
                 {!isEditing && (
@@ -249,7 +249,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
         <div className="bg-st-card p-5 rounded-2xl shadow-sm border border-st-box">
             <div className="flex items-center justify-between mb-3">
                 <h4 className="text-xs font-bold text-st-muted uppercase tracking-wide flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                    <span className="w-2 h-2 rounded-full bg-st-blue"></span>
                     Business Interests
                 </h4>
                 {!isEditing && (
@@ -277,7 +277,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
         <div className="bg-st-card p-5 rounded-2xl shadow-sm border border-st-box">
             <div className="flex items-center justify-between mb-3">
                 <h4 className="text-xs font-bold text-st-muted uppercase tracking-wide flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <span className="w-2 h-2 rounded-full bg-st-yellow"></span>
                     Lifestyle Interests
                 </h4>
                 {!isEditing && (
@@ -342,7 +342,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
           {onDeleteContact && (
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="w-full mt-3 py-2.5 text-red-400 text-sm font-medium hover:text-red-600 transition-colors"
+              className="w-full mt-3 py-2.5 text-st-red text-sm font-medium hover:text-st-red transition-colors"
             >
               이 연락처 삭제하기
             </button>
@@ -354,7 +354,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
         <div className="fixed inset-0 z-[100] flex items-center justify-center glass-overlay p-4 animate-fade-in">
           <div className="glass rounded-2xl w-full max-w-xs shadow-2xl overflow-hidden">
             <div className="p-6 text-center">
-              <div className="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-12 h-12 bg-st-red text-st-ink rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
@@ -376,7 +376,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
                   onDeleteContact?.(contact.id);
                   setShowDeleteConfirm(false);
                 }}
-                className="flex-1 py-3.5 text-red-500 font-bold text-sm hover:bg-red-50 transition-colors border-l border-st-box"
+                className="flex-1 py-3.5 text-st-red font-bold text-sm hover:bg-st-red/20 transition-colors border-l border-st-box"
               >
                 삭제
               </button>
@@ -395,28 +395,28 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
             <div className="space-y-4">
                 {todayMeetings.length > 0 && (
                     <div className="space-y-2">
-                        <p className="text-[10px] font-bold text-green-600 uppercase tracking-widest pl-1">Today's Meeting</p>
+                        <p className="text-[10px] font-bold text-st-ink uppercase tracking-widest pl-1">Today's Meeting</p>
                         {todayMeetings.map(meeting => (
                             <div
                                 key={meeting.id}
                                 onClick={() => onSelectMeeting(meeting)}
-                                className="flex flex-col gap-1 p-4 bg-green-50 rounded-xl border-2 border-green-100 cursor-pointer active:scale-[0.98] transition-all hover:bg-green-100 group shadow-sm"
+                                className="flex flex-col gap-1 p-4 bg-st-green/30 rounded-xl border-2 border-st-green cursor-pointer active:scale-[0.98] transition-all hover:bg-st-green/50 group shadow-sm"
                             >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                                        <p className="text-xs font-bold text-green-700 uppercase tracking-wide">오늘 (Today)</p>
+                                        <span className="w-2 h-2 rounded-full bg-st-green animate-pulse"></span>
+                                        <p className="text-xs font-bold text-st-ink uppercase tracking-wide">오늘 (Today)</p>
                                     </div>
-                                    <svg className="w-4 h-4 text-green-400 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                                    <svg className="w-4 h-4 text-st-muted group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                                 </div>
                                 <div className="flex justify-between items-end mt-1">
                                     <div>
-                                        <p className="text-base font-bold text-green-900">
+                                        <p className="text-base font-bold text-st-ink">
                                             {new Date(meeting.date).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                                         </p>
-                                        <p className="text-sm text-green-800 font-medium mt-0.5">{meeting.title}</p>
+                                        <p className="text-sm text-st-ink font-medium mt-0.5">{meeting.title}</p>
                                     </div>
-                                    <p className="text-xs text-green-600 font-medium mb-0.5">{meeting.location}</p>
+                                    <p className="text-xs text-st-muted font-medium mb-0.5">{meeting.location}</p>
                                 </div>
                             </div>
                         ))}
