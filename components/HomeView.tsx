@@ -90,6 +90,22 @@ const ChipGroup: React.FC<{
   </div>
 );
 
+// Helper: detect already-known fields from a contact
+const detectExisting = (contact: Contact | null | undefined) => {
+  if (!contact) return { ageRange: '', gender: '', industry: '', hobby: '', relationship: '' };
+  const tags = contact.tags || [];
+  const lifestyle = contact.interests?.lifestyle || [];
+  return {
+    ageRange: AGE_OPTIONS.find(o => tags.includes(o)) || '',
+    gender: GENDER_OPTIONS.find(o => tags.includes(o)) || '',
+    industry: (contact.role && contact.role !== 'Unknown') ? contact.role : '',
+    hobby: HOBBY_OPTIONS.filter(o => o !== '기타').find(o => lifestyle.includes(o))
+           || (lifestyle.length > 0 ? lifestyle[0] : ''),
+    relationship: RELATION_OPTIONS.filter(o => o !== '기타').find(o => tags.includes(o))
+                  || '',
+  };
+};
+
 const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectMeeting, onUpdateContact, onAddContact }) => {
   const [profile, setProfile] = useState<QuickProfile>(INITIAL_PROFILE);
   const [submitted, setSubmitted] = useState(false);
@@ -107,15 +123,33 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
   // The contact for today's meeting (if any)
   const todayContact = isToday ? upcomingContact : null;
 
+  // Detect which fields are already filled for today's contact
+  const existing = detectExisting(todayContact);
+  const needAgeRange = !existing.ageRange;
+  const needGender = !existing.gender;
+  const needIndustry = !existing.industry;
+  const needHobby = !existing.hobby;
+  const needRelation = !existing.relationship;
+  const allFilled = todayContact && !needAgeRange && !needGender && !needIndustry && !needHobby && !needRelation;
+
   const getHobbyValue = () => profile.hobby === '기타' ? profile.hobbyCustom.trim() : profile.hobby;
   const getRelationValue = () => profile.relationship === '기타' ? profile.relationshipCustom.trim() : profile.relationship;
 
   const isFormValid = () => {
+    // Only validate fields that are actually shown
+    if (todayContact) {
+      const validAge = !needAgeRange || profile.ageRange;
+      const validGender = !needGender || profile.gender;
+      const validIndustry = !needIndustry || profile.industry.trim();
+      const validHobby = !needHobby || (profile.hobby && (profile.hobby !== '기타' || profile.hobbyCustom.trim()));
+      const validRelation = !needRelation || (profile.relationship && (profile.relationship !== '기타' || profile.relationshipCustom.trim()));
+      return validAge && validGender && validIndustry && validHobby && validRelation;
+    }
+    // New contact: all fields required + name
     const hasBasics = profile.ageRange && profile.gender && profile.industry.trim();
     const hasHobby = profile.hobby && (profile.hobby !== '기타' || profile.hobbyCustom.trim());
     const hasRelation = profile.relationship && (profile.relationship !== '기타' || profile.relationshipCustom.trim());
-    const hasName = todayContact || profile.name.trim();
-    return hasBasics && hasHobby && hasRelation && hasName;
+    return profile.name.trim() && hasBasics && hasHobby && hasRelation;
   };
 
   const handleSubmit = () => {
@@ -126,18 +160,18 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
     const tags = [profile.ageRange, profile.gender, relation].filter(Boolean);
 
     if (todayContact && onUpdateContact) {
-      // Update existing contact
+      // Update existing contact — only merge new info
       const updated: Contact = {
         ...todayContact,
-        role: profile.industry.trim() || todayContact.role,
+        role: (needIndustry && profile.industry.trim()) ? profile.industry.trim() : todayContact.role,
         tags: Array.from(new Set([...todayContact.tags, ...tags])),
         interests: {
           ...todayContact.interests,
           lifestyle: Array.from(new Set([...todayContact.interests.lifestyle, ...(hobby ? [hobby] : [])])),
         },
         personality: todayContact.personality
-          ? `${todayContact.personality} / ${profile.ageRange}, ${profile.gender}`
-          : `${profile.ageRange}, ${profile.gender}`,
+          ? `${todayContact.personality} / ${[profile.ageRange, profile.gender].filter(Boolean).join(', ')}`
+          : [profile.ageRange, profile.gender].filter(Boolean).join(', '),
       };
       onUpdateContact(updated);
     } else if (onAddContact) {
@@ -239,7 +273,8 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
         </div>
       </section>
 
-      {/* Quick Profile Questionnaire */}
+      {/* Quick Profile Questionnaire — hide entirely if all info is already filled */}
+      {!allFilled && (
       <section className="mt-6 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-6" onClick={(e) => e.stopPropagation()}>
         {submitted ? (
           <div className="text-center py-8">
@@ -275,20 +310,25 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                 </div>
               )}
 
+              {needAgeRange && (
               <ChipGroup
                 label="연령대"
                 options={AGE_OPTIONS}
                 selected={profile.ageRange}
                 onSelect={(v) => setProfile(p => ({ ...p, ageRange: v }))}
               />
+              )}
 
+              {needGender && (
               <ChipGroup
                 label="성별"
                 options={GENDER_OPTIONS}
                 selected={profile.gender}
                 onSelect={(v) => setProfile(p => ({ ...p, gender: v }))}
               />
+              )}
 
+              {needIndustry && (
               <ChipGroup
                 label="직군"
                 options={[]}
@@ -299,7 +339,9 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                 onTextChange={(v) => setProfile(p => ({ ...p, industry: v }))}
                 textPlaceholder="산업/직군을 입력해주세요 (예: IT, 금융, 유통)"
               />
+              )}
 
+              {needHobby && (
               <ChipGroup
                 label="취미"
                 options={HOBBY_OPTIONS}
@@ -309,7 +351,9 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                 onCustomChange={(v) => setProfile(p => ({ ...p, hobbyCustom: v }))}
                 customPlaceholder="취미를 직접 입력해주세요"
               />
+              )}
 
+              {needRelation && (
               <ChipGroup
                 label="나와의 관계"
                 options={RELATION_OPTIONS}
@@ -319,6 +363,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                 onCustomChange={(v) => setProfile(p => ({ ...p, relationshipCustom: v }))}
                 customPlaceholder="관계를 직접 입력해주세요"
               />
+              )}
 
               <button
                 onClick={handleSubmit}
@@ -335,6 +380,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
           </>
         )}
       </section>
+      )}
     </div>
   );
 };
