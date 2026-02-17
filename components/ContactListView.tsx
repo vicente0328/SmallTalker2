@@ -225,7 +225,7 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
             </button>
             <button
                 onClick={handleOpenModal}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-st-ink text-white text-xs font-bold rounded-xl hover:bg-st-muted transition-all shadow-md active:scale-95"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-st-blue text-white text-xs font-bold rounded-xl hover:bg-st-blue/80 transition-all shadow-md active:scale-95"
             >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
                 추가하기
@@ -260,7 +260,7 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
           <div className="flex gap-3">
             <button
               onClick={handleOpenModal}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-st-ink text-white text-sm font-bold rounded-xl hover:bg-st-muted transition-all shadow-md"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-st-blue text-white text-sm font-bold rounded-xl hover:bg-st-blue/80 transition-all shadow-md"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
               직접 추가
@@ -380,7 +380,7 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
 
                     <div className="flex gap-3 pt-4">
                         <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 bg-st-box text-st-muted font-bold rounded-xl">취소</button>
-                        <button type="submit" className="flex-1 py-3 bg-st-ink text-white font-bold rounded-xl transition-all shadow-md active:scale-95">추가하기</button>
+                        <button type="submit" className="flex-1 py-3 bg-st-green text-white font-bold rounded-xl transition-all shadow-md active:scale-95">추가하기</button>
                     </div>
                 </form>
             </div>

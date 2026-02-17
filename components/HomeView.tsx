@@ -369,7 +369,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
           <p className="text-sm text-st-muted mb-4">자주 만나는 분들의 정보를 등록하면<br/>AI가 맞춤형 대화 주제를 준비합니다.</p>
           <button
             onClick={() => onNavigateToContacts?.()}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-st-ink text-white text-sm font-bold rounded-xl hover:bg-st-ink transition-all shadow-md"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-st-blue text-white text-sm font-bold rounded-xl hover:bg-st-blue/80 transition-all shadow-md"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
@@ -385,7 +385,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
         {submitted ? (
           <div className="text-center py-8">
             <div className="w-14 h-14 bg-st-green rounded-full flex items-center justify-center mx-auto mb-3">
-              <svg className="w-7 h-7 text-st-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
               </svg>
             </div>
@@ -476,7 +476,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                 disabled={!isFormValid()}
                 className={`w-full py-3 rounded-xl text-base font-bold transition-all ${
                   isFormValid()
-                    ? 'bg-st-ink text-white hover:bg-st-ink shadow-lg shadow-st-box'
+                    ? 'bg-st-green text-white hover:bg-st-green/80 shadow-lg shadow-st-box'
                     : 'bg-st-box text-st-muted cursor-not-allowed'
                 }`}
               >

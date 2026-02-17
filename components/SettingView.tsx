@@ -120,7 +120,7 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
                 <div className="space-y-3">
                     <div>
                         <label className="block text-xs font-bold text-st-muted mb-1 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-st-muted"></span>
+                            <span className="w-2 h-2 rounded-full bg-st-blue"></span>
                             Business Interests
                         </label>
                         <input
@@ -140,7 +140,7 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
                     </div>
                     <div>
                         <label className="block text-xs font-bold text-st-muted mb-1 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-st-muted"></span>
+                            <span className="w-2 h-2 rounded-full bg-st-purple"></span>
                             Lifestyle Interests
                         </label>
                         <input
@@ -174,7 +174,7 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
 
         <div className="flex gap-3 pt-4">
             <button onClick={() => setIsEditingProfile(false)} className="flex-1 py-4 bg-st-box text-st-muted font-bold rounded-2xl" disabled={isSaving}>취소</button>
-            <button onClick={handleSaveProfile} className="flex-1 py-4 bg-st-ink text-white font-bold rounded-2xl disabled:opacity-50" disabled={isSaving}>{isSaving ? '저장 중...' : '저장'}</button>
+            <button onClick={handleSaveProfile} className="flex-1 py-4 bg-st-green text-white font-bold rounded-2xl disabled:opacity-50" disabled={isSaving}>{isSaving ? '저장 중...' : '저장'}</button>
         </div>
       </div>
     );
@@ -213,7 +213,7 @@ const SettingView: React.FC<SettingViewProps> = ({ user, onUpdateUser, onLogout,
             <h3 className="text-xs font-bold text-st-muted uppercase tracking-widest">External Services</h3>
 
             {syncError && (
-                <div className="p-4 bg-st-red/30 border border-st-red rounded-2xl animate-shake">
+                <div className="p-4 bg-st-card border-l-[3px] border-l-st-red rounded-2xl animate-shake">
                     <div className="flex items-center gap-2 text-st-red mb-2">
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         <p className="text-sm font-bold">연동 설정 오류</p>

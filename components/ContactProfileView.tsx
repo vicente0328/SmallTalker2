@@ -184,9 +184,9 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
       <div className="space-y-4">
         <h3 className="text-lg font-bold text-st-ink px-1">나(User)와의 관계</h3>
 
-        <div className="bg-st-card p-5 rounded-2xl shadow-sm border border-st-box">
+        <div className="bg-st-card p-5 rounded-2xl shadow-sm border-l-[3px] border-l-st-purple">
             <div className="flex items-center justify-between mb-3">
-                <h4 className="text-xs font-bold text-st-muted uppercase tracking-wide flex items-center gap-2">
+                <h4 className="text-xs font-bold text-st-purple uppercase tracking-wide flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-st-purple"></span>
                     관계 유형
                 </h4>
@@ -218,9 +218,9 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
             )}
         </div>
 
-        <div className="bg-st-card p-5 rounded-2xl shadow-sm border border-st-box">
+        <div className="bg-st-card p-5 rounded-2xl shadow-sm border-l-[3px] border-l-st-green">
             <div className="flex items-center justify-between mb-3">
-                <h4 className="text-xs font-bold text-st-muted uppercase tracking-wide flex items-center gap-2">
+                <h4 className="text-xs font-bold text-st-green uppercase tracking-wide flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-st-green"></span>
                     지난 만남 횟수
                 </h4>
@@ -256,9 +256,9 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
       <div className="space-y-4">
         <h3 className="text-lg font-bold text-st-ink px-1">Interests & Details</h3>
 
-        <div className="bg-st-card p-5 rounded-2xl shadow-sm border border-st-box">
+        <div className="bg-st-card p-5 rounded-2xl shadow-sm border-l-[3px] border-l-st-blue">
             <div className="flex items-center justify-between mb-3">
-                <h4 className="text-xs font-bold text-st-muted uppercase tracking-wide flex items-center gap-2">
+                <h4 className="text-xs font-bold text-st-blue uppercase tracking-wide flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-st-blue"></span>
                     Business Interests
                 </h4>
@@ -284,9 +284,9 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
             )}
         </div>
 
-        <div className="bg-st-card p-5 rounded-2xl shadow-sm border border-st-box">
+        <div className="bg-st-card p-5 rounded-2xl shadow-sm border-l-[3px] border-l-st-yellow">
             <div className="flex items-center justify-between mb-3">
-                <h4 className="text-xs font-bold text-st-muted uppercase tracking-wide flex items-center gap-2">
+                <h4 className="text-xs font-bold text-st-yellow uppercase tracking-wide flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-st-yellow"></span>
                     Lifestyle Interests
                 </h4>
@@ -344,7 +344,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
             </button>
             <button
               onClick={handleSave}
-              className="flex-1 py-3.5 bg-st-ink text-white font-bold rounded-xl hover:bg-st-muted transition-all shadow-lg active:scale-95"
+              className="flex-1 py-3.5 bg-st-green text-white font-bold rounded-xl hover:bg-st-green/80 transition-all shadow-lg active:scale-95"
             >
               저장하기
             </button>
@@ -386,7 +386,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
                   onDeleteContact?.(contact.id);
                   setShowDeleteConfirm(false);
                 }}
-                className="flex-1 py-3.5 text-st-red font-bold text-sm hover:bg-st-red/20 transition-colors border-l border-st-box"
+                className="flex-1 py-3.5 bg-st-red text-white font-bold text-sm hover:bg-st-red/80 transition-colors"
               >
                 삭제
               </button>
@@ -410,7 +410,7 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
                             <div
                                 key={meeting.id}
                                 onClick={() => onSelectMeeting(meeting)}
-                                className="flex flex-col gap-1 p-4 bg-st-green/30 rounded-xl border-2 border-st-green cursor-pointer active:scale-[0.98] transition-all hover:bg-st-green/50 group shadow-sm"
+                                className="flex flex-col gap-1 p-4 bg-st-card rounded-xl border-l-[3px] border-l-st-green cursor-pointer active:scale-[0.98] transition-all hover:bg-st-box/30 group shadow-sm"
                             >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">

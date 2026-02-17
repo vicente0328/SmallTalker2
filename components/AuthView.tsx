@@ -82,7 +82,7 @@ const AuthView: React.FC = () => {
           <input type="email" className="w-full px-5 py-3 bg-st-bg border border-st-box rounded-2xl" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           <input type="password" className="w-full px-5 py-3 bg-st-bg border border-st-box rounded-2xl" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           {error && <p className="text-st-red text-xs text-center">{error}</p>}
-          <button type="submit" disabled={loading} className="w-full py-4 bg-st-ink text-white font-bold rounded-2xl">
+          <button type="submit" disabled={loading} className="w-full py-4 bg-st-blue text-white font-bold rounded-2xl hover:bg-st-blue/80 transition-all">
             {loading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
           </button>
         </form>
@@ -95,7 +95,7 @@ const AuthView: React.FC = () => {
 
         {inAppName ? (
           <div className="space-y-3">
-            <div className="bg-st-yellow/30 border border-st-yellow rounded-2xl p-4">
+            <div className="bg-st-card border-l-[3px] border-l-st-yellow rounded-2xl p-4">
               <div className="flex items-start gap-2.5">
                 <svg className="w-5 h-5 text-st-yellow shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />

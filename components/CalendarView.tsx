@@ -255,7 +255,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     const meetingExists = hasMeeting(day);
     gridCells.push(
       <div key={day} onClick={() => setSelectedDate(dateObj)} className="h-10 w-10 mx-auto flex flex-col items-center justify-center cursor-pointer relative">
-        <div className={`h-8 w-8 flex items-center justify-center rounded-full text-sm font-medium transition-colors ${isSelected ? 'bg-st-ink text-white shadow-md' : isSimulatedToday ? 'text-st-ink font-bold bg-st-box' : 'text-st-ink hover:bg-st-box/50'}`}>
+        <div className={`h-8 w-8 flex items-center justify-center rounded-full text-sm font-medium transition-colors ${isSelected ? 'bg-st-ink text-white shadow-md' : isSimulatedToday ? 'text-st-green font-bold bg-st-green/20' : 'text-st-ink hover:bg-st-box/50'}`}>
           {day}
         </div>
         {meetingExists && !isSelected && <div className="absolute bottom-1 w-1 h-1 bg-st-muted rounded-full"></div>}
@@ -301,7 +301,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
               ) : (
                 <h3 className="text-xs font-semibold text-st-muted">오늘의 일정</h3>
               )}
-              <button onClick={openCreateModal} className="inline-flex items-center gap-1 px-3 py-1.5 bg-st-ink text-white text-[11px] font-bold rounded-lg hover:bg-st-muted transition-all shadow-sm active:scale-95">
+              <button onClick={openCreateModal} className="inline-flex items-center gap-1 px-3 py-1.5 bg-st-blue text-white text-[11px] font-bold rounded-lg hover:bg-st-blue/80 transition-all shadow-sm active:scale-95">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
                 추가하기
               </button>
@@ -487,13 +487,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                <div className="space-y-2 pt-2">
                  <div className="flex gap-3">
                    <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 bg-st-box text-st-muted font-bold rounded-xl hover:bg-st-box/50 transition-colors">Cancel</button>
-                   <button type="submit" className="flex-1 py-3 bg-st-ink text-white font-bold rounded-xl hover:bg-st-muted transition-colors">Save</button>
+                   <button type="submit" className="flex-1 py-3 bg-st-green text-white font-bold rounded-xl hover:bg-st-green/80 transition-colors">Save</button>
                  </div>
                  {editingMeetingId && onDeleteMeeting && (
                    showDeleteConfirm ? (
                      <div className="flex gap-3 animate-fade-in">
                        <button type="button" onClick={() => setShowDeleteConfirm(false)} className="flex-1 py-3 bg-st-box text-st-muted font-bold rounded-xl hover:bg-st-box/50 transition-colors text-sm">취소</button>
-                       <button type="button" onClick={() => { onDeleteMeeting(editingMeetingId); setIsModalOpen(false); setShowDeleteConfirm(false); }} className="flex-1 py-3 bg-st-red text-st-ink font-bold rounded-xl hover:bg-st-red/80 transition-colors text-sm">정말 삭제하기</button>
+                       <button type="button" onClick={() => { onDeleteMeeting(editingMeetingId); setIsModalOpen(false); setShowDeleteConfirm(false); }} className="flex-1 py-3 bg-st-red text-white font-bold rounded-xl hover:bg-st-red/80 transition-colors text-sm">정말 삭제하기</button>
                      </div>
                    ) : (
                      <button type="button" onClick={() => setShowDeleteConfirm(true)} className="w-full py-3 bg-st-bg text-st-red font-bold rounded-xl border border-st-red/50 hover:bg-st-red/20 transition-colors text-sm flex items-center justify-center gap-2">

@@ -60,10 +60,10 @@ const STEPS = [
 ];
 
 const COLOR_MAP: Record<string, { bg: string; iconBg: string; iconText: string; dot: string; btn: string; btnHover: string }> = {
-  indigo: { bg: 'bg-st-bg', iconBg: 'bg-st-box', iconText: 'text-st-ink', dot: 'bg-st-ink', btn: 'bg-st-ink', btnHover: 'hover:bg-st-muted' },
-  violet: { bg: 'bg-st-bg', iconBg: 'bg-st-box', iconText: 'text-st-ink', dot: 'bg-st-ink', btn: 'bg-st-ink', btnHover: 'hover:bg-st-muted' },
-  emerald: { bg: 'bg-st-bg', iconBg: 'bg-st-box', iconText: 'text-st-ink', dot: 'bg-st-ink', btn: 'bg-st-ink', btnHover: 'hover:bg-st-muted' },
-  amber: { bg: 'bg-st-bg', iconBg: 'bg-st-box', iconText: 'text-st-ink', dot: 'bg-st-ink', btn: 'bg-st-ink', btnHover: 'hover:bg-st-muted' },
+  indigo: { bg: 'bg-st-bg', iconBg: 'bg-st-blue', iconText: 'text-white', dot: 'bg-st-blue', btn: 'bg-st-blue', btnHover: 'hover:bg-st-blue/80' },
+  violet: { bg: 'bg-st-bg', iconBg: 'bg-st-purple', iconText: 'text-white', dot: 'bg-st-purple', btn: 'bg-st-blue', btnHover: 'hover:bg-st-blue/80' },
+  emerald: { bg: 'bg-st-bg', iconBg: 'bg-st-green', iconText: 'text-white', dot: 'bg-st-green', btn: 'bg-st-blue', btnHover: 'hover:bg-st-blue/80' },
+  amber: { bg: 'bg-st-bg', iconBg: 'bg-st-yellow', iconText: 'text-white', dot: 'bg-st-yellow', btn: 'bg-st-green', btnHover: 'hover:bg-st-green/80' },
 };
 
 const SWIPE_THRESHOLD = 50;
