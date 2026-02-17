@@ -49,6 +49,7 @@ const parseVCard = (vcfText: string): Partial<Contact>[] => {
 
 const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectContact, onAddContact }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const [formName, setFormName] = useState("");
@@ -85,13 +86,12 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
           setIsModalOpen(true);
         }
       } else {
-        // Fallback: open file picker for .vcf
-        vcfInputRef.current?.click();
+        // Fallback: show guide modal for .vcf import
+        setIsGuideOpen(true);
       }
     } catch (err) {
       console.error("연락처 가져오기 실패:", err);
-      // Fallback on error as well
-      vcfInputRef.current?.click();
+      setIsGuideOpen(true);
     }
   };
 
@@ -250,6 +250,49 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
             <div className="p-12 text-center text-slate-400">검색 결과가 없습니다.</div>
         )}
       </div>
+
+      {/* Import Guide Modal */}
+      {isGuideOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 animate-fade-in backdrop-blur-sm">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold text-slate-900">연락처 가져오기</h3>
+              <button onClick={() => setIsGuideOpen(false)} className="text-slate-400 hover:text-slate-600">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-indigo-50 rounded-xl p-4">
+                <p className="text-sm font-bold text-indigo-900 mb-2">vCard 파일(.vcf)로 가져오기</p>
+                <ol className="text-sm text-indigo-800 space-y-2 list-decimal list-inside">
+                  <li><strong>연락처 앱</strong>을 열어주세요</li>
+                  <li>가져올 연락처를 선택 후 <strong>"연락처 공유"</strong>를 탭하세요</li>
+                  <li><strong>"파일에 저장"</strong>을 선택하세요</li>
+                  <li>아래 버튼을 눌러 저장한 <strong>.vcf 파일</strong>을 선택하세요</li>
+                </ol>
+              </div>
+
+              <button
+                onClick={() => { setIsGuideOpen(false); vcfInputRef.current?.click(); }}
+                className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-md flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                .vcf 파일 선택하기
+              </button>
+
+              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <div className="flex items-start gap-2">
+                  <svg className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    추후 Native App 출시 시, 시스템 연락처에서 바로 가져올 수 있는 더욱 편리한 연동 기능이 업데이트될 예정입니다.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 animate-fade-in backdrop-blur-sm">
