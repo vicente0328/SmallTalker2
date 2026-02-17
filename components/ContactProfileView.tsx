@@ -166,14 +166,19 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
 
       <div className="space-y-4">
         <h3 className="text-lg font-bold text-slate-900 px-1">Interests & Details</h3>
-        
+
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                Business Interests
-            </h4>
+            <div className="flex items-center justify-between mb-3">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                    Business Interests
+                </h4>
+                {!isEditing && (
+                    <button onClick={() => setIsEditing(true)} className="text-[11px] font-semibold text-indigo-500 hover:text-indigo-700 transition-colors px-2 py-1 rounded-lg hover:bg-indigo-50">편집하기</button>
+                )}
+            </div>
             {isEditing ? (
-                <input 
+                <input
                     className="w-full bg-slate-50 p-2 rounded-lg text-base focus:outline-none focus:ring-1 focus:ring-indigo-300"
                     value={formData.businessInterests}
                     onFocus={() => clearUnknownOnFocus('businessInterests')}
@@ -191,12 +196,17 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
         </div>
 
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                Lifestyle Interests
-            </h4>
+            <div className="flex items-center justify-between mb-3">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                    Lifestyle Interests
+                </h4>
+                {!isEditing && (
+                    <button onClick={() => setIsEditing(true)} className="text-[11px] font-semibold text-indigo-500 hover:text-indigo-700 transition-colors px-2 py-1 rounded-lg hover:bg-indigo-50">편집하기</button>
+                )}
+            </div>
             {isEditing ? (
-                <input 
+                <input
                     className="w-full bg-slate-50 p-2 rounded-lg text-base focus:outline-none focus:ring-1 focus:ring-indigo-300"
                     value={formData.lifestyleInterests}
                     onFocus={() => clearUnknownOnFocus('lifestyleInterests')}
@@ -214,9 +224,14 @@ const ContactProfileView: React.FC<ContactProfileViewProps> = ({
         </div>
 
         <div className="bg-slate-800 p-5 rounded-2xl shadow-md text-white">
-            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Personality & Note</h4>
+            <div className="flex items-center justify-between mb-2">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wide">Personality & Note</h4>
+                {!isEditing && (
+                    <button onClick={() => setIsEditing(true)} className="text-[11px] font-semibold text-indigo-300 hover:text-indigo-200 transition-colors px-2 py-1 rounded-lg hover:bg-slate-700">편집하기</button>
+                )}
+            </div>
             {isEditing ? (
-                <textarea 
+                <textarea
                     className="w-full bg-slate-700 p-3 rounded-lg text-base text-white focus:outline-none focus:ring-1 focus:ring-indigo-400 min-h-[80px]"
                     value={formData.personality}
                     onFocus={() => clearUnknownOnFocus('personality')}
