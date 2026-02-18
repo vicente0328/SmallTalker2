@@ -60,8 +60,32 @@ const detectExisting = (contact: Contact | null | undefined) => {
   };
 };
 
+// Fuzzy name similarity (edit distance based, normalized 0~1)
+function nameSimilarity(a: string, b: string): number {
+  const s1 = a.toLowerCase();
+  const s2 = b.toLowerCase();
+  if (s1 === s2) return 1;
+  const len = Math.max(s1.length, s2.length);
+  if (len === 0) return 1;
+  const dp: number[][] = Array.from({ length: s1.length + 1 }, (_, i) =>
+    Array.from({ length: s2.length + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
+  );
+  for (let i = 1; i <= s1.length; i++)
+    for (let j = 1; j <= s2.length; j++)
+      dp[i][j] = s1[i - 1] === s2[j - 1]
+        ? dp[i - 1][j - 1]
+        : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+  return 1 - dp[s1.length][s2.length] / len;
+}
+
+// Assistant result type: can include fuzzy match suggestion
+interface AssistantResult {
+  answer: string;
+  suggestedContact?: Contact; // fuzzy match candidate
+}
+
 // Local AI assistant: answer from client-side data
-function answerAssistant(query: string, user: UserProfile, meetings: Meeting[], contacts: Contact[]): string {
+function answerAssistant(query: string, user: UserProfile, meetings: Meeting[], contacts: Contact[]): AssistantResult {
   const q = query.toLowerCase().replace(/\s+/g, ' ').trim();
   const now = CURRENT_DATE;
 
@@ -78,100 +102,104 @@ function answerAssistant(query: string, user: UserProfile, meetings: Meeting[], 
   const upcomingAll = meetings.filter(m => new Date(m.date) >= now)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  const findContact = (q: string): Contact | undefined => {
-    return contacts.find(c => q.includes(c.name.toLowerCase()) || q.includes(c.name));
+  // Exact match
+  const findContact = (q: string): Contact | undefined =>
+    contacts.find(c => q.includes(c.name.toLowerCase()) || q.includes(c.name));
+
+  // Fuzzy match: extract name-like words from query and find best match
+  const findFuzzyContact = (q: string): Contact | undefined => {
+    if (contacts.length === 0) return undefined;
+    // Extract potential name tokens (2-4 char Korean words)
+    const words = q.match(/[가-힣]{2,4}/g) || [];
+    let best: Contact | undefined;
+    let bestScore = 0;
+    for (const word of words) {
+      for (const c of contacts) {
+        const score = nameSimilarity(word, c.name);
+        if (score > bestScore && score >= 0.5) {
+          bestScore = score;
+          best = c;
+        }
+      }
+    }
+    return bestScore < 1 ? best : undefined; // only return if NOT exact (exact handled separately)
   };
 
   const formatTime = (d: Date) => d.toLocaleTimeString('ko-KR', { hour: 'numeric', minute: 'numeric' });
   const formatDate = (d: Date) => d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' });
   const getAttendees = (m: Meeting) => m.contactIds.map(id => contacts.find(c => c.id === id)?.name || '').filter(Boolean).join(', ');
 
+  const contactSummary = (c: Contact): string => {
+    const parts: string[] = [];
+    if (c.company && c.company !== 'Unknown') parts.push(c.company);
+    if (c.role && c.role !== 'Unknown') parts.push(c.role);
+    if (c.relationshipType) parts.push(c.relationshipType);
+    const info = parts.length > 0 ? ` (${parts.join(', ')})` : '';
+    const contactMeetings = meetings.filter(m => m.contactIds.includes(c.id));
+    const meetInfo = contactMeetings.length > 0 ? `, ${contactMeetings.length}회 만남` : '';
+    return `${c.name}님${info}${meetInfo}`;
+  };
+
   // 1. Schedule briefing
   const isScheduleQuery = /일정|스케줄|미팅|브리핑|오늘|내일|이번\s*주|뭐\s*있|예정/.test(q);
   if (isScheduleQuery) {
-    // Today
     if (/오늘/.test(q) || (!(/내일|이번\s*주/).test(q) && isScheduleQuery)) {
       if (todayMeetings.length === 0) {
         if (meetings.length === 0) {
-          return `${user.name}님, 아직 등록된 일정이 없어요. 캘린더에서 미팅을 추가해보시면 AI가 맞춤 대화 주제를 준비해드릴게요!`;
+          return { answer: `아직 등록된 일정이 없습니다. 캘린더에서 미팅을 추가해보세요.` };
         }
         const next = upcomingAll[0];
         if (next) {
           const nd = new Date(next.date);
-          return `오늘은 예정된 일정이 없어요. 가장 가까운 일정은 ${formatDate(nd)} ${formatTime(nd)}에 "${next.title}" 미팅이 있습니다. 참석자는 ${getAttendees(next) || '미정'}이에요.`;
+          return { answer: `오늘은 일정이 없습니다. 다음 일정은 ${formatDate(nd)} ${formatTime(nd)} "${next.title}"입니다. 캘린더에서 확인해보세요.` };
         }
-        return '오늘은 예정된 일정이 없어요. 여유로운 하루 보내세요!';
+        return { answer: '오늘은 일정이 없습니다. 여유로운 하루 보내세요.' };
       }
       const lines = todayMeetings.map(m => {
         const d = new Date(m.date);
-        const names = getAttendees(m);
-        return `${formatTime(d)} "${m.title}" (${names || '참석자 미정'}${m.location ? ', ' + m.location : ''})`;
+        return `• ${formatTime(d)} ${m.title} (${getAttendees(m) || '참석자 미정'})`;
       });
-      return `${user.name}님, 오늘은 ${todayMeetings.length}개의 미팅이 있어요.\n${lines.join('\n')}\n좋은 만남 되세요!`;
+      return { answer: `오늘 ${todayMeetings.length}건의 미팅이 있습니다.\n${lines.join('\n')}\n자세한 내용은 각 일정을 탭해서 확인하세요.` };
     }
 
-    // Tomorrow
     if (/내일/.test(q)) {
       const tomorrow = new Date(now);
       tomorrow.setDate(tomorrow.getDate() + 1);
       const tmMeetings = meetings.filter(m => new Date(m.date).toDateString() === tomorrow.toDateString())
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      if (tmMeetings.length === 0) return '내일은 예정된 일정이 없어요.';
-      const lines = tmMeetings.map(m => {
-        const d = new Date(m.date);
-        return `${formatTime(d)} "${m.title}" (${getAttendees(m) || '참석자 미정'})`;
-      });
-      return `내일은 ${tmMeetings.length}개의 미팅이 있어요.\n${lines.join('\n')}`;
+      if (tmMeetings.length === 0) return { answer: '내일은 예정된 일정이 없습니다.' };
+      const lines = tmMeetings.map(m => `• ${formatTime(new Date(m.date))} ${m.title} (${getAttendees(m) || '참석자 미정'})`);
+      return { answer: `내일 ${tmMeetings.length}건의 미팅이 있습니다.\n${lines.join('\n')}\n캘린더에서 상세 내용을 확인하세요.` };
     }
 
-    // This week
     if (/이번\s*주/.test(q)) {
-      if (weekMeetings.length === 0) return '이번 주에는 남은 일정이 없어요.';
-      const lines = weekMeetings.map(m => {
-        const d = new Date(m.date);
-        return `${formatDate(d)} ${formatTime(d)} "${m.title}" (${getAttendees(m) || '참석자 미정'})`;
-      });
-      return `이번 주에는 ${weekMeetings.length}개의 일정이 있어요.\n${lines.join('\n')}`;
+      if (weekMeetings.length === 0) return { answer: '이번 주에는 남은 일정이 없습니다.' };
+      const lines = weekMeetings.slice(0, 5).map(m => `• ${formatDate(new Date(m.date))} ${formatTime(new Date(m.date))} ${m.title}`);
+      const more = weekMeetings.length > 5 ? `\n외 ${weekMeetings.length - 5}건` : '';
+      return { answer: `이번 주 ${weekMeetings.length}건의 일정이 있습니다.\n${lines.join('\n')}${more}\n캘린더에서 상세 내용을 확인하세요.` };
     }
   }
 
-  // 2. Contact query
+  // 2. Contact query — exact match
   const matchedContact = findContact(q);
   if (matchedContact) {
     const c = matchedContact;
-    const parts: string[] = [`${c.name}님에 대한 정보를 알려드릴게요.`];
-    if (c.company && c.company !== 'Unknown') parts.push(`회사: ${c.company}`);
-    if (c.role && c.role !== 'Unknown') parts.push(`직책/직군: ${c.role}`);
-    if (c.relationshipType) parts.push(`관계: ${c.relationshipType}`);
-    const allInterests = [...(c.interests?.business || []), ...(c.interests?.lifestyle || [])].filter(Boolean);
-    if (allInterests.length > 0) parts.push(`관심사: ${allInterests.join(', ')}`);
-    if (c.personality) parts.push(`성격/특징: ${c.personality}`);
-    const tags = (c.tags || []).filter(Boolean);
-    if (tags.length > 0) parts.push(`태그: ${tags.join(', ')}`);
-
-    // Recent meetings with this contact
-    const contactMeetings = meetings.filter(m => m.contactIds.includes(c.id))
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    if (contactMeetings.length > 0) {
-      const last = contactMeetings[0];
-      parts.push(`최근 미팅: "${last.title}" (${formatDate(new Date(last.date))})`);
-      parts.push(`총 ${contactMeetings.length}번 만남`);
-    }
-
-    return parts.join('\n');
+    return { answer: `${contactSummary(c)}\n연락처 페이지에서 더 자세한 정보를 확인하실 수 있습니다.` };
   }
 
-  // Check if asking about a person not in contacts
-  const personPatterns = /누구|어떤\s*분|어떤\s*사람|정보|알려/;
-  if (personPatterns.test(q) && contacts.length === 0) {
-    return `아직 등록된 연락처가 없어요. 연락처를 추가해보시면 상대방에 맞는 스몰토크 가이드를 받으실 수 있어요!`;
-  }
-  if (personPatterns.test(q)) {
-    return `해당 인물이 연락처에 등록되어 있지 않아요. 연락처에 추가해주시면 더 자세한 정보를 준비할 수 있어요!`;
+  // 3. Contact query — fuzzy match
+  const fuzzy = findFuzzyContact(q);
+  if (fuzzy) {
+    return { answer: `혹시 "${fuzzy.name}"님을 찾으시나요?`, suggestedContact: fuzzy };
   }
 
-  // 3. Fallback: general help
-  return `${user.name}님, 이런 것들을 물어보실 수 있어요:\n• "오늘 일정 알려줘" - 오늘의 미팅 브리핑\n• "이번 주 미팅 있어?" - 주간 일정 확인\n• 특정 인물 이름 - 연락처 정보 조회\n무엇을 도와드릴까요?`;
+  // 4. Person not found
+  if (contacts.length === 0) {
+    return { answer: '아직 등록된 연락처가 없습니다. 연락처를 추가하시면 인물 정보를 조회할 수 있습니다.' };
+  }
+
+  // 5. Fallback
+  return { answer: `이런 것들을 물어보실 수 있습니다:\n• "오늘 일정 알려줘"\n• "이번 주 미팅 있어?"\n• 연락처에 등록된 분의 이름` };
 }
 
 // Web Speech API support check
@@ -199,15 +227,47 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
   const [assistantAnswer, setAssistantAnswer] = useState('');
   const [assistantLoading, setAssistantLoading] = useState(false);
   const [assistantSpeaking, setAssistantSpeaking] = useState(false);
+  const [suggestedContact, setSuggestedContact] = useState<Contact | null>(null);
   const assistantRecRef = useRef<any>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  // Select best Korean TTS voice
+  const getBestKoreanVoice = useCallback((): SpeechSynthesisVoice | null => {
+    if (!('speechSynthesis' in window)) return null;
+    const voices = window.speechSynthesis.getVoices();
+    // Prefer premium/enhanced voices
+    const koreanVoices = voices.filter(v => v.lang.startsWith('ko'));
+    const premium = koreanVoices.find(v => /premium|enhanced|natural|yuna|heami/i.test(v.name));
+    if (premium) return premium;
+    // Prefer non-default local voice
+    const local = koreanVoices.find(v => v.localService);
+    if (local) return local;
+    return koreanVoices[0] || null;
+  }, []);
+
+  const speakText = useCallback((text: string) => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ko-KR';
+    utter.rate = 0.95;
+    utter.pitch = 1.05;
+    const voice = getBestKoreanVoice();
+    if (voice) utter.voice = voice;
+    utter.onstart = () => setAssistantSpeaking(true);
+    utter.onend = () => setAssistantSpeaking(false);
+    utter.onerror = () => setAssistantSpeaking(false);
+    utteranceRef.current = utter;
+    window.speechSynthesis.speak(utter);
+  }, [getBestKoreanVoice]);
 
   const startAssistantListening = useCallback(() => {
     if (!SpeechRecognition) return;
     const rec = new SpeechRecognition();
     rec.lang = 'ko-KR';
-    rec.continuous = false;
+    rec.continuous = true;
     rec.interimResults = true;
+    rec.maxAlternatives = 3;
 
     rec.onresult = (event: any) => {
       let final = '';
@@ -237,6 +297,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
     rec.start();
     setAssistantListening(true);
     setAssistantAnswer('');
+    setSuggestedContact(null);
   }, []);
 
   const stopAssistantListening = useCallback(() => {
@@ -248,30 +309,21 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
     setAssistantInterim('');
   }, []);
 
-  const handleAssistantAsk = useCallback(() => {
-    const q = assistantQuery.trim();
+  const handleAssistantAsk = useCallback((overrideQuery?: string) => {
+    const q = (overrideQuery || assistantQuery).trim();
     if (!q) return;
+    if (!overrideQuery) setAssistantQuery(q);
     setAssistantLoading(true);
     setAssistantAnswer('');
-    // Small delay for natural feel
+    setSuggestedContact(null);
     setTimeout(() => {
-      const answer = answerAssistant(q, user, meetings, contacts);
-      setAssistantAnswer(answer);
+      const result = answerAssistant(q, user, meetings, contacts);
+      setAssistantAnswer(result.answer);
+      setSuggestedContact(result.suggestedContact || null);
       setAssistantLoading(false);
-      // TTS
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(answer);
-        utter.lang = 'ko-KR';
-        utter.rate = 1.05;
-        utter.onstart = () => setAssistantSpeaking(true);
-        utter.onend = () => setAssistantSpeaking(false);
-        utter.onerror = () => setAssistantSpeaking(false);
-        utteranceRef.current = utter;
-        window.speechSynthesis.speak(utter);
-      }
+      speakText(result.answer);
     }, 400);
-  }, [assistantQuery, user, meetings, contacts]);
+  }, [assistantQuery, user, meetings, contacts, speakText]);
 
   const handleAssistantClose = useCallback(() => {
     stopAssistantListening();
@@ -281,6 +333,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
     setAssistantQuery('');
     setAssistantAnswer('');
     setAssistantInterim('');
+    setSuggestedContact(null);
   }, [stopAssistantListening]);
 
   const stopSpeaking = useCallback(() => {
@@ -611,6 +664,31 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
             {assistantAnswer && !assistantLoading && (
               <div className="bg-st-bg rounded-xl p-4 space-y-3">
                 <p className="text-sm text-st-ink leading-relaxed whitespace-pre-wrap">{assistantAnswer}</p>
+
+                {/* Fuzzy match confirmation */}
+                {suggestedContact && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setSuggestedContact(null);
+                        handleAssistantAsk(suggestedContact.name);
+                      }}
+                      className="flex-1 py-2 bg-st-blue text-white text-xs font-bold rounded-lg hover:bg-st-blue/80 transition-all"
+                    >
+                      네, {suggestedContact.name}님이요
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSuggestedContact(null);
+                        setAssistantAnswer('해당 인물이 연락처에 등록되어 있지 않습니다. 연락처에 추가해주시면 정보를 조회할 수 있습니다.');
+                      }}
+                      className="flex-1 py-2 bg-st-bg text-st-muted text-xs font-semibold rounded-lg border border-st-box/50 hover:bg-st-box/50 transition-all"
+                    >
+                      아니요
+                    </button>
+                  </div>
+                )}
+
                 <div className="flex items-center gap-2">
                   {assistantSpeaking ? (
                     <button
@@ -625,18 +703,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                     </button>
                   ) : (
                     <button
-                      onClick={() => {
-                        if ('speechSynthesis' in window) {
-                          window.speechSynthesis.cancel();
-                          const utter = new SpeechSynthesisUtterance(assistantAnswer);
-                          utter.lang = 'ko-KR';
-                          utter.rate = 1.05;
-                          utter.onstart = () => setAssistantSpeaking(true);
-                          utter.onend = () => setAssistantSpeaking(false);
-                          utter.onerror = () => setAssistantSpeaking(false);
-                          window.speechSynthesis.speak(utter);
-                        }
-                      }}
+                      onClick={() => speakText(assistantAnswer)}
                       className="flex items-center gap-1.5 px-3 py-1.5 bg-st-bg text-st-muted text-xs font-semibold rounded-lg hover:bg-st-box/50 border border-st-box/50 transition-colors"
                     >
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -646,7 +713,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                     </button>
                   )}
                   <button
-                    onClick={() => { setAssistantQuery(''); setAssistantAnswer(''); }}
+                    onClick={() => { setAssistantQuery(''); setAssistantAnswer(''); setSuggestedContact(null); }}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-st-bg text-st-muted text-xs font-semibold rounded-lg hover:bg-st-box/50 border border-st-box/50 transition-colors"
                   >
                     새 질문
