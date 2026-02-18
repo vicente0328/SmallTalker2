@@ -252,7 +252,7 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
             </button>
             <button
                 onClick={handleOpenModal}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-st-blue text-white text-xs font-bold rounded-xl hover:bg-st-blue/80 transition-all shadow-md active:scale-95"
+                className={`inline-flex items-center gap-1.5 px-4 py-2 bg-st-blue text-white text-xs font-bold rounded-xl hover:bg-st-blue/80 transition-all shadow-md active:scale-95${contacts.length < 3 ? ' onboard-glow ring-2 ring-st-blue/30' : ''}`}
             >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
                 추가하기

@@ -57,6 +57,13 @@
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
       }
+      @keyframes onboard-glow {
+        0%, 100% { box-shadow: 0 0 4px 0 rgba(0,122,255,0.3); }
+        50% { box-shadow: 0 0 12px 4px rgba(0,122,255,0.45); }
+      }
+      .onboard-glow {
+        animation: onboard-glow 2s ease-in-out infinite;
+      }
     </style>
 
 </head>

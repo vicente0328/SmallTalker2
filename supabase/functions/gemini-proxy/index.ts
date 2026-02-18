@@ -257,6 +257,79 @@ ${hasHistory ? "주의: 이미 아는 사이. 초면 인사 금지. 지난 대�
       });
     }
 
+    if (action === 'assistantChat') {
+      const { query, user, meetings, contacts } = payload;
+      const now = new Date();
+      const todayStr = now.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+
+      // Build context about today's meetings
+      const todayMeetings = (meetings || []).filter((m: any) => {
+        const d = new Date(m.date);
+        return d.toDateString() === now.toDateString();
+      });
+      const upcomingMeetings = (meetings || []).filter((m: any) => {
+        const d = new Date(m.date);
+        return d > now;
+      }).sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(0, 5);
+
+      const meetingSummary = todayMeetings.length > 0
+        ? todayMeetings.map((m: any) => {
+            const attendees = (m.contactIds || []).map((cid: string) => {
+              const c = (contacts || []).find((ct: any) => ct.id === cid);
+              return c ? `${c.name} (${c.company || ''} ${c.role || ''})` : '알 수 없음';
+            }).join(', ');
+            return `- ${new Date(m.date).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: 'numeric' })} | ${m.title} | 참석자: ${attendees} | 장소: ${m.location || '미정'}`;
+          }).join('\n')
+        : '오늘 예정된 미팅이 없습니다.';
+
+      const upcomingSummary = upcomingMeetings.length > 0
+        ? upcomingMeetings.map((m: any) => {
+            const attendees = (m.contactIds || []).map((cid: string) => {
+              const c = (contacts || []).find((ct: any) => ct.id === cid);
+              return c ? c.name : '알 수 없음';
+            }).join(', ');
+            return `- ${new Date(m.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', weekday: 'short' })} ${new Date(m.date).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: 'numeric' })} | ${m.title} | ${attendees}`;
+          }).join('\n')
+        : '';
+
+      const contactsSummary = (contacts || []).map((c: any) =>
+        `- ${c.name}: ${c.company || ''} ${c.role || ''} | 관심사: ${[...(c.interests?.business || []), ...(c.interests?.lifestyle || [])].join(', ') || '없음'} | 성격: ${c.personality || '정보 없음'} | 관계: ${c.relationshipType || '정보 없음'} | 태그: ${(c.tags || []).join(', ') || '없음'}`
+      ).join('\n');
+
+      const prompt = `당신은 SmallTalker AI 비서입니다. 사용자의 비즈니스 미팅과 인맥 관리를 돕습니다.
+반드시 친근한 존댓말(~합니다, ~하세요, ~해요)로 자연스럽게 대화하세요.
+답변은 간결하고 핵심적으로, 음성으로 읽기 좋게 2-4문장 내외로 작성하세요.
+
+=== 오늘 날짜 ===
+${todayStr}
+
+=== 사용자 정보 ===
+이름: ${user?.name || '사용자'}
+
+=== 오늘의 일정 ===
+${meetingSummary}
+
+${upcomingSummary ? `=== 다가오는 일정 ===\n${upcomingSummary}` : ''}
+
+=== 등록된 연락처 (${(contacts || []).length}명) ===
+${contactsSummary || '등록된 연락처가 없습니다.'}
+
+=== 규칙 ===
+1. 사용자가 일정 브리핑을 요청하면: 오늘의 미팅을 시간순으로 요약하고, 각 미팅의 참석자와 준비 포인트를 알려주세요.
+2. 사용자가 특정 인물에 대해 물어보면: 해당 인물의 정보(회사, 직책, 관심사, 성격, 관계 등)를 종합적으로 요약하세요.
+3. 일정이 없으면: "아직 등록된 일정이 없네요. 캘린더에서 미팅을 추가해보시면 AI가 맞춤 대화 주제를 준비해드릴게요!" 라고 안내하세요.
+4. 연락처가 없으면: "아직 등록된 연락처가 없네요. 연락처를 추가해보시면 상대방에 맞는 스몰토크 가이드를 받으실 수 있어요!" 라고 안내하세요.
+5. 질문에 해당하는 인물이 없으면: "해당 인물이 연락처에 등록되어 있지 않네요. 연락처에 추가해주시면 더 자세한 정보를 준비할 수 있어요!" 라고 안내하세요.
+
+사용자 질문: "${query}"`;
+
+      const text = await callClaude(apiKey, prompt, { answer: "AI 비서의 답변 (string)" });
+      const json = text.replace(/^```json?\s*/i, '').replace(/```\s*$/i, '').trim();
+      return new Response(json, {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     throw new Error('정의되지 않은 액션입니다.');
 
   } catch (error: any) {

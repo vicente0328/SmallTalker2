@@ -314,7 +314,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
               ) : (
                 <h3 className="text-xs font-semibold text-st-muted">오늘의 일정</h3>
               )}
-              <button onClick={openCreateModal} className="inline-flex items-center gap-1 px-3 py-1.5 bg-st-blue text-white text-[11px] font-bold rounded-lg hover:bg-st-blue/80 transition-all shadow-sm active:scale-95">
+              <button onClick={openCreateModal} className={`inline-flex items-center gap-1 px-3 py-1.5 bg-st-blue text-white text-[11px] font-bold rounded-lg hover:bg-st-blue/80 transition-all shadow-sm active:scale-95${meetings.length < 3 ? ' onboard-glow ring-2 ring-st-blue/30' : ''}`}>
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
                 추가하기
               </button>

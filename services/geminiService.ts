@@ -229,6 +229,24 @@ export const searchRelatedArticles = async (
   }
 };
 
+export const askAssistant = async (
+  query: string,
+  user: UserProfile,
+  meetings: Meeting[],
+  contacts: Contact[],
+): Promise<string> => {
+  try {
+    const result = await callEdgeFunction({
+      action: 'assistantChat',
+      payload: { query, user, meetings, contacts },
+    });
+    return result?.answer || '죄송합니다, 잠시 후 다시 시도해주세요.';
+  } catch (error) {
+    console.error('AI Assistant error:', error);
+    return '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+  }
+};
+
 export const analyzeNoteForProfileUpdate = async (
     supabase: SupabaseClient,
     note: string,
