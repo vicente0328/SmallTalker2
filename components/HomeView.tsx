@@ -1,7 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { UserProfile, Meeting, Contact } from '../types';
 import { CURRENT_DATE } from '../constants';
-import { askAssistant } from '../services/geminiService';
 import Avatar from './Avatar';
 import ChipGroup from './ChipGroup';
 
@@ -60,6 +59,120 @@ const detectExisting = (contact: Contact | null | undefined) => {
                   || '',
   };
 };
+
+// Local AI assistant: answer from client-side data
+function answerAssistant(query: string, user: UserProfile, meetings: Meeting[], contacts: Contact[]): string {
+  const q = query.toLowerCase().replace(/\s+/g, ' ').trim();
+  const now = CURRENT_DATE;
+
+  const todayMeetings = meetings.filter(m => new Date(m.date).toDateString() === now.toDateString())
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  const thisWeekEnd = new Date(now);
+  thisWeekEnd.setDate(thisWeekEnd.getDate() + (7 - thisWeekEnd.getDay()));
+  const weekMeetings = meetings.filter(m => {
+    const d = new Date(m.date);
+    return d >= now && d <= thisWeekEnd;
+  }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  const upcomingAll = meetings.filter(m => new Date(m.date) >= now)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  const findContact = (q: string): Contact | undefined => {
+    return contacts.find(c => q.includes(c.name.toLowerCase()) || q.includes(c.name));
+  };
+
+  const formatTime = (d: Date) => d.toLocaleTimeString('ko-KR', { hour: 'numeric', minute: 'numeric' });
+  const formatDate = (d: Date) => d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' });
+  const getAttendees = (m: Meeting) => m.contactIds.map(id => contacts.find(c => c.id === id)?.name || '').filter(Boolean).join(', ');
+
+  // 1. Schedule briefing
+  const isScheduleQuery = /일정|스케줄|미팅|브리핑|오늘|내일|이번\s*주|뭐\s*있|예정/.test(q);
+  if (isScheduleQuery) {
+    // Today
+    if (/오늘/.test(q) || (!(/내일|이번\s*주/).test(q) && isScheduleQuery)) {
+      if (todayMeetings.length === 0) {
+        if (meetings.length === 0) {
+          return `${user.name}님, 아직 등록된 일정이 없어요. 캘린더에서 미팅을 추가해보시면 AI가 맞춤 대화 주제를 준비해드릴게요!`;
+        }
+        const next = upcomingAll[0];
+        if (next) {
+          const nd = new Date(next.date);
+          return `오늘은 예정된 일정이 없어요. 가장 가까운 일정은 ${formatDate(nd)} ${formatTime(nd)}에 "${next.title}" 미팅이 있습니다. 참석자는 ${getAttendees(next) || '미정'}이에요.`;
+        }
+        return '오늘은 예정된 일정이 없어요. 여유로운 하루 보내세요!';
+      }
+      const lines = todayMeetings.map(m => {
+        const d = new Date(m.date);
+        const names = getAttendees(m);
+        return `${formatTime(d)} "${m.title}" (${names || '참석자 미정'}${m.location ? ', ' + m.location : ''})`;
+      });
+      return `${user.name}님, 오늘은 ${todayMeetings.length}개의 미팅이 있어요.\n${lines.join('\n')}\n좋은 만남 되세요!`;
+    }
+
+    // Tomorrow
+    if (/내일/.test(q)) {
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tmMeetings = meetings.filter(m => new Date(m.date).toDateString() === tomorrow.toDateString())
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      if (tmMeetings.length === 0) return '내일은 예정된 일정이 없어요.';
+      const lines = tmMeetings.map(m => {
+        const d = new Date(m.date);
+        return `${formatTime(d)} "${m.title}" (${getAttendees(m) || '참석자 미정'})`;
+      });
+      return `내일은 ${tmMeetings.length}개의 미팅이 있어요.\n${lines.join('\n')}`;
+    }
+
+    // This week
+    if (/이번\s*주/.test(q)) {
+      if (weekMeetings.length === 0) return '이번 주에는 남은 일정이 없어요.';
+      const lines = weekMeetings.map(m => {
+        const d = new Date(m.date);
+        return `${formatDate(d)} ${formatTime(d)} "${m.title}" (${getAttendees(m) || '참석자 미정'})`;
+      });
+      return `이번 주에는 ${weekMeetings.length}개의 일정이 있어요.\n${lines.join('\n')}`;
+    }
+  }
+
+  // 2. Contact query
+  const matchedContact = findContact(q);
+  if (matchedContact) {
+    const c = matchedContact;
+    const parts: string[] = [`${c.name}님에 대한 정보를 알려드릴게요.`];
+    if (c.company && c.company !== 'Unknown') parts.push(`회사: ${c.company}`);
+    if (c.role && c.role !== 'Unknown') parts.push(`직책/직군: ${c.role}`);
+    if (c.relationshipType) parts.push(`관계: ${c.relationshipType}`);
+    const allInterests = [...(c.interests?.business || []), ...(c.interests?.lifestyle || [])].filter(Boolean);
+    if (allInterests.length > 0) parts.push(`관심사: ${allInterests.join(', ')}`);
+    if (c.personality) parts.push(`성격/특징: ${c.personality}`);
+    const tags = (c.tags || []).filter(Boolean);
+    if (tags.length > 0) parts.push(`태그: ${tags.join(', ')}`);
+
+    // Recent meetings with this contact
+    const contactMeetings = meetings.filter(m => m.contactIds.includes(c.id))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    if (contactMeetings.length > 0) {
+      const last = contactMeetings[0];
+      parts.push(`최근 미팅: "${last.title}" (${formatDate(new Date(last.date))})`);
+      parts.push(`총 ${contactMeetings.length}번 만남`);
+    }
+
+    return parts.join('\n');
+  }
+
+  // Check if asking about a person not in contacts
+  const personPatterns = /누구|어떤\s*분|어떤\s*사람|정보|알려/;
+  if (personPatterns.test(q) && contacts.length === 0) {
+    return `아직 등록된 연락처가 없어요. 연락처를 추가해보시면 상대방에 맞는 스몰토크 가이드를 받으실 수 있어요!`;
+  }
+  if (personPatterns.test(q)) {
+    return `해당 인물이 연락처에 등록되어 있지 않아요. 연락처에 추가해주시면 더 자세한 정보를 준비할 수 있어요!`;
+  }
+
+  // 3. Fallback: general help
+  return `${user.name}님, 이런 것들을 물어보실 수 있어요:\n• "오늘 일정 알려줘" - 오늘의 미팅 브리핑\n• "이번 주 미팅 있어?" - 주간 일정 확인\n• 특정 인물 이름 - 연락처 정보 조회\n무엇을 도와드릴까요?`;
+}
 
 // Web Speech API support check
 const SpeechRecognition = typeof window !== 'undefined'
@@ -135,14 +248,16 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
     setAssistantInterim('');
   }, []);
 
-  const handleAssistantAsk = useCallback(async () => {
+  const handleAssistantAsk = useCallback(() => {
     const q = assistantQuery.trim();
     if (!q) return;
     setAssistantLoading(true);
     setAssistantAnswer('');
-    try {
-      const answer = await askAssistant(q, user, meetings, contacts);
+    // Small delay for natural feel
+    setTimeout(() => {
+      const answer = answerAssistant(q, user, meetings, contacts);
       setAssistantAnswer(answer);
+      setAssistantLoading(false);
       // TTS
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
@@ -155,11 +270,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
         utteranceRef.current = utter;
         window.speechSynthesis.speak(utter);
       }
-    } catch {
-      setAssistantAnswer('죄송합니다, 오류가 발생했습니다. 다시 시도해주세요.');
-    } finally {
-      setAssistantLoading(false);
-    }
+    }, 400);
   }, [assistantQuery, user, meetings, contacts]);
 
   const handleAssistantClose = useCallback(() => {
