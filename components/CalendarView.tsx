@@ -44,6 +44,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   const [showAddPartner, setShowAddPartner] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  // Wizard state for new meeting creation
+  const [wizardStep, setWizardStep] = useState(1);
+  const [formAgenda, setFormAgenda] = useState("");
+  const [formKeywords, setFormKeywords] = useState("");
+
   const formatDateForInput = (date: Date) => {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -96,6 +101,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     setFormDate(formatDateForInput(dateToUse));
     setFormTime("10:00");
     setFormLocation("");
+    setWizardStep(1);
+    setFormAgenda("");
+    setFormKeywords("");
     setIsModalOpen(true);
   };
 
@@ -158,8 +166,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     setShowAddPartner(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent | Event) => {
+    if (e && 'preventDefault' in e) e.preventDefault();
     if (!formTitle || !formDate || !formTime) {
       alert("Please fill in required fields (Title, Date, Time).");
       return;
@@ -221,7 +229,12 @@ const CalendarView: React.FC<CalendarViewProps> = ({
             title: formTitle,
             date: dateTimeString,
             location: formLocation,
-            pastContext: { lastMetDate: "", lastMetLocation: "", keywords: [], summary: "" }
+            pastContext: {
+              lastMetDate: "",
+              lastMetLocation: "",
+              keywords: formKeywords.split(',').map(s => s.trim()).filter(Boolean),
+              summary: formAgenda,
+            }
         };
         onAddMeeting(newMeeting, newContact);
     }
@@ -369,141 +382,264 @@ const CalendarView: React.FC<CalendarViewProps> = ({
        {isModalOpen && (
          <div className="fixed inset-0 z-50 flex items-center justify-center glass-overlay p-4 animate-fade-in">
            <div className="glass rounded-2xl w-full max-w-sm p-5 shadow-2xl max-h-[90vh] overflow-y-auto">
-             <h3 className="text-xl font-bold text-st-ink mb-4">{editingMeetingId ? 'Edit Meeting' : 'New Meeting'}</h3>
 
-             <form onSubmit={handleSubmit} className="space-y-4">
-               <div>
-                 <label className="block text-xs font-bold text-st-muted uppercase mb-1">Title</label>
-                 <input type="text" value={formTitle} onChange={(e) => setFormTitle(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-base" placeholder="Meeting Topic" />
-               </div>
-
-               <div>
-                 <label className="block text-xs font-bold text-st-muted uppercase mb-1">참석자</label>
-                 <div className="space-y-2">
-                    {/* Selected contacts chips */}
-                    {formContactIds.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {formContactIds.map(cId => {
-                          const c = contacts.find(ct => ct.id === cId);
-                          if (!c) return null;
-                          return (
-                            <div key={cId} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-st-box border border-st-box rounded-lg animate-fade-in">
-                              <Avatar src={c.avatarUrl} name={c.name} size={20} />
-                              <span className="text-xs font-medium text-st-ink">{c.name}</span>
-                              <button type="button" onClick={() => handleRemoveContact(cId)} className="ml-0.5 text-st-muted hover:text-st-red transition-colors">
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    {/* Add partner button / dropdown */}
-                    {!showAddPartner ? (
-                      <button
-                        type="button"
-                        onClick={() => setShowAddPartner(true)}
-                        className="w-full p-2.5 bg-st-bg rounded-xl border border-dashed border-st-box text-st-muted text-sm font-medium hover:bg-st-box/50 hover:border-st-muted hover:text-st-ink transition-all flex items-center justify-center gap-1.5"
-                      >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                        참석자 추가하기
-                      </button>
-                    ) : (
-                      <div className="space-y-2 animate-slide-up">
-                        <select
-                          value=""
-                          onChange={(e) => {
-                            if (e.target.value === 'manual') {
-                              // Keep showing manual input
-                            } else if (e.target.value) {
-                              handleAddExistingContact(e.target.value);
-                            }
-                          }}
-                          className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted appearance-none text-base"
-                        >
-                          <option value="">기존 연락처에서 선택...</option>
-                          {contacts.filter(c => !formContactIds.includes(c.id)).map(c => (
-                            <option key={c.id} value={c.id}>{c.name} ({c.company})</option>
-                          ))}
-                        </select>
-
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={manualPartnerName}
-                            onChange={(e) => setManualPartnerName(e.target.value)}
-                            className="w-full p-2.5 bg-st-box rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-st-ink placeholder-st-muted text-base"
-                            placeholder="또는 이름을 직접 입력하세요"
-                            autoFocus
-                          />
-
-                          {existingContactMatch ? (
-                            <div className="mt-2 p-3 bg-st-bg border border-st-box rounded-xl flex items-center justify-between shadow-sm animate-fade-in">
-                              <div className="flex items-center gap-2 overflow-hidden">
-                                <Avatar src={existingContactMatch.avatarUrl} name={existingContactMatch.name} size={24} />
-                                <p className="text-[11px] text-st-muted truncate">이미 등록된 <strong>{existingContactMatch.name}</strong>님이 있습니다.</p>
-                              </div>
-                              <button type="button" onClick={handleLinkExisting} className="shrink-0 text-[10px] font-bold text-white bg-st-ink px-2 py-1 rounded-md hover:bg-st-muted ml-2">연동하기</button>
-                            </div>
-                          ) : (
-                            manualPartnerName.trim().length >= 1 && (
-                              <div className="mt-2 p-3 bg-st-bg border border-st-box rounded-xl flex items-center justify-between shadow-sm animate-fade-in">
-                                <p className="text-[11px] text-st-muted truncate">신규 인물입니다. 연락처에 추가할까요?</p>
-                                <button type="button" onClick={handleQuickAddContact} className="shrink-0 text-[10px] font-bold text-st-ink bg-st-box px-2 py-1 rounded-md hover:bg-st-box/50 ml-2">추가하기</button>
-                              </div>
-                            )
-                          )}
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => { setShowAddPartner(false); setManualPartnerName(""); }}
-                          className="text-xs text-st-muted hover:text-st-ink font-medium"
-                        >
-                          취소
-                        </button>
-                      </div>
-                    )}
-                 </div>
-               </div>
-
-               <div className="grid grid-cols-2 gap-3">
-                 <div>
-                    <label className="block text-xs font-bold text-st-muted uppercase mb-1">Date</label>
-                    <input type="date" value={formDate} onChange={(e) => setFormDate(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-sm" />
-                 </div>
-                 <div>
-                    <label className="block text-xs font-bold text-st-muted uppercase mb-1">Time</label>
-                    <input type="time" value={formTime} onChange={(e) => setFormTime(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-sm text-left" />
-                 </div>
-               </div>
-
-               <div>
-                 <label className="block text-xs font-bold text-st-muted uppercase mb-1">Location</label>
-                 <input type="text" value={formLocation} onChange={(e) => setFormLocation(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-base" placeholder="Place" />
-               </div>
-
-               <div className="space-y-2 pt-2">
-                 <div className="flex gap-3">
-                   <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 bg-st-box text-st-muted font-bold rounded-xl hover:bg-st-box/50 transition-colors">Cancel</button>
-                   <button type="submit" className="flex-1 py-3 bg-st-blue text-white font-bold rounded-xl hover:bg-st-blue/80 transition-colors">Save</button>
-                 </div>
-                 {editingMeetingId && onDeleteMeeting && (
-                   showDeleteConfirm ? (
-                     <div className="flex gap-3 animate-fade-in">
-                       <button type="button" onClick={() => setShowDeleteConfirm(false)} className="flex-1 py-3 bg-st-box text-st-muted font-bold rounded-xl hover:bg-st-box/50 transition-colors text-sm">취소</button>
-                       <button type="button" onClick={() => { onDeleteMeeting(editingMeetingId); setIsModalOpen(false); setShowDeleteConfirm(false); }} className="flex-1 py-3 bg-st-red text-white font-bold rounded-xl hover:bg-st-red/80 transition-colors text-sm">정말 삭제하기</button>
+             {/* ===== EDIT MODE: flat form ===== */}
+             {editingMeetingId ? (
+               <>
+                 <h3 className="text-xl font-bold text-st-ink mb-4">일정 수정</h3>
+                 <form onSubmit={handleSubmit} className="space-y-4">
+                   <div>
+                     <label className="block text-xs font-bold text-st-muted uppercase mb-1">Title</label>
+                     <input type="text" value={formTitle} onChange={(e) => setFormTitle(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-base" placeholder="Meeting Topic" />
+                   </div>
+                   <div>
+                     <label className="block text-xs font-bold text-st-muted uppercase mb-1">참석자</label>
+                     <div className="space-y-2">
+                       {formContactIds.length > 0 && (
+                         <div className="flex flex-wrap gap-2">
+                           {formContactIds.map(cId => { const c = contacts.find(ct => ct.id === cId); if (!c) return null; return (
+                             <div key={cId} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-st-box border border-st-box rounded-lg animate-fade-in">
+                               <Avatar src={c.avatarUrl} name={c.name} size={20} />
+                               <span className="text-xs font-medium text-st-ink">{c.name}</span>
+                               <button type="button" onClick={() => handleRemoveContact(cId)} className="ml-0.5 text-st-muted hover:text-st-red transition-colors"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+                             </div>
+                           ); })}
+                         </div>
+                       )}
+                       {!showAddPartner ? (
+                         <button type="button" onClick={() => setShowAddPartner(true)} className="w-full p-2.5 bg-st-bg rounded-xl border border-dashed border-st-box text-st-muted text-sm font-medium hover:bg-st-box/50 hover:border-st-muted hover:text-st-ink transition-all flex items-center justify-center gap-1.5">
+                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>참석자 추가하기
+                         </button>
+                       ) : (
+                         <div className="space-y-2 animate-slide-up">
+                           <select value="" onChange={(e) => { if (e.target.value && e.target.value !== 'manual') handleAddExistingContact(e.target.value); }} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted appearance-none text-base">
+                             <option value="">기존 연락처에서 선택...</option>
+                             {contacts.filter(c => !formContactIds.includes(c.id)).map(c => (<option key={c.id} value={c.id}>{c.name} ({c.company})</option>))}
+                           </select>
+                           <div className="relative">
+                             <input type="text" value={manualPartnerName} onChange={(e) => setManualPartnerName(e.target.value)} className="w-full p-2.5 bg-st-box rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-st-ink placeholder-st-muted text-base" placeholder="또는 이름을 직접 입력하세요" autoFocus />
+                             {existingContactMatch ? (
+                               <div className="mt-2 p-3 bg-st-bg border border-st-box rounded-xl flex items-center justify-between shadow-sm animate-fade-in">
+                                 <div className="flex items-center gap-2 overflow-hidden"><Avatar src={existingContactMatch.avatarUrl} name={existingContactMatch.name} size={24} /><p className="text-[11px] text-st-muted truncate">이미 등록된 <strong>{existingContactMatch.name}</strong>님이 있습니다.</p></div>
+                                 <button type="button" onClick={handleLinkExisting} className="shrink-0 text-[10px] font-bold text-white bg-st-ink px-2 py-1 rounded-md hover:bg-st-muted ml-2">연동하기</button>
+                               </div>
+                             ) : manualPartnerName.trim().length >= 1 && (
+                               <div className="mt-2 p-3 bg-st-bg border border-st-box rounded-xl flex items-center justify-between shadow-sm animate-fade-in">
+                                 <p className="text-[11px] text-st-muted truncate">신규 인물입니다. 연락처에 추가할까요?</p>
+                                 <button type="button" onClick={handleQuickAddContact} className="shrink-0 text-[10px] font-bold text-st-ink bg-st-box px-2 py-1 rounded-md hover:bg-st-box/50 ml-2">추가하기</button>
+                               </div>
+                             )}
+                           </div>
+                           <button type="button" onClick={() => { setShowAddPartner(false); setManualPartnerName(""); }} className="text-xs text-st-muted hover:text-st-ink font-medium">취소</button>
+                         </div>
+                       )}
                      </div>
-                   ) : (
-                     <button type="button" onClick={() => setShowDeleteConfirm(true)} className="w-full py-3 bg-st-bg text-st-red font-bold rounded-xl border border-st-red/50 hover:bg-st-red/20 transition-colors text-sm flex items-center justify-center gap-2">
-                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                       이 일정 삭제하기
+                   </div>
+                   <div className="grid grid-cols-2 gap-3">
+                     <div><label className="block text-xs font-bold text-st-muted uppercase mb-1">Date</label><input type="date" value={formDate} onChange={(e) => setFormDate(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-sm" /></div>
+                     <div><label className="block text-xs font-bold text-st-muted uppercase mb-1">Time</label><input type="time" value={formTime} onChange={(e) => setFormTime(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-sm text-left" /></div>
+                   </div>
+                   <div><label className="block text-xs font-bold text-st-muted uppercase mb-1">Location</label><input type="text" value={formLocation} onChange={(e) => setFormLocation(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-base" placeholder="Place" /></div>
+                   <div className="space-y-2 pt-2">
+                     <div className="flex gap-3">
+                       <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 bg-st-box text-st-muted font-bold rounded-xl hover:bg-st-box/50 transition-colors">취소</button>
+                       <button type="submit" className="flex-1 py-3 bg-st-blue text-white font-bold rounded-xl hover:bg-st-blue/80 transition-colors">저장</button>
+                     </div>
+                     {onDeleteMeeting && (
+                       showDeleteConfirm ? (
+                         <div className="flex gap-3 animate-fade-in">
+                           <button type="button" onClick={() => setShowDeleteConfirm(false)} className="flex-1 py-3 bg-st-box text-st-muted font-bold rounded-xl hover:bg-st-box/50 transition-colors text-sm">취소</button>
+                           <button type="button" onClick={() => { onDeleteMeeting(editingMeetingId); setIsModalOpen(false); setShowDeleteConfirm(false); }} className="flex-1 py-3 bg-st-red text-white font-bold rounded-xl hover:bg-st-red/80 transition-colors text-sm">정말 삭제하기</button>
+                         </div>
+                       ) : (
+                         <button type="button" onClick={() => setShowDeleteConfirm(true)} className="w-full py-3 bg-st-bg text-st-red font-bold rounded-xl border border-st-red/50 hover:bg-st-red/20 transition-colors text-sm flex items-center justify-center gap-2">
+                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                           이 일정 삭제하기
+                         </button>
+                       )
+                     )}
+                   </div>
+                 </form>
+               </>
+             ) : (
+               /* ===== CREATE MODE: conversational wizard ===== */
+               <>
+                 {/* Header: back + step dots + close */}
+                 <div className="flex items-center justify-between mb-5">
+                   {wizardStep > 1 ? (
+                     <button onClick={() => setWizardStep(wizardStep - 1)} className="p-1 text-st-muted hover:text-st-ink transition-colors">
+                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                      </button>
-                   )
+                   ) : <div className="w-7" />}
+                   <div className="flex items-center gap-2">
+                     {[1, 2, 3].map(s => (
+                       <div key={s} className={`h-1.5 rounded-full transition-all duration-300 ${s === wizardStep ? 'w-6 bg-st-blue' : s < wizardStep ? 'w-1.5 bg-st-ink' : 'w-1.5 bg-st-box'}`} />
+                     ))}
+                   </div>
+                   <button onClick={() => setIsModalOpen(false)} className="p-1 text-st-muted hover:text-st-ink transition-colors">
+                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                   </button>
+                 </div>
+
+                 {/* Step 1: What & Who */}
+                 {wizardStep === 1 && (
+                   <div className="animate-fade-in space-y-4">
+                     <div className="mb-2">
+                       <h3 className="text-xl font-bold text-st-ink">어떤 미팅을 준비하시나요?</h3>
+                       <p className="text-sm text-st-muted mt-1">미팅 제목과 참석자를 알려주세요.</p>
+                     </div>
+
+                     <div>
+                       <label className="block text-xs font-bold text-st-muted uppercase mb-1">미팅 제목</label>
+                       <input type="text" value={formTitle} onChange={(e) => setFormTitle(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-blue/30 focus:border-st-blue/30 text-base" placeholder="예: 프로젝트 킥오프 미팅" autoFocus />
+                     </div>
+
+                     <div>
+                       <label className="block text-xs font-bold text-st-muted uppercase mb-1">참석자</label>
+                       <div className="space-y-2">
+                         {formContactIds.length > 0 && (
+                           <div className="flex flex-wrap gap-2">
+                             {formContactIds.map(cId => { const c = contacts.find(ct => ct.id === cId); if (!c) return null; return (
+                               <div key={cId} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-st-blue/8 border border-st-blue/20 rounded-lg animate-fade-in">
+                                 <Avatar src={c.avatarUrl} name={c.name} size={20} />
+                                 <span className="text-xs font-medium text-st-ink">{c.name}</span>
+                                 <button type="button" onClick={() => handleRemoveContact(cId)} className="ml-0.5 text-st-muted hover:text-st-red transition-colors"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+                               </div>
+                             ); })}
+                           </div>
+                         )}
+                         {!showAddPartner ? (
+                           <button type="button" onClick={() => setShowAddPartner(true)} className="w-full p-2.5 bg-st-bg rounded-xl border border-dashed border-st-box text-st-muted text-sm font-medium hover:bg-st-box/50 hover:border-st-muted hover:text-st-ink transition-all flex items-center justify-center gap-1.5">
+                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>참석자 추가하기
+                           </button>
+                         ) : (
+                           <div className="space-y-2 animate-slide-up">
+                             <select value="" onChange={(e) => { if (e.target.value && e.target.value !== 'manual') handleAddExistingContact(e.target.value); }} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted appearance-none text-base">
+                               <option value="">기존 연락처에서 선택...</option>
+                               {contacts.filter(c => !formContactIds.includes(c.id)).map(c => (<option key={c.id} value={c.id}>{c.name} ({c.company})</option>))}
+                             </select>
+                             <div className="relative">
+                               <input type="text" value={manualPartnerName} onChange={(e) => setManualPartnerName(e.target.value)} className="w-full p-2.5 bg-st-box rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-st-ink placeholder-st-muted text-base" placeholder="또는 이름을 직접 입력하세요" autoFocus />
+                               {existingContactMatch ? (
+                                 <div className="mt-2 p-3 bg-st-bg border border-st-box rounded-xl flex items-center justify-between shadow-sm animate-fade-in">
+                                   <div className="flex items-center gap-2 overflow-hidden"><Avatar src={existingContactMatch.avatarUrl} name={existingContactMatch.name} size={24} /><p className="text-[11px] text-st-muted truncate">이미 등록된 <strong>{existingContactMatch.name}</strong>님이 있습니다.</p></div>
+                                   <button type="button" onClick={handleLinkExisting} className="shrink-0 text-[10px] font-bold text-white bg-st-ink px-2 py-1 rounded-md hover:bg-st-muted ml-2">연동하기</button>
+                                 </div>
+                               ) : manualPartnerName.trim().length >= 1 && (
+                                 <div className="mt-2 p-3 bg-st-bg border border-st-box rounded-xl flex items-center justify-between shadow-sm animate-fade-in">
+                                   <p className="text-[11px] text-st-muted truncate">신규 인물입니다. 연락처에 추가할까요?</p>
+                                   <button type="button" onClick={handleQuickAddContact} className="shrink-0 text-[10px] font-bold text-st-ink bg-st-box px-2 py-1 rounded-md hover:bg-st-box/50 ml-2">추가하기</button>
+                                 </div>
+                               )}
+                             </div>
+                             <button type="button" onClick={() => { setShowAddPartner(false); setManualPartnerName(""); }} className="text-xs text-st-muted hover:text-st-ink font-medium">취소</button>
+                           </div>
+                         )}
+                       </div>
+                     </div>
+
+                     <button
+                       type="button"
+                       onClick={() => { setShowAddPartner(false); setWizardStep(2); }}
+                       disabled={!formTitle.trim() || (formContactIds.length === 0 && !manualPartnerName.trim())}
+                       className={`w-full py-3 font-bold rounded-xl transition-all ${
+                         formTitle.trim() && (formContactIds.length > 0 || manualPartnerName.trim())
+                           ? 'bg-st-blue text-white hover:bg-st-blue/80'
+                           : 'bg-st-box text-st-muted cursor-not-allowed'
+                       }`}
+                     >
+                       다음
+                     </button>
+                   </div>
                  )}
-               </div>
-             </form>
+
+                 {/* Step 2: When & Where */}
+                 {wizardStep === 2 && (
+                   <div className="animate-fade-in space-y-4">
+                     <div className="mb-2">
+                       <h3 className="text-xl font-bold text-st-ink">언제, 어디에서 만나시나요?</h3>
+                       <p className="text-sm text-st-muted mt-1">날짜와 시간을 정해주세요.</p>
+                     </div>
+
+                     <div className="grid grid-cols-2 gap-3">
+                       <div>
+                         <label className="block text-xs font-bold text-st-muted uppercase mb-1">날짜</label>
+                         <input type="date" value={formDate} onChange={(e) => setFormDate(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-blue/30 focus:border-st-blue/30 text-sm" />
+                       </div>
+                       <div>
+                         <label className="block text-xs font-bold text-st-muted uppercase mb-1">시간</label>
+                         <input type="time" value={formTime} onChange={(e) => setFormTime(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-blue/30 focus:border-st-blue/30 text-sm text-left" />
+                       </div>
+                     </div>
+
+                     <div>
+                       <label className="block text-xs font-bold text-st-muted uppercase mb-1">장소</label>
+                       <input type="text" value={formLocation} onChange={(e) => setFormLocation(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-blue/30 focus:border-st-blue/30 text-base" placeholder="예: 강남역 스타벅스" />
+                       <p className="text-[11px] text-st-muted mt-1.5">장소를 입력하면 AI가 더 맞춤형 대화 주제를 준비해요.</p>
+                     </div>
+
+                     <button
+                       type="button"
+                       onClick={() => setWizardStep(3)}
+                       disabled={!formDate || !formTime}
+                       className={`w-full py-3 font-bold rounded-xl transition-all ${
+                         formDate && formTime
+                           ? 'bg-st-blue text-white hover:bg-st-blue/80'
+                           : 'bg-st-box text-st-muted cursor-not-allowed'
+                       }`}
+                     >
+                       다음
+                     </button>
+                   </div>
+                 )}
+
+                 {/* Step 3: Enrichment */}
+                 {wizardStep === 3 && (
+                   <div className="animate-fade-in space-y-4">
+                     <div className="mb-2">
+                       <h3 className="text-xl font-bold text-st-ink">이 미팅에 대해 더 알려주실래요?</h3>
+                       <p className="text-sm text-st-muted mt-1">메모를 남겨주시면 AI가 더 정확한 스몰토크 가이드를 준비합니다.</p>
+                     </div>
+
+                     <div>
+                       <label className="block text-xs font-bold text-st-muted uppercase mb-1">미팅 안건 / 목적</label>
+                       <textarea
+                         value={formAgenda}
+                         onChange={(e) => setFormAgenda(e.target.value)}
+                         className="w-full p-3 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-blue/30 focus:border-st-blue/30 text-sm min-h-[80px] resize-none"
+                         placeholder="예: 신규 프로젝트 제안, 분기 실적 논의..."
+                       />
+                     </div>
+
+                     <div>
+                       <label className="block text-xs font-bold text-st-muted uppercase mb-1">키워드</label>
+                       <input
+                         type="text"
+                         value={formKeywords}
+                         onChange={(e) => setFormKeywords(e.target.value)}
+                         className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-blue/30 focus:border-st-blue/30 text-sm"
+                         placeholder="쉼표로 구분 (예: 골프, 투자, AI)"
+                       />
+                     </div>
+
+                     <button
+                       type="button"
+                       onClick={() => handleSubmit()}
+                       className="w-full py-3 bg-st-blue text-white font-bold rounded-xl hover:bg-st-blue/80 transition-all"
+                     >
+                       저장하기
+                     </button>
+                     <button
+                       type="button"
+                       onClick={() => { setFormAgenda(""); setFormKeywords(""); handleSubmit(); }}
+                       className="w-full py-2 text-st-muted font-semibold text-sm hover:text-st-ink transition-colors"
+                     >
+                       건너뛰기
+                     </button>
+                   </div>
+                 )}
+               </>
+             )}
            </div>
          </div>
        )}

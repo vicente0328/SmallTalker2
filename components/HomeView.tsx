@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { UserProfile, Meeting, Contact } from '../types';
 import { CURRENT_DATE } from '../constants';
 import Avatar from './Avatar';
+import ChipGroup from './ChipGroup';
 
 interface HomeViewProps {
   user: UserProfile;
@@ -13,6 +14,7 @@ interface HomeViewProps {
   onNavigateToCalendar?: () => void;
   onNavigateToContacts?: () => void;
   onRestartTour?: () => void;
+  onUpdateMeetingNote?: (meetingId: string, note: string) => void;
 }
 
 interface QuickProfile {
@@ -42,58 +44,6 @@ const GENDER_OPTIONS = ['남성', '여성'];
 const HOBBY_OPTIONS = ['골프', '테니스', '위스키', '기타'];
 const RELATION_OPTIONS = ['비즈니스', '가족', '친구', '기타'];
 
-const ChipGroup: React.FC<{
-  label: string;
-  options: string[];
-  selected: string;
-  onSelect: (v: string) => void;
-  customValue?: string;
-  onCustomChange?: (v: string) => void;
-  customPlaceholder?: string;
-  isTextInput?: boolean;
-  textValue?: string;
-  onTextChange?: (v: string) => void;
-  textPlaceholder?: string;
-}> = ({ label, options, selected, onSelect, customValue, onCustomChange, customPlaceholder, isTextInput, textValue, onTextChange, textPlaceholder }) => (
-  <div className="space-y-2">
-    <p className="text-xs font-bold text-st-muted uppercase tracking-wider">{label}</p>
-    {isTextInput ? (
-      <input
-        type="text"
-        value={textValue || ''}
-        onChange={(e) => onTextChange?.(e.target.value)}
-        placeholder={textPlaceholder}
-        className="w-full px-4 py-2.5 bg-st-bg border border-st-box/50 rounded-xl text-sm text-st-ink placeholder-st-muted focus:outline-none focus:ring-2 focus:ring-st-box focus:border-transparent transition"
-      />
-    ) : (
-      <div className="flex flex-wrap gap-2">
-        {options.map(opt => (
-          <button
-            key={opt}
-            onClick={() => onSelect(opt)}
-            className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${
-              selected === opt
-                ? 'bg-st-blue text-white shadow-sm'
-                : 'bg-st-bg text-st-ink hover:bg-st-box/50'
-            }`}
-          >
-            {opt}
-          </button>
-        ))}
-      </div>
-    )}
-    {selected === '기타' && onCustomChange && (
-      <input
-        type="text"
-        value={customValue || ''}
-        onChange={(e) => onCustomChange(e.target.value)}
-        placeholder={customPlaceholder}
-        className="w-full mt-1 px-4 py-2.5 bg-st-bg border border-st-box rounded-xl text-sm text-st-ink placeholder-st-muted focus:outline-none focus:ring-2 focus:ring-st-box focus:border-transparent transition"
-      />
-    )}
-  </div>
-);
-
 // Helper: detect already-known fields from a contact
 const detectExisting = (contact: Contact | null | undefined) => {
   if (!contact) return { ageRange: '', gender: '', industry: '', hobby: '', relationship: '' };
@@ -110,9 +60,22 @@ const detectExisting = (contact: Contact | null | undefined) => {
   };
 };
 
-const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectMeeting, onUpdateContact, onAddContact, onNavigateToCalendar, onNavigateToContacts, onRestartTour }) => {
+// Web Speech API support check
+const SpeechRecognition = typeof window !== 'undefined'
+  ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+  : null;
+
+const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectMeeting, onUpdateContact, onAddContact, onNavigateToCalendar, onNavigateToContacts, onRestartTour, onUpdateMeetingNote }) => {
   const [profile, setProfile] = useState<QuickProfile>(INITIAL_PROFILE);
   const [submitted, setSubmitted] = useState(false);
+
+  // Voice memo states
+  const [isRecording, setIsRecording] = useState(false);
+  const [voiceText, setVoiceText] = useState('');
+  const [interimText, setInterimText] = useState('');
+  const [showVoiceMemo, setShowVoiceMemo] = useState(false);
+  const [voiceSaved, setVoiceSaved] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   // 가입 후 7일 이내인지 확인
   const isNewUser = (() => {
@@ -121,6 +84,72 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
     const elapsed = Date.now() - parseInt(signupTime, 10);
     return elapsed < 7 * 24 * 60 * 60 * 1000; // 7일
   })();
+
+  const startRecording = useCallback(() => {
+    if (!SpeechRecognition) return;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ko-KR';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event: any) => {
+      let final = '';
+      let interim = '';
+      for (let i = 0; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          final += transcript + ' ';
+        } else {
+          interim += transcript;
+        }
+      }
+      if (final) setVoiceText(prev => (prev + final).trim());
+      setInterimText(interim);
+    };
+
+    recognition.onerror = () => {
+      setIsRecording(false);
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsRecording(true);
+    setShowVoiceMemo(true);
+  }, []);
+
+  const stopRecording = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+    }
+    setIsRecording(false);
+    setInterimText('');
+  }, []);
+
+  const handleSaveVoiceMemo = useCallback((meetingId: string, existingNote?: string) => {
+    if (!voiceText.trim() || !onUpdateMeetingNote) return;
+    const newNote = existingNote
+      ? `${existingNote}\n\n${voiceText.trim()}`
+      : voiceText.trim();
+    onUpdateMeetingNote(meetingId, newNote);
+    setVoiceSaved(true);
+    setTimeout(() => {
+      setShowVoiceMemo(false);
+      setVoiceText('');
+      setVoiceSaved(false);
+    }, 1500);
+  }, [voiceText, onUpdateMeetingNote]);
+
+  const handleCancelVoiceMemo = useCallback(() => {
+    stopRecording();
+    setShowVoiceMemo(false);
+    setVoiceText('');
+    setInterimText('');
+  }, [stopRecording]);
 
   const upcomingMeetings = meetings
     .filter(m => new Date(m.date) >= CURRENT_DATE)
@@ -327,10 +356,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
 
       {/* Previous Schedule Card */}
       {lastMeeting && lastMeetingContact && (
-      <section
-        onClick={() => onSelectMeeting(lastMeeting)}
-        className="mt-6 relative w-full bg-white rounded-2xl shadow-sm cursor-pointer active:scale-[0.98] transition-all group overflow-hidden shrink-0"
-      >
+      <section className="mt-6 relative w-full bg-white rounded-2xl shadow-sm overflow-hidden shrink-0">
         <div className="p-5 md:p-6">
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-st-bg text-[10px] md:text-xs font-bold text-st-muted mb-3 tracking-wide">
             <span className="w-1.5 h-1.5 rounded-full bg-st-muted"></span>
@@ -341,7 +367,95 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
             지난 만남은 어떠셨나요? 공유해주시는 내용을 바탕으로 다음 만남을 더욱 세심하게 준비하겠습니다.
           </p>
 
-          <div className="flex items-center gap-3 bg-st-bg p-3 md:p-4 rounded-xl">
+          {/* Voice Memo Section */}
+          {SpeechRecognition && onUpdateMeetingNote && !showVoiceMemo && (
+            <button
+              onClick={(e) => { e.stopPropagation(); startRecording(); }}
+              className="w-full flex items-center justify-center gap-2.5 px-4 py-3 mb-4 bg-st-blue/8 text-st-blue text-sm font-semibold rounded-xl hover:bg-st-blue/15 active:scale-[0.98] transition-all"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8m-4-16a3 3 0 00-3 3v4a3 3 0 006 0V6a3 3 0 00-3-3z" />
+              </svg>
+              음성으로 기록하기
+            </button>
+          )}
+
+          {showVoiceMemo && (
+            <div className="mb-4 space-y-3" onClick={(e) => e.stopPropagation()}>
+              {voiceSaved ? (
+                <div className="flex items-center justify-center gap-2 py-6">
+                  <div className="w-10 h-10 bg-st-green rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-bold text-st-ink">저장되었습니다!</p>
+                </div>
+              ) : (
+                <>
+                  {/* Recording indicator */}
+                  {isRecording && (
+                    <div className="flex items-center gap-3 px-4 py-3 bg-st-red/8 rounded-xl">
+                      <span className="w-3 h-3 rounded-full bg-st-red animate-pulse"></span>
+                      <span className="text-sm font-semibold text-st-red">듣고 있습니다...</span>
+                      <button
+                        onClick={stopRecording}
+                        className="ml-auto px-3.5 py-1.5 bg-st-red text-white text-xs font-bold rounded-lg hover:bg-st-red/80 transition-all"
+                      >
+                        정지
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Transcribed text area */}
+                  <textarea
+                    className="w-full bg-st-bg border border-st-box/50 p-4 rounded-xl min-h-[100px] text-sm text-st-ink placeholder-st-muted focus:outline-none focus:ring-2 focus:ring-st-blue/30 focus:border-st-blue/30 transition resize-none"
+                    value={voiceText + (interimText ? (voiceText ? ' ' : '') + interimText : '')}
+                    onChange={(e) => { setVoiceText(e.target.value); setInterimText(''); }}
+                    placeholder={isRecording ? '음성이 여기에 텍스트로 변환됩니다...' : '변환된 텍스트를 확인하고 수정할 수 있습니다.'}
+                  />
+
+                  {/* Action buttons */}
+                  {!isRecording && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleCancelVoiceMemo}
+                        className="flex-1 py-2.5 text-sm font-semibold text-st-muted bg-st-bg rounded-xl hover:bg-st-box/50 transition-all"
+                      >
+                        취소
+                      </button>
+                      <button
+                        onClick={() => startRecording()}
+                        className="px-4 py-2.5 text-sm font-semibold text-st-blue bg-st-blue/8 rounded-xl hover:bg-st-blue/15 transition-all flex items-center gap-1.5"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8m-4-16a3 3 0 00-3 3v4a3 3 0 006 0V6a3 3 0 00-3-3z" />
+                        </svg>
+                        다시 녹음
+                      </button>
+                      <button
+                        onClick={() => handleSaveVoiceMemo(lastMeeting.id, lastMeeting.userNote)}
+                        disabled={!voiceText.trim()}
+                        className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${
+                          voiceText.trim()
+                            ? 'bg-st-blue text-white hover:bg-st-blue/80'
+                            : 'bg-st-box text-st-muted cursor-not-allowed'
+                        }`}
+                      >
+                        저장하기
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Meeting info — clickable to detail */}
+          <div
+            onClick={() => onSelectMeeting(lastMeeting)}
+            className="flex items-center gap-3 bg-st-bg p-3 md:p-4 rounded-xl cursor-pointer hover:bg-st-box/50 active:scale-[0.98] transition-all group"
+          >
             <Avatar src={lastMeetingContact.avatarUrl} name={lastMeetingContact.name} size={40} className="md:!w-11 md:!h-11 border-2 border-white shadow-sm" />
             <div className="min-w-0 flex-1">
               <p className="text-st-ink font-bold text-sm md:text-base truncate">{lastMeeting.title}</p>

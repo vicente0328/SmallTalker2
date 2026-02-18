@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react';
 import { Contact } from '../types';
 import ContextualTip from './ContextualTip';
 import Avatar from './Avatar';
+import ChipGroup from './ChipGroup';
 
 interface ContactListViewProps {
   contacts: Contact[];
@@ -65,6 +66,20 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
   const [formBusinessInterests, setFormBusinessInterests] = useState("");
   const [formLifestyleInterests, setFormLifestyleInterests] = useState("");
   const [formPersonality, setFormPersonality] = useState("");
+
+  // Wizard state
+  const [wizardStep, setWizardStep] = useState(1);
+  const [formAgeRange, setFormAgeRange] = useState("");
+  const [formGender, setFormGender] = useState("");
+  const [formHobby, setFormHobby] = useState("");
+  const [formHobbyCustom, setFormHobbyCustom] = useState("");
+  const [formRelationship, setFormRelationship] = useState("");
+  const [formRelationshipCustom, setFormRelationshipCustom] = useState("");
+
+  const AGE_OPTIONS = ['20대', '30대', '40대', '50대', '그 외'];
+  const GENDER_OPTIONS = ['남성', '여성'];
+  const HOBBY_OPTIONS = ['골프', '테니스', '위스키', '기타'];
+  const RELATION_OPTIONS = ['비즈니스', '가족', '친구', '기타'];
 
   const vcfInputRef = useRef<HTMLInputElement>(null);
 
@@ -169,12 +184,24 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
     setFormBusinessInterests("");
     setFormLifestyleInterests("");
     setFormPersonality("");
+    setWizardStep(1);
+    setFormAgeRange("");
+    setFormGender("");
+    setFormHobby("");
+    setFormHobbyCustom("");
+    setFormRelationship("");
+    setFormRelationshipCustom("");
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!formName) return;
+
+    const hobbyValue = formHobby === '기타' ? formHobbyCustom.trim() : formHobby;
+    const relationValue = formRelationship === '기타' ? formRelationshipCustom.trim() : formRelationship;
+    const enrichTags = [formAgeRange, formGender, relationValue].filter(Boolean);
+    const enrichPersonality = [formAgeRange, formGender].filter(Boolean).join(', ');
 
     const newContact: Contact = {
         id: `c-${Date.now()}`,
@@ -183,15 +210,15 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
         role: formRole.trim() || "Unknown",
         phoneNumber: formPhone,
         email: formEmail,
-        tags: formTags.split(',').map(s => s.trim()).filter(s => s),
+        tags: [...formTags.split(',').map(s => s.trim()).filter(s => s), ...enrichTags],
         interests: {
             business: formBusinessInterests.split(',').map(s => s.trim()).filter(s => s),
-            lifestyle: formLifestyleInterests.split(',').map(s => s.trim()).filter(s => s),
+            lifestyle: [...formLifestyleInterests.split(',').map(s => s.trim()).filter(s => s), ...(hobbyValue ? [hobbyValue] : [])],
         },
-        personality: formPersonality,
+        personality: enrichPersonality || formPersonality,
         contactFrequency: "Unknown",
         avatarUrl: '',
-        relationshipType: "",
+        relationshipType: relationValue || "",
         meetingFrequency: "",
     };
 
@@ -343,46 +370,156 @@ const ContactListView: React.FC<ContactListViewProps> = ({ contacts, onSelectCon
       {isModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center glass-overlay p-4 animate-fade-in">
             <div className="glass rounded-2xl w-full max-w-md p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-                <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-bold text-st-ink">New Contact</h3>
-                    <button onClick={() => setIsModalOpen(false)} className="text-st-muted hover:text-st-ink">
-                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+
+                {/* Header: back + step dots + close */}
+                <div className="flex items-center justify-between mb-5">
+                  {wizardStep > 1 ? (
+                    <button onClick={() => setWizardStep(wizardStep - 1)} className="p-1 text-st-muted hover:text-st-ink transition-colors">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                     </button>
+                  ) : <div className="w-7" />}
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3].map(s => (
+                      <div key={s} className={`h-1.5 rounded-full transition-all duration-300 ${s === wizardStep ? 'w-6 bg-st-blue' : s < wizardStep ? 'w-1.5 bg-st-ink' : 'w-1.5 bg-st-box'}`} />
+                    ))}
+                  </div>
+                  <button onClick={() => setIsModalOpen(false)} className="p-1 text-st-muted hover:text-st-ink transition-colors">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-bold text-st-muted uppercase mb-1">Name *</label>
-                            <input type="text" value={formName} onChange={(e) => setFormName(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-base" placeholder="홍길동" required />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-st-muted uppercase mb-1">Company</label>
-                            <input type="text" value={formCompany} onChange={(e) => setFormCompany(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-base" placeholder="(주)회사명" />
-                        </div>
+                {/* Step 1: Who */}
+                {wizardStep === 1 && (
+                  <div className="animate-fade-in space-y-4">
+                    <div className="mb-2">
+                      <h3 className="text-xl font-bold text-st-ink">어떤 분을 등록하시나요?</h3>
+                      <p className="text-sm text-st-muted mt-1">이름만 알려주셔도 괜찮아요.</p>
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-st-muted uppercase mb-1">Role</label>
-                        <input type="text" value={formRole} onChange={(e) => setFormRole(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-base" placeholder="직함" />
+                      <label className="block text-xs font-bold text-st-muted uppercase mb-1">이름 *</label>
+                      <input type="text" value={formName} onChange={(e) => setFormName(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-blue/30 focus:border-st-blue/30 text-base" placeholder="홍길동" autoFocus />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-bold text-st-muted uppercase mb-1">Phone</label>
-                            <input type="tel" value={formPhone} onChange={(e) => setFormPhone(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-base" placeholder="010-0000-0000" />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-st-muted uppercase mb-1">Email</label>
-                            <input type="email" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-muted text-base" placeholder="example@mail.com" />
-                        </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-st-muted uppercase mb-1">회사</label>
+                        <input type="text" value={formCompany} onChange={(e) => setFormCompany(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-blue/30 focus:border-st-blue/30 text-base" placeholder="(주)회사명" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-st-muted uppercase mb-1">직함</label>
+                        <input type="text" value={formRole} onChange={(e) => setFormRole(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-blue/30 focus:border-st-blue/30 text-base" placeholder="직함" />
+                      </div>
                     </div>
 
-                    <div className="flex gap-3 pt-4">
-                        <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 bg-st-box text-st-muted font-bold rounded-xl">취소</button>
-                        <button type="submit" className="flex-1 py-3 bg-st-blue text-white font-bold rounded-xl transition-all shadow-md active:scale-95">추가하기</button>
+                    <button
+                      type="button"
+                      onClick={() => setWizardStep(2)}
+                      disabled={!formName.trim()}
+                      className={`w-full py-3 font-bold rounded-xl transition-all ${
+                        formName.trim()
+                          ? 'bg-st-blue text-white hover:bg-st-blue/80'
+                          : 'bg-st-box text-st-muted cursor-not-allowed'
+                      }`}
+                    >
+                      다음
+                    </button>
+                  </div>
+                )}
+
+                {/* Step 2: Contact info */}
+                {wizardStep === 2 && (
+                  <div className="animate-fade-in space-y-4">
+                    <div className="mb-2">
+                      <h3 className="text-xl font-bold text-st-ink">연락처를 알고 계시면 알려주세요.</h3>
+                      <p className="text-sm text-st-muted mt-1">나중에 추가하셔도 됩니다.</p>
                     </div>
-                </form>
+
+                    <div>
+                      <label className="block text-xs font-bold text-st-muted uppercase mb-1">전화번호</label>
+                      <input type="tel" value={formPhone} onChange={(e) => setFormPhone(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-blue/30 focus:border-st-blue/30 text-base" placeholder="010-0000-0000" autoFocus />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-st-muted uppercase mb-1">이메일</label>
+                      <input type="email" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} className="w-full p-2.5 bg-st-bg rounded-xl border border-st-box focus:outline-none focus:ring-2 focus:ring-st-blue/30 focus:border-st-blue/30 text-base" placeholder="example@mail.com" />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setWizardStep(3)}
+                      className="w-full py-3 bg-st-blue text-white font-bold rounded-xl hover:bg-st-blue/80 transition-all"
+                    >
+                      다음
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setWizardStep(3)}
+                      className="w-full py-2 text-st-muted font-semibold text-sm hover:text-st-ink transition-colors"
+                    >
+                      건너뛰기
+                    </button>
+                  </div>
+                )}
+
+                {/* Step 3: Get to know them */}
+                {wizardStep === 3 && (
+                  <div className="animate-fade-in space-y-4">
+                    <div className="mb-2">
+                      <h3 className="text-xl font-bold text-st-ink">이 분에 대해 더 알려주실래요?</h3>
+                      <p className="text-sm text-st-muted mt-1">AI가 맞춤 대화 주제를 준비하는 데 도움이 돼요.</p>
+                    </div>
+
+                    <ChipGroup
+                      label="연령대"
+                      options={AGE_OPTIONS}
+                      selected={formAgeRange}
+                      onSelect={(v) => setFormAgeRange(v)}
+                    />
+
+                    <ChipGroup
+                      label="성별"
+                      options={GENDER_OPTIONS}
+                      selected={formGender}
+                      onSelect={(v) => setFormGender(v)}
+                    />
+
+                    <ChipGroup
+                      label="관심사 / 취미"
+                      options={HOBBY_OPTIONS}
+                      selected={formHobby}
+                      onSelect={(v) => { setFormHobby(v); if (v !== '기타') setFormHobbyCustom(''); }}
+                      customValue={formHobbyCustom}
+                      onCustomChange={(v) => setFormHobbyCustom(v)}
+                      customPlaceholder="취미를 직접 입력해주세요"
+                    />
+
+                    <ChipGroup
+                      label="나와의 관계"
+                      options={RELATION_OPTIONS}
+                      selected={formRelationship}
+                      onSelect={(v) => { setFormRelationship(v); if (v !== '기타') setFormRelationshipCustom(''); }}
+                      customValue={formRelationshipCustom}
+                      onCustomChange={(v) => setFormRelationshipCustom(v)}
+                      customPlaceholder="관계를 직접 입력해주세요"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => handleSubmit()}
+                      className="w-full py-3 bg-st-blue text-white font-bold rounded-xl hover:bg-st-blue/80 transition-all"
+                    >
+                      저장하기
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setFormAgeRange(""); setFormGender(""); setFormHobby(""); setFormRelationship(""); handleSubmit(); }}
+                      className="w-full py-2 text-st-muted font-semibold text-sm hover:text-st-ink transition-colors"
+                    >
+                      건너뛰기
+                    </button>
+                  </div>
+                )}
             </div>
         </div>
       )}

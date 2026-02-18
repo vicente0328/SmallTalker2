@@ -342,7 +342,7 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (currentView) {
       case ViewState.HOME:
-        return <HomeView user={user} meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onUpdateContact={handleUpdateContact} onAddContact={handleAddContact} onNavigateToCalendar={() => setView(ViewState.CALENDAR)} onNavigateToContacts={() => setView(ViewState.CONTACT_LIST)} onRestartTour={handleRestartTour} />;
+        return <HomeView user={user} meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onUpdateContact={handleUpdateContact} onAddContact={handleAddContact} onNavigateToCalendar={() => setView(ViewState.CALENDAR)} onNavigateToContacts={() => setView(ViewState.CONTACT_LIST)} onRestartTour={handleRestartTour} onUpdateMeetingNote={handleUpdateMeetingNote} />;
       case ViewState.CALENDAR:
         return <CalendarView meetings={meetings} contacts={contacts} onSelectMeeting={handleSelectMeeting} onAddMeeting={handleAddMeeting} onEditMeeting={handleEditMeeting} onDeleteMeeting={handleDeleteMeeting} onAddContact={handleAddContact} dismissedTips={dismissedTips} onDismissTip={handleDismissTip} />;
       case ViewState.MEETING_DETAIL:
