@@ -226,40 +226,8 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
   const [assistantInterim, setAssistantInterim] = useState('');
   const [assistantAnswer, setAssistantAnswer] = useState('');
   const [assistantLoading, setAssistantLoading] = useState(false);
-  const [assistantSpeaking, setAssistantSpeaking] = useState(false);
   const [suggestedContact, setSuggestedContact] = useState<Contact | null>(null);
   const assistantRecRef = useRef<any>(null);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-
-  // Select best Korean TTS voice
-  const getBestKoreanVoice = useCallback((): SpeechSynthesisVoice | null => {
-    if (!('speechSynthesis' in window)) return null;
-    const voices = window.speechSynthesis.getVoices();
-    // Prefer premium/enhanced voices
-    const koreanVoices = voices.filter(v => v.lang.startsWith('ko'));
-    const premium = koreanVoices.find(v => /premium|enhanced|natural|yuna|heami/i.test(v.name));
-    if (premium) return premium;
-    // Prefer non-default local voice
-    const local = koreanVoices.find(v => v.localService);
-    if (local) return local;
-    return koreanVoices[0] || null;
-  }, []);
-
-  const speakText = useCallback((text: string) => {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'ko-KR';
-    utter.rate = 0.95;
-    utter.pitch = 1.05;
-    const voice = getBestKoreanVoice();
-    if (voice) utter.voice = voice;
-    utter.onstart = () => setAssistantSpeaking(true);
-    utter.onend = () => setAssistantSpeaking(false);
-    utter.onerror = () => setAssistantSpeaking(false);
-    utteranceRef.current = utter;
-    window.speechSynthesis.speak(utter);
-  }, [getBestKoreanVoice]);
 
   const startAssistantListening = useCallback(() => {
     if (!SpeechRecognition) return;
@@ -321,25 +289,17 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
       setAssistantAnswer(result.answer);
       setSuggestedContact(result.suggestedContact || null);
       setAssistantLoading(false);
-      speakText(result.answer);
     }, 400);
-  }, [assistantQuery, user, meetings, contacts, speakText]);
+  }, [assistantQuery, user, meetings, contacts]);
 
   const handleAssistantClose = useCallback(() => {
     stopAssistantListening();
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-    setAssistantSpeaking(false);
     setAssistantOpen(false);
     setAssistantQuery('');
     setAssistantAnswer('');
     setAssistantInterim('');
     setSuggestedContact(null);
   }, [stopAssistantListening]);
-
-  const stopSpeaking = useCallback(() => {
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-    setAssistantSpeaking(false);
-  }, []);
 
   // 가입 후 7일 이내인지 확인
   const isNewUser = (() => {
@@ -690,28 +650,6 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                 )}
 
                 <div className="flex items-center gap-2">
-                  {assistantSpeaking ? (
-                    <button
-                      onClick={stopSpeaking}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-st-blue/10 text-st-blue text-xs font-semibold rounded-lg hover:bg-st-blue/20 transition-colors"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10h6v4H9z" />
-                      </svg>
-                      읽기 중지
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => speakText(assistantAnswer)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-st-bg text-st-muted text-xs font-semibold rounded-lg hover:bg-st-box/50 border border-st-box/50 transition-colors"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                      </svg>
-                      다시 듣기
-                    </button>
-                  )}
                   <button
                     onClick={() => { setAssistantQuery(''); setAssistantAnswer(''); setSuggestedContact(null); }}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-st-bg text-st-muted text-xs font-semibold rounded-lg hover:bg-st-box/50 border border-st-box/50 transition-colors"
