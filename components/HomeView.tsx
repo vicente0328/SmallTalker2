@@ -634,7 +634,7 @@ const HomeView: React.FC<HomeViewProps> = ({ user, meetings, contacts, onSelectM
                 </button>
               )}
               <button
-                onClick={handleAssistantAsk}
+                onClick={() => handleAssistantAsk()}
                 disabled={!assistantQuery.trim() || assistantLoading}
                 className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0 ${
                   assistantQuery.trim() && !assistantLoading
