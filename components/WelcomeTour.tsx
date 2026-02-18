@@ -4,7 +4,7 @@ import { ViewState } from '../types';
 
 interface WelcomeTourProps {
   userName: string;
-  onComplete: () => void;
+  onComplete: (navigateToView?: ViewState) => void;
   setView: (view: ViewState) => void;
 }
 
@@ -170,10 +170,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ userName, onComplete, setView
   };
 
   const handleActionWithNav = () => {
-    onComplete();
-    if (current.targetView) {
-      setView(current.targetView);
-    }
+    onComplete(current.targetView ?? undefined);
   };
 
   const dragOpacity = Math.max(0.5, 1 - Math.abs(dragX) / 600);

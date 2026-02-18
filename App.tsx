@@ -117,6 +117,8 @@ const App: React.FC = () => {
             .single();
           if (insertError) console.error("User profile insert error:", insertError);
           if (newProfile) userData = newProfile;
+          // 신규 가입 시 투어 플래그 초기화 → 반드시 Welcome Tour 표시
+          localStorage.removeItem('smalltalker_tour_done');
         }
 
         const { data: contactsData } = await supabase.from('contacts').select('*');
@@ -134,21 +136,24 @@ const App: React.FC = () => {
     fetchData();
   }, [session]);
 
-  // Welcome tour: show on first login
+  // Welcome tour: show on first login — always start on HOME
   useEffect(() => {
     if (loading || !session) return;
     const tourDone = localStorage.getItem('smalltalker_tour_done');
     if (!tourDone) {
+      setView(ViewState.HOME);
       setShowWelcomeTour(true);
     }
   }, [loading, session]);
 
-  const handleCompleteTour = () => {
+  const handleCompleteTour = (navigateToView?: ViewState) => {
     setShowWelcomeTour(false);
     localStorage.setItem('smalltalker_tour_done', 'true');
     if (!localStorage.getItem('smalltalker_signup_time')) {
       localStorage.setItem('smalltalker_signup_time', Date.now().toString());
     }
+    // 특정 뷰로 이동 요청이 없으면 홈으로 복귀
+    setView(navigateToView ?? ViewState.HOME);
   };
 
   const handleRestartTour = () => {
